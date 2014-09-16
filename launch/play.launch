@@ -1,0 +1,7 @@
+<launch>
+
+	<arg name="title" default="default_title" />	
+			
+	<node pkg="rosbag" type="play" name="playBag" output="screen" args="$(find human_cognition)/records/$(arg title).bag"/>	
+			
+</launch>	
