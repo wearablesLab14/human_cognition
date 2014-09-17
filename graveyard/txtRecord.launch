@@ -1,0 +1,56 @@
+<launch>
+
+	<arg name="title" default="default_title" />
+
+	<rosparam command="load" file="$(find bp1human)/launch/parameter/parameterTopics.yaml" />
+	<rosparam command="load" file="$(find bp1human)/launch/parameter/parameterRecordPlayTxt.yaml" />
+	
+	<param name="title" value="$(arg title)" type="str" />
+	<param name="recordsTxtPath" value="$(find bp1human)/records/txt/" type="str" />	
+
+	<arg name="nodeType" default="nodeTxtRecord" />		
+	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_00" output="screen" >			
+		<param name="numbering" value="0" type="int" />	 			
+	</node>		
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_01" output="screen" >			 	 	
+		<param name="numbering" value="1" type="int" />			 			
+	</node>		
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_02" output="screen" >		 		
+		<param name="numbering" value="2" type="int" />			 			
+	</node>	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_03" output="screen" >		 		
+		<param name="numbering" value="3" type="int" />		 			
+	</node>	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_04" output="screen" >		
+	 	<param name="numbering" value="4" type="int" />	 			
+	</node>	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_05" output="screen" >		
+	 	<param name="numbering" value="5" type="int" />		 			
+	</node>		
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_06" output="screen" >		
+	 	<param name="numbering" value="6" type="int" />		 			
+	</node>		
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_07" output="screen" >		
+	 	<param name="numbering" value="7" type="int" />		 			
+	</node>			
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_08" output="screen" >		
+	 	<param name="numbering" value="8" type="int" />				 			
+	</node>	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_09" output="screen" >		
+	 	<param name="numbering" value="9" type="int" />				 			
+	</node>	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_10" output="screen" >		
+	 	<param name="numbering" value="10" type="int" />			 			
+	</node>	
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_11" output="screen" >		
+	 	<param name="numbering" value="11" type="int" />				 			
+	</node>		
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_12" output="screen" >		
+	 	<param name="numbering" value="12" type="int" />				 			
+	</node>		
+	<node pkg="bp1human" type="$(arg nodeType)" name="$(arg nodeType)_13" output="screen" >		
+	 	<param name="numbering" value="13" type="int" />			 			
+	</node>						
+
+</launch>	

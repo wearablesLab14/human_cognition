@@ -1,6 +1,6 @@
 <launch>
 						
-	<param name="robot_description" textfile="$(find human_cognition)/model/human_realSize.urdf" />
+	<param name="robot_description" textfile="$(find human_cognition)/model/human_real_size.urdf" />
 	
 	<node name="rviz" pkg="rviz" type="rviz" output="screen" args="-d $(find human_cognition)/ui/rviz_config.rviz" required="true" />	
 		

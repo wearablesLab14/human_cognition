@@ -78,6 +78,29 @@ void QNode::shutdownNode() {
 
 /**
  *
+ * @param frame_index
+ * @return
+ */
+DisplayLevel QNode::getLevelForFrame(const int &frame_index) {
+
+	DisplayLevel level;
+
+	if (frame_index < 2) {
+		level = FRAME01;
+	} else if(frame_index < 5) {
+		level = FRAME234;
+	} else if(frame_index < 8) {
+		level = FRAME567;
+	} else if(frame_index < 11) {
+		level = FRAME8910;
+	} else {
+		level = FRAME111213;
+	}
+	return level;
+}
+
+/**
+ *
  * @param level
  * @param info
  */
@@ -89,20 +112,36 @@ void QNode::display(const DisplayLevel &level, const QString &info) {
 
 	switch (level) {
 	case (INSTRUCTION): {
-		listViewItem->setData(QBrush(QColor(Qt::darkBlue)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(Qt::black)), Qt::ForegroundRole);
 		break;
 	}
 	case (INFO): {
-		listViewItem->setData(QBrush(QColor(Qt::darkGreen)),
+		listViewItem->setData(QBrush(QColor(Qt::darkCyan)),
 				Qt::ForegroundRole);
 		break;
 	}
 	case (ERROR): {
-		listViewItem->setData(QBrush(QColor(Qt::darkRed)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(Qt::darkMagenta)), Qt::ForegroundRole);
 		break;
 	}
-	case (ACTIVE_FRAME): {
-		listViewItem->setData(QBrush(QColor(Qt::darkCyan)), Qt::ForegroundRole);
+	case (FRAME01): {
+		listViewItem->setData(QBrush(QColor(5,14,64)), Qt::ForegroundRole);
+		break;
+	}
+	case (FRAME234): {
+		listViewItem->setData(QBrush(QColor(56,118,29)), Qt::ForegroundRole);
+		break;
+	}
+	case (FRAME567): {
+		listViewItem->setData(QBrush(QColor(180,95,6)), Qt::ForegroundRole);
+		break;
+	}
+	case (FRAME8910): {
+		listViewItem->setData(QBrush(QColor(255,0,0)), Qt::ForegroundRole);
+		break;
+	}
+	case (FRAME111213): {
+		listViewItem->setData(QBrush(QColor(153,0,255)), Qt::ForegroundRole);
 		break;
 	}
 	}

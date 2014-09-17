@@ -35,7 +35,7 @@
 #define TO_IGNORE_ADDRESS "---.---.-.---"
 
 enum DisplayLevel {
-	INSTRUCTION, INFO, ERROR, ACTIVE_FRAME
+	INSTRUCTION, INFO, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
 };
 
 struct SensorData {
@@ -66,6 +66,7 @@ public:
 	 ***********************************************/
 	bool initNode();
 	void shutdownNode();
+	DisplayLevel getLevelForFrame(const int &frame_index);
 	void display(const DisplayLevel &level, const QString &info);
 
 	/***********************************************

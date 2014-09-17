@@ -132,7 +132,7 @@ void QNodeListener::run() {
 						QString::number(
 								tf_joint_coordinates[display_coordinates_frame].getZ()));
 
-				display(ACTIVE_FRAME, msg);
+				display(getLevelForFrame(display_coordinates_frame), msg);
 
 				start_time = ros::Time::now();
 			}

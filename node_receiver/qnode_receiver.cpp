@@ -387,7 +387,8 @@ void QNodeReceiver::setFrameAddress(const int &frame_index, QString address) {
 		} else {
 			frame.append(QString::number(frame_index));
 		}
-		display(ACTIVE_FRAME, frame.append(QString(" >>> ")).append(address));
+
+		display(getLevelForFrame(frame_index), frame.append(QString(" >>> ")).append(address));
 	}
 }
 

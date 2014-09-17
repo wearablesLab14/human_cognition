@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogFrames</class>
+ <widget class="QDialog" name="DialogFrames">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>630</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>630</width>
+    <height>480</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>630</width>
+    <height>480</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Frames</string>
+  </property>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>611</width>
+     <height>461</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QGraphicsView" name="graphicsView"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

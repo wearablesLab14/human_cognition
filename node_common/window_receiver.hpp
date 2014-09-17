@@ -7,7 +7,8 @@
 
 #ifndef Q_MOC_RUN
 #include "node_common/ui_window_receiver.h"
-#include "node_common/dialog.hpp"
+#include "node_common/dialog_about.hpp"
+#include "node_common/dialog_frames.hpp"
 #include "../node_receiver/qnode_receiver.hpp"
 #endif
 
@@ -39,7 +40,7 @@ public Q_SLOTS:
 	void on_pushButtonRecord_clicked();
 	void on_pushButtonPlay_clicked();
 	void on_pushButtonAbout_clicked();
-	void on_pushButtonHelp_clicked();
+	void on_pushButtonFrames_clicked();
 	void on_pushButtonSwitch_clicked();
 	void on_checkBox_00_stateChanged(int state);
 	void on_checkBox_01_stateChanged(int state);
@@ -64,7 +65,6 @@ private:
 	 ***********************************************/
 	void frameSwitch(const int &frame_index_a, const int &frame_index_b);
 	void frameSelectChanged(const int &frame_index, int state);
-	void updateFrameViewColor(const int &frame_index);
 	void updateFrameAddressView(const int &frame_index);
 	void updateFrameHertzView(const int &frame_index);
 	void updateFrameInactivityView(const int &frame_index);
@@ -77,7 +77,8 @@ private:
 
 	Ui::WindowReceiverDesign ui_recv;
 	QNodeReceiver *qnode_recv;
-	Dialog test;
+	DialogAbout dialogAbout;
+	DialogFrames dialogFrames;
 
 	QCheckBox* frame_select_checkbox[NUMBER_OF_FRAMES];
 	QComboBox* frame_switch_combobox[NUMBER_OF_FRAMES];

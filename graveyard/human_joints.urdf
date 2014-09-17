@@ -1,0 +1,506 @@
+<?xml version="1.0" ?>
+<robot name="human_joints">
+
+<!--#########################################################-->
+<!--########################LINKS###########################-->
+<!--#########################################################-->
+
+<link name="base_link">
+	<origin xyz="0 0 0.5"/>
+</link>
+
+<!--########################CORE###########################-->
+<link name="core">
+	<visual>
+	<geometry>
+		<mesh filename="package://bp1human/model/meshes/body.dae" scale="0.6 0.6 0.6"/>
+		<!--cylinder length="1" radius="0.3"/>-->			
+	</geometry>
+	<origin xyz="0 0 0.2"/>
+	<material name="blue">
+	<color rgba="0 0 0.5 1"/>
+	</material>
+	</visual>	
+</link>
+
+<!--########################HEAD###########################-->
+<link name="head">
+	<visual>
+	<geometry>
+	<mesh filename="package://bp1human/model/meshes/head.dae" scale="1 1 1"/>
+	<!--<cylinder length="0.4" radius="0.2"/>-->
+	</geometry>
+	<origin xyz="0.15 0 -0.1" rpy="0 0 0"/>
+	<material name="white">
+	<color rgba="1 1 1 1"/>
+	</material>
+	</visual>
+</link>
+
+<!--########################UPPER-ARM###########################-->
+<link name="upper_arm_left">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/upper_arm.dae" scale="0.5 0.5 0.5"/>
+			<!--<cylinder length="0.5" radius="0.1"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.5" rpy="0 0 0"/>
+		<material name="dark_red">
+			<color rgba="0.5 0 0 1"/>
+		</material>		
+	</visual>	
+</link>
+
+<link name="upper_arm_right">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/upper_arm.dae" scale="0.5 0.5 0.5"/>
+			<!--<cylinder length="0.5" radius="0.1"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.5" rpy="0 0 0"/>
+		<material name="dark_red"/>
+	</visual>
+</link>
+
+<!--########################UNDER-ARM###########################-->
+<link name="under_arm_left">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/under_arm.dae" scale="0.5 0.5 0.5"/>
+			<!--<cylinder length="0.5" radius="0.1"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.5" rpy="0 0 0"/>
+		<material name="white"/>	
+	</visual>
+</link>
+<link name="under_arm_right">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/under_arm.dae" scale="0.5 0.5 0.5"/>
+			<!--<cylinder length="0.5" radius="0.1"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.5" rpy="0 0 0"/>
+		<material name="white"/>	
+	</visual>
+</link>
+
+<!--########################HAND###########################-->
+<link name="hand_left">
+	<visual>
+		<geometry>
+			<box size="0.3 0.2 0.15"/>
+		</geometry>
+		<origin xyz="0 0 -0.05" rpy="1.57 1.57 0"/>
+		<material name="dark_red"/>			
+	</visual>
+</link>
+
+<link name="hand_right">
+	<visual>
+		<geometry>
+			<box size="0.3 0.2 0.15"/>
+		</geometry>
+		<origin xyz="0 0 -0.05" rpy="1.57 1.57 0"/>
+		<material name="dark_red"/>	
+	</visual>
+</link>
+
+<!--########################UPPER-LEG###########################-->
+<link name="upper_leg_left">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/upper_leg.dae" scale="0.8 0.8 0.8"/>
+			<!--<cylinder length="0.8" radius="0.155"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.8" rpy="0 0 0"/>
+		<material name="dark_red"/>	
+	</visual>
+</link>
+
+<link name="upper_leg_right">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/upper_leg.dae" scale="0.8 0.8 0.8"/>
+			<!--<cylinder length="0.8" radius="0.155"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.8" rpy="0 0 0"/>
+		<material name="dark_red"/>
+	</visual>
+</link>
+
+<!--########################UNDER-LEG###########################-->
+<link name="under_leg_left">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/under_leg.dae" scale="0.7 0.7 0.7"/>
+			<!--<cylinder length="0.6" radius="0.125"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.7" rpy="0 0 0"/>
+		<material name="white"/>			
+	</visual>
+</link>
+
+<link name="under_leg_right">
+	<visual>
+		<geometry>
+			<mesh filename="package://bp1human/model/meshes/under_leg.dae" scale="0.7 0.7 0.7"/>
+			<!--<cylinder length="0.6" radius="0.125"/>-->
+		</geometry>
+		<origin xyz="0 0 -0.7" rpy="0 0 0"/>
+		<material name="white"/>	
+	</visual>
+</link>
+
+<!--########################FEET###########################-->
+<link name="foot_left">
+	<visual>
+		<geometry>			
+			<box size="0.4 0.2 0.15"/>
+		</geometry>
+		<origin xyz="0.15 0 0" rpy="0 0 0"/>
+		<material name="dark_red"/>			
+	</visual>
+</link>
+
+<link name="foot_right">
+	<visual>
+		<geometry>
+			<box size="0.4 0.2 0.15"/>
+		</geometry>
+		<origin xyz="0.15 0 0" rpy="0 0 0"/>
+		<material name="dark_red"/>	
+	</visual>
+</link>
+
+<!--#########################################################-->
+<!--#####################JOINT-LINKS#########################-->
+<!--#########################################################-->
+
+<link name="neck_1"> 			<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="neck_2"> 			<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="core_1"> 			<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="core_2"> 			<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_shoulder_1"> 	<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_shoulder_2"> 	<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_shoulder_1"> 	<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_shoulder_2"> 	<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_hand_1">		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_hand_1">		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_hip_1"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_hip_2"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_hip_1"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_hip_2"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_foot_1"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="left_foot_2"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_foot_1">		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+<link name="right_foot_2"> 		<origin xyz="0 0 0" rpy="0 0 0"/> </link>
+
+<!--#########################################################-->
+<!--########################JOINTS###########################-->
+<!--#########################################################-->
+
+<!--########################NECK###########################-->
+
+<!--###jointsB[0]###-->
+<joint name="b_neck_x" type="revolute">
+	<origin xyz="0 0 1"/>
+	<parent link="core"/>
+	<child link="neck_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="-0.78" upper="0.78" />
+</joint>
+
+<!--###jointsB[1]###-->
+<joint name="b_neck_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="neck_1"/>
+	<child link="neck_2"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-1.36" upper="1.36" />
+</joint>
+
+<!--###jointsB[2]###-->
+<joint name="b_neck_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="neck_2"/>
+	<child link="head"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="-1.57" upper="1.57" />
+</joint>
+
+<!--########################CORE###########################-->
+
+<!--###jointsB[3]###-->
+<joint name="b_core_x" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="base_link"/>
+	<child link="core_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="-1" upper="1.17" />
+</joint>
+
+<!--###jointsB[4]###-->
+<joint name="b_core_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="core_1"/>
+	<child link="core_2"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-1" upper="1.17" />
+</joint>
+
+<!--###jointsB[5]###-->
+<joint name="b_core_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="core_2"/>
+	<child link="core"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="-1" upper="1.17" />
+</joint>
+
+<!--########################SHOULDER###########################-->
+
+<!--###jointsL[0]###-->
+<joint name="l_shoulder_x" type="revolute">
+	<origin xyz="0 0.6 .95"/>
+	<parent link="core"/>
+	<child link="left_shoulder_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="-0.34" upper="3.14" />
+</joint>
+
+<!--###jointsL[1]###-->
+<joint name="l_shoulder_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_shoulder_2"/>
+	<child link="upper_arm_left"/>
+	<axis xyz="0 -1 0"/>
+	<limit effort="30" velocity="1.0" lower="-0.69" upper="2.96" />
+</joint>
+
+<!--###jointsL[2]###-->
+<joint name="l_shoulder_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_shoulder_1"/>
+	<child link="left_shoulder_2"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="-1.57" upper="1.57" />
+</joint>
+
+<!--###jointsR[0]###-->
+<joint name="r_shoulder_x" type="revolute">
+	<origin xyz="0 -0.6 0.95"/>
+	<parent link="core"/>
+	<child link="right_shoulder_1"/>
+	<axis xyz="-1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="-0.34" upper="3.14" />
+</joint>
+
+<!--###jointsR[1]###-->
+<joint name="r_shoulder_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_shoulder_2"/>
+	<child link="upper_arm_right"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-0.69" upper="2.96" />
+</joint>
+
+<!--###jointsR[2]###-->
+<joint name="r_shoulder_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_shoulder_1"/>
+	<child link="right_shoulder_2"/>
+	<axis xyz="0 0 -1"/>
+	<limit effort="30" velocity="1.0" lower="-1.57" upper="1.57" />
+</joint>
+
+<!--########################ELBOW###########################-->
+
+<!--###jointsL[3]###-->
+<joint name="l_elbow_y" type="revolute">
+	<origin xyz="0 0 -0.5"/>
+	<parent link="upper_arm_left"/>
+	<child link="under_arm_left"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-2.61" upper="0" />
+</joint>
+
+<!--###jointsR[3]###-->
+<joint name="r_elbow_y" type="revolute">
+	<origin xyz="0 0 -0.5"/>
+	<parent link="upper_arm_right"/>
+	<child link="under_arm_right"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-2.61" upper="0" />
+</joint>
+
+<!--########################WRIST###########################-->
+
+<!--###jointsL[4]###-->
+<joint name="l_wrist_x" type="revolute">
+	<origin xyz="0 0 -0.6"/>
+	<parent link="under_arm_left"/>
+	<child link="left_hand_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsL[5]###-->
+<joint name="l_wrist_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_hand_1"/>
+	<child link="hand_left"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsR[4]###-->
+<joint name="r_wrist_x" type="revolute">
+	<origin xyz="0 0 -0.6"/>
+	<parent link="under_arm_right"/>
+	<child link="right_hand_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsR[5]###-->
+<joint name="r_wrist_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_hand_1"/>
+	<child link="hand_right"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--########################HIP###########################-->
+
+<!--###jointsL[6]###-->
+<joint name="l_hip_x" type="revolute">
+	<origin xyz="0 0.2 0"/>
+	<parent link="base_link"/>
+	<child link="left_hip_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="0.0" upper="3.14" />
+</joint>
+
+<!--###jointsL[7]###-->
+<joint name="l_hip_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_hip_2"/>
+	<child link="upper_leg_left"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-3.14" upper="1.17" />
+</joint>
+
+<!--###jointsL[8]###-->
+<joint name="l_hip_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_hip_1"/>
+	<child link="left_hip_2"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="-0.73" upper="1.49" />
+</joint>
+
+<!--###jointsR[6]###-->
+<joint name="r_hip_x" type="revolute">
+	<origin xyz="0 -0.2 0"/>
+	<parent link="base_link"/>
+	<child link="right_hip_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="-3.14" upper="0.0" />
+</joint>
+
+<!--###jointsR[7]###-->
+<joint name="r_hip_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_hip_2"/>
+	<child link="upper_leg_right"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="-3.14" upper="1.17" />
+</joint>
+
+<!--###jointsR[8]###-->
+<joint name="r_hip_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_hip_1"/>
+	<child link="right_hip_2"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="-2.33" upper="0.9" />
+</joint>
+
+<!--########################KNEE###########################-->
+
+<!--###jointsL[9]###-->
+<joint name="l_knee_y" type="revolute">
+	<origin xyz="0 0 -0.8"/>
+	<parent link="upper_leg_left"/>
+	<child link="under_leg_left"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsR[9]###-->
+<joint name="r_knee_y" type="revolute">
+	<origin xyz="0 0 -0.8"/>
+	<parent link="upper_leg_right"/>
+	<child link="under_leg_right"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--########################ANKLE###########################-->
+
+<!--###jointsL[10]###-->
+<joint name="l_ankle_x" type="revolute">
+	<origin xyz="0 0 -0.725"/>
+	<parent link="under_leg_left"/>
+	<child link="left_foot_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsL[11]###-->
+<joint name="l_ankle_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_foot_1"/>
+	<child link="left_foot_2"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsL[12]###-->
+<joint name="l_ankle_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="left_foot_2"/>
+	<child link="foot_left"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsR[10]###-->
+<joint name="r_ankle_x" type="revolute">
+	<origin xyz="0 0 -0.725"/>
+	<parent link="under_leg_right"/>
+	<child link="right_foot_1"/>
+	<axis xyz="1 0 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsR[11]###-->
+<joint name="r_ankle_y" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_foot_1"/>
+	<child link="right_foot_2"/>
+	<axis xyz="0 1 0"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+<!--###jointsR[12]###-->
+<joint name="r_ankle_z" type="revolute">
+	<origin xyz="0 0 0"/>
+	<parent link="right_foot_2"/>
+	<child link="foot_right"/>
+	<axis xyz="0 0 1"/>
+	<limit effort="30" velocity="1.0" lower="0" upper="2.4" />
+</joint>
+
+</robot>

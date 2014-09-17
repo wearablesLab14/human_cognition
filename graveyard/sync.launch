@@ -1,0 +1,11 @@
+<launch>	
+	
+	<rosparam command="load" file="$(find bp1human)/launch/parameter/parameterTopicsKinematic.yaml" />	
+					
+	<node pkg="bp1human" type="nodeSync" name="nodeSync" output="screen" >
+		<param name="qSizeSub" value="10" type="int" />
+		<param name="qSizePub" value="0" type="int" />		
+		<param name="qSizeSyc" value="100" type="int" />										
+	</node>				
+							
+</launch>

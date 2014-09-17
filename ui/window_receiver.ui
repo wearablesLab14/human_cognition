@@ -30,7 +30,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Receiver</string>
+   <string>Human Cognition - Receiver</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -237,6 +237,14 @@
              <height>23</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string>04 l Hand</string>
            </property>
@@ -255,6 +263,18 @@
              <width>80</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string>06 l LoLe</string>
@@ -291,6 +311,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string>13 r Hand</string>
            </property>
@@ -309,6 +332,19 @@
              <width>80</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}
+</string>
            </property>
            <property name="text">
             <string>08 r UpAr</string>
@@ -342,6 +378,16 @@
              <height>23</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }
+
+</string>
+           </property>
            <property name="text">
             <string>02 l UpAr</string>
            </property>
@@ -360,6 +406,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
            </property>
            <property name="text">
             <string/>
@@ -386,6 +435,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -410,6 +462,9 @@
              <width>145</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -436,6 +491,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -460,6 +518,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -491,6 +552,9 @@
              <pointsize>11</pointsize>
             </font>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -518,8 +582,16 @@
            </property>
            <property name="font">
             <font>
+             <family>Liberation Mono</family>
              <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
             </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}
+</string>
            </property>
            <property name="text">
             <string>00 b Body</string>
@@ -539,6 +611,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -565,6 +640,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -590,6 +668,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string>01 b Head</string>
            </property>
@@ -608,6 +689,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -633,6 +717,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
            </property>
            <property name="text">
             <string/>
@@ -675,6 +762,19 @@
              <height>23</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}
+</string>
+           </property>
            <property name="text">
             <string>05 l UpLe</string>
            </property>
@@ -693,6 +793,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -764,6 +867,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -817,6 +923,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -872,6 +981,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -897,6 +1009,10 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}
+</string>
+           </property>
            <property name="text">
             <string>11 r UpLe</string>
            </property>
@@ -915,6 +1031,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -941,6 +1060,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -965,6 +1087,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -991,6 +1116,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1016,6 +1144,14 @@
              <height>23</height>
             </size>
            </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string>03 l LoAr</string>
            </property>
@@ -1035,6 +1171,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string>10 r Hand</string>
            </property>
@@ -1053,6 +1192,9 @@
              <width>145</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
            </property>
            <property name="text">
             <string/>
@@ -1079,6 +1221,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1103,6 +1248,18 @@
              <width>80</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+             <pointsize>11</pointsize>
+             <weight>50</weight>
+             <italic>false</italic>
+             <bold>false</bold>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string>07 l Foot</string>
@@ -1149,6 +1306,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1190,6 +1350,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string>09 r LoAr</string>
            </property>
@@ -1208,6 +1371,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1250,6 +1416,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1274,6 +1443,12 @@
              <width>145</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
+           <property name="inputMask">
+            <string/>
            </property>
            <property name="text">
             <string/>
@@ -1300,6 +1475,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1324,6 +1502,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1350,6 +1531,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1374,6 +1558,9 @@
              <width>16777215</width>
              <height>80</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLabel{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string>12 r LoLe</string>
@@ -1420,6 +1607,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1445,6 +1635,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1469,6 +1662,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1566,6 +1762,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1607,6 +1806,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1631,6 +1833,9 @@
              <width>145</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(153, 0, 255); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1657,6 +1862,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(5, 14, 64); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1681,6 +1889,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1758,6 +1969,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1796,6 +2010,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1820,6 +2037,9 @@
              <width>45</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1862,6 +2082,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1886,6 +2109,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(255, 0, 0); font: 11pt &quot;Liberation Mono&quot;;}</string>
            </property>
            <property name="text">
             <string/>
@@ -1912,6 +2138,9 @@
              <height>23</height>
             </size>
            </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(180, 95, 6); font: 11pt &quot;Liberation Mono&quot;;}</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -1936,6 +2165,9 @@
              <width>16777215</width>
              <height>23</height>
             </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QLineEdit{color : rgb(56, 118, 29); font: 11pt &quot;Liberation Mono&quot;; }</string>
            </property>
            <property name="text">
             <string/>
@@ -2252,7 +2484,7 @@
           </widget>
          </item>
          <item row="2" column="2">
-          <widget class="QPushButton" name="pushButtonHelp">
+          <widget class="QPushButton" name="pushButtonFrames">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -2271,7 +2503,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Help</string>
+            <string>Frames</string>
            </property>
           </widget>
          </item>

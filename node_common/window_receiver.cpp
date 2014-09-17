@@ -198,22 +198,17 @@ void WindowReceiver::on_pushButtonPlay_clicked() {
  */
 void WindowReceiver::on_pushButtonAbout_clicked() {
 
-
-	test.setModal(true);
-	test.exec();
-	/*QDialog d;
-	d.setMinimumHeight(50);
-	d.setMaximumHeight(50);
-	d.setWindowTitle("dialog");
-	d.exec();*/
-
+	dialogAbout.setModal(true);
+	dialogAbout.exec();
 }
 
 /**
  *
  */
-void WindowReceiver::on_pushButtonHelp_clicked() {
+void WindowReceiver::on_pushButtonFrames_clicked() {
 
+	dialogFrames.setModal(true);
+	dialogFrames.exec();
 }
 
 /**
@@ -388,7 +383,6 @@ void WindowReceiver::updateFrameViews() {
 		updateFrameHertzView(i);
 		qnode_recv->setFrameHertz(i, 0);
 		updateFrameInactivityView(i);
-		updateFrameViewColor(i);
 	}
 }
 
@@ -433,37 +427,6 @@ void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
 				qnode_recv->getIgnoreAddress());
 	}
 	updateFrameAddressView(frame_index);
-	updateFrameViewColor(frame_index);
-}
-
-/**
- *
- * @param frame_index
- */
-void WindowReceiver::updateFrameViewColor(const int &frame_index) {
-
-	QPalette *ignorePalette = new QPalette();
-	QPalette *assignPalette = new QPalette();
-	QPalette *activePalette = new QPalette();
-	ignorePalette->setColor(QPalette::Text, Qt::darkGray);
-	assignPalette->setColor(QPalette::Text, Qt::darkMagenta);
-	activePalette->setColor(QPalette::Text, Qt::darkCyan);
-
-	if (qnode_recv->getFrameAddress(frame_index)
-			== qnode_recv->getIgnoreAddress()) {
-		frame_address_line[frame_index]->setPalette(*ignorePalette);
-		frame_hertz_line[frame_index]->setPalette(*ignorePalette);
-		frame_inactivity_line[frame_index]->setPalette(*ignorePalette);
-	} else if (qnode_recv->getFrameAddress(frame_index)
-			== qnode_recv->getAssignAddress()) {
-		frame_address_line[frame_index]->setPalette(*assignPalette);
-		frame_hertz_line[frame_index]->setPalette(*assignPalette);
-		frame_inactivity_line[frame_index]->setPalette(*assignPalette);
-	} else {
-		frame_address_line[frame_index]->setPalette(*activePalette);
-		frame_hertz_line[frame_index]->setPalette(*activePalette);
-		frame_inactivity_line[frame_index]->setPalette(*activePalette);
-	}
 }
 
 /**
@@ -558,7 +521,6 @@ void WindowReceiver::readSettings() {
 		updateFrameAddressView(i);
 		updateFrameHertzView(i);
 		updateFrameInactivityView(i);
-		updateFrameViewColor(i);
 	}
 }
 
