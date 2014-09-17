@@ -198,6 +198,15 @@ void WindowReceiver::on_pushButtonPlay_clicked() {
  */
 void WindowReceiver::on_pushButtonAbout_clicked() {
 
+
+	test.setModal(true);
+	test.exec();
+	/*QDialog d;
+	d.setMinimumHeight(50);
+	d.setMaximumHeight(50);
+	d.setWindowTitle("dialog");
+	d.exec();*/
+
 }
 
 /**

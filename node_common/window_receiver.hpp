@@ -2,10 +2,12 @@
 #define human_cognition_WINDOW_RECEIVER_H
 
 #include <QtGui>
+#include <QtGui/QDialog>
 #include <QtGui/QMainWindow>
 
 #ifndef Q_MOC_RUN
 #include "node_common/ui_window_receiver.h"
+#include "node_common/dialog.hpp"
 #include "../node_receiver/qnode_receiver.hpp"
 #endif
 
@@ -75,6 +77,7 @@ private:
 
 	Ui::WindowReceiverDesign ui_recv;
 	QNodeReceiver *qnode_recv;
+	Dialog test;
 
 	QCheckBox* frame_select_checkbox[NUMBER_OF_FRAMES];
 	QComboBox* frame_switch_combobox[NUMBER_OF_FRAMES];
