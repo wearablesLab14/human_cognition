@@ -1,29 +1,101 @@
 #include "window_receiver.hpp"
-//#include "about_window.hpp"
 
 using namespace Qt;
 
 /**
  *
- * @param argc
- * @param argv
+ * @param node
  * @param parent
  */
-WindowReceiver::WindowReceiver(QNode *node, QWidget *parent) :
-		QMainWindow(parent), qnode(node) {
+WindowReceiver::WindowReceiver(QNodeReceiver *node, QWidget *parent) :
+		QMainWindow(parent), qnode_recv(node) {
 
-	ui.setupUi(this);
-	initQElements();
+	ui_recv.setupUi(this);
+	frame_select_checkbox[0] = ui_recv.checkBox_00;
+	frame_select_checkbox[1] = ui_recv.checkBox_01;
+	frame_select_checkbox[2] = ui_recv.checkBox_02;
+	frame_select_checkbox[3] = ui_recv.checkBox_03;
+	frame_select_checkbox[4] = ui_recv.checkBox_04;
+	frame_select_checkbox[5] = ui_recv.checkBox_05;
+	frame_select_checkbox[6] = ui_recv.checkBox_06;
+	frame_select_checkbox[7] = ui_recv.checkBox_07;
+	frame_select_checkbox[8] = ui_recv.checkBox_08;
+	frame_select_checkbox[9] = ui_recv.checkBox_09;
+	frame_select_checkbox[10] = ui_recv.checkBox_10;
+	frame_select_checkbox[11] = ui_recv.checkBox_11;
+	frame_select_checkbox[12] = ui_recv.checkBox_12;
+	frame_select_checkbox[13] = ui_recv.checkBox_13;
+
+	frame_switch_combobox[0] = ui_recv.comboBox_00;
+	frame_switch_combobox[1] = ui_recv.comboBox_01;
+	frame_switch_combobox[2] = ui_recv.comboBox_02;
+	frame_switch_combobox[3] = ui_recv.comboBox_03;
+	frame_switch_combobox[4] = ui_recv.comboBox_04;
+	frame_switch_combobox[5] = ui_recv.comboBox_05;
+	frame_switch_combobox[6] = ui_recv.comboBox_06;
+	frame_switch_combobox[7] = ui_recv.comboBox_07;
+	frame_switch_combobox[8] = ui_recv.comboBox_08;
+	frame_switch_combobox[9] = ui_recv.comboBox_09;
+	frame_switch_combobox[10] = ui_recv.comboBox_10;
+	frame_switch_combobox[11] = ui_recv.comboBox_11;
+	frame_switch_combobox[12] = ui_recv.comboBox_12;
+	frame_switch_combobox[13] = ui_recv.comboBox_13;
+
+	frame_address_line[0] = ui_recv.lineEditIP_00;
+	frame_address_line[1] = ui_recv.lineEditIP_01;
+	frame_address_line[2] = ui_recv.lineEditIP_02;
+	frame_address_line[3] = ui_recv.lineEditIP_03;
+	frame_address_line[4] = ui_recv.lineEditIP_04;
+	frame_address_line[5] = ui_recv.lineEditIP_05;
+	frame_address_line[6] = ui_recv.lineEditIP_06;
+	frame_address_line[7] = ui_recv.lineEditIP_07;
+	frame_address_line[8] = ui_recv.lineEditIP_08;
+	frame_address_line[9] = ui_recv.lineEditIP_09;
+	frame_address_line[10] = ui_recv.lineEditIP_10;
+	frame_address_line[11] = ui_recv.lineEditIP_11;
+	frame_address_line[12] = ui_recv.lineEditIP_12;
+	frame_address_line[13] = ui_recv.lineEditIP_13;
+
+	frame_hertz_line[0] = ui_recv.lineEditHz_00;
+	frame_hertz_line[1] = ui_recv.lineEditHz_01;
+	frame_hertz_line[2] = ui_recv.lineEditHz_02;
+	frame_hertz_line[3] = ui_recv.lineEditHz_03;
+	frame_hertz_line[4] = ui_recv.lineEditHz_04;
+	frame_hertz_line[5] = ui_recv.lineEditHz_05;
+	frame_hertz_line[6] = ui_recv.lineEditHz_06;
+	frame_hertz_line[7] = ui_recv.lineEditHz_07;
+	frame_hertz_line[8] = ui_recv.lineEditHz_08;
+	frame_hertz_line[9] = ui_recv.lineEditHz_09;
+	frame_hertz_line[10] = ui_recv.lineEditHz_10;
+	frame_hertz_line[11] = ui_recv.lineEditHz_11;
+	frame_hertz_line[12] = ui_recv.lineEditHz_12;
+	frame_hertz_line[13] = ui_recv.lineEditHz_13;
+
+	frame_inactivity_line[0] = ui_recv.lineEditInactivity_00;
+	frame_inactivity_line[1] = ui_recv.lineEditInactivity_01;
+	frame_inactivity_line[2] = ui_recv.lineEditInactivity_02;
+	frame_inactivity_line[3] = ui_recv.lineEditInactivity_03;
+	frame_inactivity_line[4] = ui_recv.lineEditInactivity_04;
+	frame_inactivity_line[5] = ui_recv.lineEditInactivity_05;
+	frame_inactivity_line[6] = ui_recv.lineEditInactivity_06;
+	frame_inactivity_line[7] = ui_recv.lineEditInactivity_07;
+	frame_inactivity_line[8] = ui_recv.lineEditInactivity_08;
+	frame_inactivity_line[9] = ui_recv.lineEditInactivity_09;
+	frame_inactivity_line[10] = ui_recv.lineEditInactivity_10;
+	frame_inactivity_line[11] = ui_recv.lineEditInactivity_11;
+	frame_inactivity_line[12] = ui_recv.lineEditInactivity_12;
+	frame_inactivity_line[13] = ui_recv.lineEditInactivity_13;
 
 	readSettings();
 
-	ui.listViewInfo->setModel(qnode->getListViewModel());
+	ui_recv.listViewInfo->setModel(qnode_recv->getListViewModel());
 
-	QObject::connect(qnode, SIGNAL(frameInfoUpdated()), this,
-			SLOT(updateFrameInfo()));
+	QObject::connect(qnode_recv, SIGNAL(listViewModelUpdated()), this,
+			SLOT(updateListView()));
 
-	QObject::connect(qnode, SIGNAL(listInfoUpdated()), this,
-			SLOT(updateListInfo()));
+	QObject::connect(qnode_recv, SIGNAL(frameDataUpdated()), this,
+			SLOT(updateFrameViews()));
+
 }
 
 /**
@@ -32,110 +104,32 @@ WindowReceiver::WindowReceiver(QNode *node, QWidget *parent) :
 WindowReceiver::~WindowReceiver() {
 }
 
-//**************************************************************************************
-
-void WindowReceiver::on_pushButtonAbout_clicked() {
-
-	/*about = new About(this);
-	about->exec();*/
-}
-
 /**
  *
+ * @param event
  */
-void WindowReceiver::initQElements() {
-
-	frame_select_checkbox[0] = ui.checkBox_00;
-	frame_select_checkbox[1] = ui.checkBox_01;
-	frame_select_checkbox[2] = ui.checkBox_02;
-	frame_select_checkbox[3] = ui.checkBox_03;
-	frame_select_checkbox[4] = ui.checkBox_04;
-	frame_select_checkbox[5] = ui.checkBox_05;
-	frame_select_checkbox[6] = ui.checkBox_06;
-	frame_select_checkbox[7] = ui.checkBox_07;
-	frame_select_checkbox[8] = ui.checkBox_08;
-	frame_select_checkbox[9] = ui.checkBox_09;
-	frame_select_checkbox[10] = ui.checkBox_10;
-	frame_select_checkbox[11] = ui.checkBox_11;
-	frame_select_checkbox[12] = ui.checkBox_12;
-	frame_select_checkbox[13] = ui.checkBox_13;
-
-	frame_switch_combobox[0] = ui.comboBox_00;
-	frame_switch_combobox[1] = ui.comboBox_01;
-	frame_switch_combobox[2] = ui.comboBox_02;
-	frame_switch_combobox[3] = ui.comboBox_03;
-	frame_switch_combobox[4] = ui.comboBox_04;
-	frame_switch_combobox[5] = ui.comboBox_05;
-	frame_switch_combobox[6] = ui.comboBox_06;
-	frame_switch_combobox[7] = ui.comboBox_07;
-	frame_switch_combobox[8] = ui.comboBox_08;
-	frame_switch_combobox[9] = ui.comboBox_09;
-	frame_switch_combobox[10] = ui.comboBox_10;
-	frame_switch_combobox[11] = ui.comboBox_11;
-	frame_switch_combobox[12] = ui.comboBox_12;
-	frame_switch_combobox[13] = ui.comboBox_13;
-
-	frame_address_line[0] = ui.lineEditIP_00;
-	frame_address_line[1] = ui.lineEditIP_01;
-	frame_address_line[2] = ui.lineEditIP_02;
-	frame_address_line[3] = ui.lineEditIP_03;
-	frame_address_line[4] = ui.lineEditIP_04;
-	frame_address_line[5] = ui.lineEditIP_05;
-	frame_address_line[6] = ui.lineEditIP_06;
-	frame_address_line[7] = ui.lineEditIP_07;
-	frame_address_line[8] = ui.lineEditIP_08;
-	frame_address_line[9] = ui.lineEditIP_09;
-	frame_address_line[10] = ui.lineEditIP_10;
-	frame_address_line[11] = ui.lineEditIP_11;
-	frame_address_line[12] = ui.lineEditIP_12;
-	frame_address_line[13] = ui.lineEditIP_13;
-
-	frame_hertz_line[0] = ui.lineEditHz_00;
-	frame_hertz_line[1] = ui.lineEditHz_01;
-	frame_hertz_line[2] = ui.lineEditHz_02;
-	frame_hertz_line[3] = ui.lineEditHz_03;
-	frame_hertz_line[4] = ui.lineEditHz_04;
-	frame_hertz_line[5] = ui.lineEditHz_05;
-	frame_hertz_line[6] = ui.lineEditHz_06;
-	frame_hertz_line[7] = ui.lineEditHz_07;
-	frame_hertz_line[8] = ui.lineEditHz_08;
-	frame_hertz_line[9] = ui.lineEditHz_09;
-	frame_hertz_line[10] = ui.lineEditHz_10;
-	frame_hertz_line[11] = ui.lineEditHz_11;
-	frame_hertz_line[12] = ui.lineEditHz_12;
-	frame_hertz_line[13] = ui.lineEditHz_13;
-
-	frame_inactivity_line[0] = ui.lineEditInactivity_00;
-	frame_inactivity_line[1] = ui.lineEditInactivity_01;
-	frame_inactivity_line[2] = ui.lineEditInactivity_02;
-	frame_inactivity_line[3] = ui.lineEditInactivity_03;
-	frame_inactivity_line[4] = ui.lineEditInactivity_04;
-	frame_inactivity_line[5] = ui.lineEditInactivity_05;
-	frame_inactivity_line[6] = ui.lineEditInactivity_06;
-	frame_inactivity_line[7] = ui.lineEditInactivity_07;
-	frame_inactivity_line[8] = ui.lineEditInactivity_08;
-	frame_inactivity_line[9] = ui.lineEditInactivity_09;
-	frame_inactivity_line[10] = ui.lineEditInactivity_10;
-	frame_inactivity_line[11] = ui.lineEditInactivity_11;
-	frame_inactivity_line[12] = ui.lineEditInactivity_12;
-	frame_inactivity_line[13] = ui.lineEditInactivity_13;
+void WindowReceiver::closeEvent(QCloseEvent *event) {
+	writeSettings();
+	QMainWindow::closeEvent(event);
 }
 
-//**************************************************************************************
+/***********************************************
+ GUI ACTION METHODS
+ ***********************************************/
 
 /**
  *
  */
 void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 
-	if (qnode->receiveReady()) {
-		ui.pushButtonReceiverSetup->setEnabled(false);
+	if (qnode_recv->readyForAction()) {
+		ui_recv.pushButtonReceiverSetup->setEnabled(false);
 
-		ui.checkBoxEuler->setEnabled(true);
-		ui.comboBoxEuler->setEnabled(true);
-		ui.pushButtonReceiverStart->setEnabled(true);
-		ui.pushButtonResetModel->setEnabled(true);
-		ui.pushButtonResetFrames->setEnabled(true);
+		ui_recv.checkBoxEuler->setEnabled(true);
+		ui_recv.comboBoxEuler->setEnabled(true);
+		ui_recv.pushButtonReceiverStart->setEnabled(true);
+		ui_recv.pushButtonResetModel->setEnabled(true);
+		ui_recv.pushButtonResetFrames->setEnabled(true);
 	}
 }
 
@@ -144,18 +138,17 @@ void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
  */
 void WindowReceiver::on_pushButtonReceiverStart_clicked() {
 
-	qnode->setDisplayEulerSignal(ui.checkBoxEuler->isChecked());
-	qnode->setDisplayEulerFrame(ui.comboBoxEuler->currentIndex());
+	qnode_recv->setDisplayEulerSignal(ui_recv.checkBoxEuler->isChecked());
+	qnode_recv->setDisplayEulerFrame(ui_recv.comboBoxEuler->currentIndex());
 
-	qnode->startThread();
-	ui.pushButtonReceiverStart->setEnabled(false);
+	qnode_recv->startAction();
+	ui_recv.pushButtonReceiverStart->setEnabled(false);
 
+	ui_recv.checkBoxEuler->setEnabled(false);
+	ui_recv.comboBoxEuler->setEnabled(false);
 
-	ui.checkBoxEuler->setEnabled(false);
-	ui.comboBoxEuler->setEnabled(false);
-
-	ui.pushButtonReceiverStop->setEnabled(true);
-	ui.pushButtonResetModel->setEnabled(true);
+	ui_recv.pushButtonReceiverStop->setEnabled(true);
+	ui_recv.pushButtonResetModel->setEnabled(true);
 
 }
 
@@ -164,14 +157,54 @@ void WindowReceiver::on_pushButtonReceiverStart_clicked() {
  */
 void WindowReceiver::on_pushButtonReceiverStop_clicked() {
 
-	qnode->stopThread();
-	ui.pushButtonReceiverStop->setEnabled(false);
-	ui.pushButtonResetModel->setEnabled(false);
-	ui.pushButtonResetFrames->setEnabled(false);
+	qnode_recv->stopAction();
+	ui_recv.pushButtonReceiverStop->setEnabled(false);
+	ui_recv.pushButtonResetModel->setEnabled(false);
+	ui_recv.pushButtonResetFrames->setEnabled(false);
 
-	ui.pushButtonReceiverSetup->setEnabled(true);
-	ui.checkBoxEuler->setEnabled(true);
-	ui.checkBoxEuler->setChecked(false);
+	ui_recv.pushButtonReceiverSetup->setEnabled(true);
+	ui_recv.checkBoxEuler->setEnabled(true);
+	ui_recv.checkBoxEuler->setChecked(false);
+}
+
+/**
+ *
+ * @param state
+ */
+void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
+	if (state == 2) {
+		ui_recv.comboBoxEuler->setEnabled(true);
+	} else if (state == 0) {
+		ui_recv.comboBoxEuler->setEnabled(false);
+	}
+}
+
+/**
+ *
+ */
+void WindowReceiver::on_pushButtonRecord_clicked() {
+
+}
+
+/**
+ *
+ */
+void WindowReceiver::on_pushButtonPlay_clicked() {
+
+}
+
+/**
+ *
+ */
+void WindowReceiver::on_pushButtonAbout_clicked() {
+
+}
+
+/**
+ *
+ */
+void WindowReceiver::on_pushButtonHelp_clicked() {
+
 }
 
 /**
@@ -181,7 +214,7 @@ void WindowReceiver::on_pushButtonSwitch_clicked() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		if (i != frame_switch_combobox[i]->currentIndex()) {
-			switchFrames(i, frame_switch_combobox[i]->currentIndex());
+			frameSwitch(i, frame_switch_combobox[i]->currentIndex());
 			frame_switch_combobox[i]->setCurrentIndex(i);
 		}
 	}
@@ -191,37 +224,25 @@ void WindowReceiver::on_pushButtonSwitch_clicked() {
  *
  */
 void WindowReceiver::on_pushButtonResetModel_clicked() {
-	qnode->setResetModelSignal(true);
+	qnode_recv->setResetModelSignal(true);
 }
 
 /**
  *
  */
 void WindowReceiver::on_pushButtonResetFrames_clicked() {
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		if (frame_select_checkbox[i]->isChecked()) {
-			qnode->setFrameAddress(i, qnode->getAssignAddress());
+			qnode_recv->setFrameAddress(i, qnode_recv->getAssignAddress());
 		}
-		qnode->setFrameHertz(i, 0);
-		qnode->setLastUpdate(i, ros::Time::now());
+		qnode_recv->setFrameHertz(i, 0);
+		qnode_recv->setLastUpdate(i, ros::Time::now());
 
 		frame_select_checkbox[i]->setChecked(true);
 		frame_switch_combobox[i]->setCurrentIndex(i);
 	}
-	updateFrameInfo();
-}
-
-/**
- *
- * @param state
- */
-void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
-	if (state == 2) {
-		ui.comboBoxEuler->setEnabled(true);
-	} else if (state == 0) {
-		ui.comboBoxEuler->setEnabled(false);
-	}
+	updateFrameViews();
 }
 
 /**
@@ -336,58 +357,81 @@ void WindowReceiver::on_checkBox_13_stateChanged(int state) {
 	frameSelectChanged(13, state);
 }
 
-//**************************************************************************************
-
-/**
- *
- * @param index_a
- * @param index_b
- */
-void WindowReceiver::switchFrames(int index_a, int index_b) {
-
-	QString address_a = qnode->getFrameAddress(index_a);
-	QString address_b = qnode->getFrameAddress(index_b);
-	bool boolean_a = frame_select_checkbox[index_a]->isChecked();
-	bool boolean_b = frame_select_checkbox[index_b]->isChecked();
-
-	qnode->setFrameAddress(index_a, address_b);
-	qnode->setFrameAddress(index_b, address_a);
-	frame_select_checkbox[index_a]->setChecked(boolean_b);
-	frame_select_checkbox[index_b]->setChecked(boolean_a);
-	updateFrameInfo();
-}
-
-//**************************************************************************************
+/***********************************************
+ MODEL SIGNAL METHODS
+ ***********************************************/
 
 /**
  *
  */
-void WindowReceiver::updateListInfo() {
-	ui.listViewInfo->scrollToBottom();
+void WindowReceiver::updateListView() {
+	ui_recv.listViewInfo->scrollToBottom();
 
 }
 
-//**************************************************************************************
-
 /**
  *
  */
-void WindowReceiver::updateFrameInfo() {
+void WindowReceiver::updateFrameViews() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		updateFrameIP(i);
-		updateFrameHertz(i);
-		qnode->setFrameHertz(i, 0);
-		updateFrameInactivity(i);
-		updateFrameColor(i);
+		updateFrameAddressView(i);
+		updateFrameHertzView(i);
+		qnode_recv->setFrameHertz(i, 0);
+		updateFrameInactivityView(i);
+		updateFrameViewColor(i);
 	}
 }
 
+/***********************************************
+ PRIVATE GUI METHODS
+ ***********************************************/
+
 /**
  *
- * @param index
+ * @param frame_index_a
+ * @param frame_index_b
  */
-void WindowReceiver::updateFrameColor(int index) {
+void WindowReceiver::frameSwitch(const int &frame_index_a,
+		const int &frame_index_b) {
+
+	QString address_a = qnode_recv->getFrameAddress(frame_index_a);
+	QString address_b = qnode_recv->getFrameAddress(frame_index_b);
+	bool boolean_a = frame_select_checkbox[frame_index_a]->isChecked();
+	bool boolean_b = frame_select_checkbox[frame_index_b]->isChecked();
+
+	qnode_recv->setFrameAddress(frame_index_a, address_b);
+	qnode_recv->setFrameAddress(frame_index_b, address_a);
+	frame_select_checkbox[frame_index_a]->setChecked(boolean_b);
+	frame_select_checkbox[frame_index_b]->setChecked(boolean_a);
+	updateFrameViews();
+}
+
+/**
+ *
+ * @param frame_index
+ * @param state
+ */
+void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
+
+	if (state == 2
+			&& qnode_recv->getFrameAddress(frame_index)
+					== qnode_recv->getIgnoreAddress()) {
+		qnode_recv->setFrameAddress(frame_index,
+				qnode_recv->getAssignAddress());
+	} else if (state == 0) {
+		qnode_recv->setFrameAddress(frame_index,
+				qnode_recv->getIgnoreAddress());
+	}
+	updateFrameAddressView(frame_index);
+	updateFrameViewColor(frame_index);
+}
+
+/**
+ *
+ * @param frame_index
+ */
+void WindowReceiver::updateFrameViewColor(const int &frame_index) {
 
 	QPalette *ignorePalette = new QPalette();
 	QPalette *assignPalette = new QPalette();
@@ -396,87 +440,78 @@ void WindowReceiver::updateFrameColor(int index) {
 	assignPalette->setColor(QPalette::Text, Qt::darkMagenta);
 	activePalette->setColor(QPalette::Text, Qt::darkCyan);
 
-	if (qnode->getFrameAddress(index) == qnode->getIgnoreAddress()) {
-		frame_address_line[index]->setPalette(*ignorePalette);
-		frame_hertz_line[index]->setPalette(*ignorePalette);
-		frame_inactivity_line[index]->setPalette(*ignorePalette);
-	} else if (qnode->getFrameAddress(index) == qnode->getAssignAddress()) {
-		frame_address_line[index]->setPalette(*assignPalette);
-		frame_hertz_line[index]->setPalette(*assignPalette);
-		frame_inactivity_line[index]->setPalette(*assignPalette);
+	if (qnode_recv->getFrameAddress(frame_index)
+			== qnode_recv->getIgnoreAddress()) {
+		frame_address_line[frame_index]->setPalette(*ignorePalette);
+		frame_hertz_line[frame_index]->setPalette(*ignorePalette);
+		frame_inactivity_line[frame_index]->setPalette(*ignorePalette);
+	} else if (qnode_recv->getFrameAddress(frame_index)
+			== qnode_recv->getAssignAddress()) {
+		frame_address_line[frame_index]->setPalette(*assignPalette);
+		frame_hertz_line[frame_index]->setPalette(*assignPalette);
+		frame_inactivity_line[frame_index]->setPalette(*assignPalette);
 	} else {
-		frame_address_line[index]->setPalette(*activePalette);
-		frame_hertz_line[index]->setPalette(*activePalette);
-		frame_inactivity_line[index]->setPalette(*activePalette);
+		frame_address_line[frame_index]->setPalette(*activePalette);
+		frame_hertz_line[frame_index]->setPalette(*activePalette);
+		frame_inactivity_line[frame_index]->setPalette(*activePalette);
 	}
 }
 
 /**
  *
- * @param index
+ * @param frame_index
  */
-void WindowReceiver::updateFrameIP(int index) {
-	frame_address_line[index]->setText(qnode->getFrameAddress(index));
+void WindowReceiver::updateFrameAddressView(const int &frame_index) {
+	frame_address_line[frame_index]->setText(
+			qnode_recv->getFrameAddress(frame_index));
 }
 
 /**
  *
- * @param index
+ * @param frame_index
  */
-void WindowReceiver::updateFrameHertz(const int &frame_index) {
+void WindowReceiver::updateFrameHertzView(const int &frame_index) {
 	frame_hertz_line[frame_index]->setText(
-			QString::number(qnode->getFrameHertz(frame_index)));
+			QString::number(qnode_recv->getFrameHertz(frame_index)));
 }
 
 /**
  *
- * @param index
+ * @param frame_index
  */
-void WindowReceiver::updateFrameInactivity(const int &frame_index) {
-	frame_inactivity_line[frame_index]->setText(qnode->getFrameInactivity(frame_index));
+void WindowReceiver::updateFrameInactivityView(const int &frame_index) {
+	frame_inactivity_line[frame_index]->setText(
+			qnode_recv->getFrameInactivity(frame_index));
 }
 
-/**
- *
- * @param index
- * @param state
- */
-void WindowReceiver::frameSelectChanged(int index, int state) {
-
-	if (state == 2 && qnode->getFrameAddress(index) == qnode->getIgnoreAddress()) {
-		qnode->setFrameAddress(index, qnode->getAssignAddress());
-	} else if (state == 0) {
-		qnode->setFrameAddress(index, qnode->getIgnoreAddress());
-	}
-	updateFrameIP(index);
-	updateFrameColor(index);
-}
-
-//**************************************************************************************
+/***********************************************
+ GUI SETTINGS
+ ***********************************************/
 
 /**
  *
  */
 void WindowReceiver::readSettings() {
 
-	QSettings settings(QString("TU Darmstadt"), QString("cognition_project"));
+	QSettings settings(QString("TU Darmstadt"),
+			QString("human_cognition_receiver"));
 
 	restoreGeometry(settings.value(QString("geometry")).toByteArray());
 	restoreState(settings.value(QString("windowState")).toByteArray());
 
-	qnode->clearAllFrameAddesses();
+	qnode_recv->clearAllFrameAddresses();
 	int size = settings.beginReadArray("addressList");
 	if (size == NUMBER_OF_FRAMES) {
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 			settings.setArrayIndex(i);
-			qnode->addFrameAddress(
-					settings.value("address", qnode->getAssignAddress()).toString());
+			qnode_recv->addFrameAddress(
+					settings.value("address", qnode_recv->getAssignAddress()).toString());
 		}
 		settings.endArray();
 	} else {
 		settings.endArray();
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-			qnode->addFrameAddress(qnode->getAssignAddress());
+			qnode_recv->addFrameAddress(qnode_recv->getAssignAddress());
 		}
 	}
 
@@ -489,32 +524,32 @@ void WindowReceiver::readSettings() {
 			comboList.append(QString("%1").arg(i));
 		}
 	}
-	ui.comboBoxEuler->addItems(comboList);
-	ui.comboBoxEuler->setEnabled(false);
+	ui_recv.comboBoxEuler->addItems(comboList);
+	ui_recv.comboBoxEuler->setEnabled(false);
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		frame_switch_combobox[i]->addItems(comboList);
 		frame_switch_combobox[i]->setCurrentIndex(i);
 	}
 
-	ui.checkBoxEuler->setChecked(false);
+	ui_recv.checkBoxEuler->setChecked(false);
 
-	ui.pushButtonReceiverStart->setEnabled(false);
-	ui.pushButtonReceiverStop->setEnabled(false);
-	ui.pushButtonResetModel->setEnabled(false);
-	ui.pushButtonResetFrames->setEnabled(false);
+	ui_recv.pushButtonReceiverStart->setEnabled(false);
+	ui_recv.pushButtonReceiverStop->setEnabled(false);
+	ui_recv.pushButtonResetModel->setEnabled(false);
+	ui_recv.pushButtonResetFrames->setEnabled(false);
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-		if (qnode->getFrameAddress(i) == qnode->getIgnoreAddress()) {
+		if (qnode_recv->getFrameAddress(i) == qnode_recv->getIgnoreAddress()) {
 			frame_select_checkbox[i]->setChecked(false);
 		} else {
 			frame_select_checkbox[i]->setChecked(true);
 		}
-		updateFrameIP(i);
-		updateFrameHertz(i);
-		updateFrameInactivity(i);
-		updateFrameColor(i);
+		updateFrameAddressView(i);
+		updateFrameHertzView(i);
+		updateFrameInactivityView(i);
+		updateFrameViewColor(i);
 	}
 }
 
@@ -522,26 +557,15 @@ void WindowReceiver::readSettings() {
  *
  */
 void WindowReceiver::writeSettings() {
-	QSettings settings(QString("TU Darmstadt"), QString("cognition_project"));
+	QSettings settings(QString("TU Darmstadt"),
+			QString("human_cognition_receiver"));
 	settings.setValue(QString("geometry"), saveGeometry());
 	settings.setValue(QString("windowState"), saveState());
 
 	settings.beginWriteArray("addressList");
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		settings.setArrayIndex(i);
-		settings.setValue("address", qnode->getFrameAddress(i));
+		settings.setValue("address", qnode_recv->getFrameAddress(i));
 	}
 	settings.endArray();
 }
-
-//**************************************************************************************
-
-/**
- *
- * @param event
- */
-void WindowReceiver::closeEvent(QCloseEvent *event) {
-	writeSettings();
-	QMainWindow::closeEvent(event);
-}
-

@@ -1,5 +1,6 @@
 #include <QtGui>
 #include <QApplication>
+
 #include "../node_common/window_receiver.hpp"
 #include "qnode_receiver.hpp"
 

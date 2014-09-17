@@ -6,32 +6,44 @@
 
 #ifndef Q_MOC_RUN
 #include "node_common/ui_window_listener.h"
-#include "qnode.hpp"
+#include "../node_listener/qnode_listener.hpp"
 #endif
 
+/**
+ *
+ */
 class WindowListener: public QMainWindow {
 Q_OBJECT
 
 public:
-	WindowListener(QNode *node, QWidget *parent = 0);
+	WindowListener(QNodeListener *node, QWidget *parent = 0);
 	~WindowListener();
 	void closeEvent(QCloseEvent *event);
 
-	void readSettings();
-	void writeSettings();
-
 public Q_SLOTS:
-	void updateListInfo();
+	/***********************************************
+	 MODEL SIGNAL METHODS
+	 ***********************************************/
+	void updateListView();
 
-	void on_checkBoxRecordCoordinates_stateChanged(int state);
-	void on_checkBoxDisplayCoordinates_stateChanged(int state);
+	/***********************************************
+	 GUI ACTION METHODS
+	 ***********************************************/
 	void on_pushButtonListenerSetup_clicked();
 	void on_pushButtonListenerStart_clicked();
 	void on_pushButtonListenerStop_clicked();
+	void on_checkBoxRecordCoordinates_stateChanged(int state);
+	void on_checkBoxDisplayCoordinates_stateChanged(int state);
 
 private:
-	Ui::WindowListenerDesign ui;
-	QNode *qnode;
+	/***********************************************
+	 GUI SETTINGS
+	 ***********************************************/
+	void readSettings();
+	void writeSettings();
+
+	Ui::WindowListenerDesign ui_list;
+	QNodeListener *qnode_list;
 };
 
 #endif

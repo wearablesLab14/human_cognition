@@ -1,5 +1,6 @@
 #include <QtGui>
 #include <QApplication>
+
 #include "../node_common/window_listener.hpp"
 #include "qnode_listener.hpp"
 

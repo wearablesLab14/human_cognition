@@ -13,12 +13,6 @@ foreach(subdir
 	node_common
 	node_listener
     node_receiver    
-    )
-  #install(DIRECTORY ${subdir} DESTINATION ${CMAKE_INSTALL_PREFIX}/share/qt_tutorials)
+    ) 
   add_subdirectory(${subdir})
 endforeach()
-
-install(DIRECTORY resources DESTINATION ${CMAKE_INSTALL_PREFIX}/share/qt_tutorials)
-install(DIRECTORY ui DESTINATION ${CMAKE_INSTALL_PREFIX}/share/qt_tutorials)
-
-

@@ -6,46 +6,39 @@
 
 #ifndef Q_MOC_RUN
 #include "node_common/ui_window_receiver.h"
-#include "node_common/qnode.hpp"
-//#include "node_common/about_window.hpp"
+#include "../node_receiver/qnode_receiver.hpp"
 #endif
 
+/**
+ *
+ */
 class WindowReceiver: public QMainWindow {
 Q_OBJECT
 
 public:
-	WindowReceiver(QNode *node, QWidget *parent = 0);
+	WindowReceiver(QNodeReceiver *node, QWidget *parent = 0);
 	~WindowReceiver();
 	void closeEvent(QCloseEvent *event);
 
-	void initQElements();
-	void switchFrames(int index_a, int index_b);
-	void frameSelectChanged(int index, int state);
-	void updateFrameColor(int index);
-	void updateFrameIP(int index);
-	void updateFrameHertz(const int &frame_index);
-	void updateFrameInactivity(const int &frame_index);
-	void resetFrames();
-	void readSettings();
-	void writeSettings();
-
 public Q_SLOTS:
-	void updateListInfo();
-	void updateFrameInfo();
+	/***********************************************
+	 MODEL SIGNAL METHODS
+	 ***********************************************/
+	void updateListView();
+	void updateFrameViews();
 
+	/***********************************************
+	 GUI ACTION METHODS
+	 ***********************************************/
 	void on_pushButtonReceiverSetup_clicked();
 	void on_pushButtonReceiverStart_clicked();
 	void on_pushButtonReceiverStop_clicked();
-	//void on_pushButtonRecord_clicked();
-	//void on_pushButtonPlay_clicked();
-	void on_pushButtonAbout_clicked();
-	//void on_pushButtonHelp_clicked();
-	void on_pushButtonSwitch_clicked();
-	void on_pushButtonResetModel_clicked();
-	void on_pushButtonResetFrames_clicked();
-
 	void on_checkBoxEuler_stateChanged(int state);
-
+	void on_pushButtonRecord_clicked();
+	void on_pushButtonPlay_clicked();
+	void on_pushButtonAbout_clicked();
+	void on_pushButtonHelp_clicked();
+	void on_pushButtonSwitch_clicked();
 	void on_checkBox_00_stateChanged(int state);
 	void on_checkBox_01_stateChanged(int state);
 	void on_checkBox_02_stateChanged(int state);
@@ -60,11 +53,28 @@ public Q_SLOTS:
 	void on_checkBox_11_stateChanged(int state);
 	void on_checkBox_12_stateChanged(int state);
 	void on_checkBox_13_stateChanged(int state);
+	void on_pushButtonResetModel_clicked();
+	void on_pushButtonResetFrames_clicked();
 
 private:
-	Ui::WindowReceiverDesign ui;
-	QNode *qnode;
-	//About *about;
+	/***********************************************
+	 PRIVATE GUI METHODS
+	 ***********************************************/
+	void frameSwitch(const int &frame_index_a, const int &frame_index_b);
+	void frameSelectChanged(const int &frame_index, int state);
+	void updateFrameViewColor(const int &frame_index);
+	void updateFrameAddressView(const int &frame_index);
+	void updateFrameHertzView(const int &frame_index);
+	void updateFrameInactivityView(const int &frame_index);
+
+	/***********************************************
+	 GUI SETTINGS
+	 ***********************************************/
+	void readSettings();
+	void writeSettings();
+
+	Ui::WindowReceiverDesign ui_recv;
+	QNodeReceiver *qnode_recv;
 
 	QCheckBox* frame_select_checkbox[NUMBER_OF_FRAMES];
 	QComboBox* frame_switch_combobox[NUMBER_OF_FRAMES];

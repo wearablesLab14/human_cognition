@@ -4,20 +4,19 @@ using namespace Qt;
 
 /**
  *
- * @param argc
- * @param argv
+ * @param node
  * @param parent
  */
-WindowListener::WindowListener(QNode *node, QWidget *parent) :
-		QMainWindow(parent), qnode(node) {
+WindowListener::WindowListener(QNodeListener *node, QWidget *parent) :
+		QMainWindow(parent), qnode_list(node) {
 
-	ui.setupUi(this);
+	ui_list.setupUi(this);
 
 	readSettings();
 
-	ui.listViewInfo->setModel(qnode->getListViewModel());
+	ui_list.listViewInfo->setModel(qnode_list->getListViewModel());
 
-	QObject::connect(qnode, SIGNAL(listInfoUpdated()), this, SLOT(updateListInfo()));
+	QObject::connect(qnode_list, SIGNAL(listViewModelUpdated()), this, SLOT(updateListView()));
 }
 
 /**
@@ -26,23 +25,33 @@ WindowListener::WindowListener(QNode *node, QWidget *parent) :
 WindowListener::~WindowListener() {
 }
 
-//**************************************************************************************
+/**
+ *
+ * @param event
+ */
+void WindowListener::closeEvent(QCloseEvent *event) {
+	writeSettings();
+	QMainWindow::closeEvent(event);
+}
+
+/***********************************************
+ GUI ACTION METHODS
+ ***********************************************/
 
 /**
  *
  */
 void WindowListener::on_pushButtonListenerSetup_clicked() {
 
-	if (qnode->listenReady()) {
-		ui.pushButtonListenerSetup->setEnabled(false);
+	if (qnode_list->readyForAction()) {
+		ui_list.pushButtonListenerSetup->setEnabled(false);
 
-		ui.pushButtonListenerStart->setEnabled(true);
-		ui.checkBoxDisplayCoordinates->setEnabled(true);
-		ui.comboBoxCoordinates->setEnabled(true);
-		ui.checkBoxRecordCoordinates->setEnabled(true);
-		ui.lineEditFile->setEnabled(true);
+		ui_list.pushButtonListenerStart->setEnabled(true);
+		ui_list.checkBoxDisplayCoordinates->setEnabled(true);
+		ui_list.comboBoxCoordinates->setEnabled(true);
+		ui_list.checkBoxRecordCoordinates->setEnabled(true);
+		ui_list.lineEditFile->setEnabled(true);
 	}
-
 }
 
 /**
@@ -50,22 +59,22 @@ void WindowListener::on_pushButtonListenerSetup_clicked() {
  */
 void WindowListener::on_pushButtonListenerStart_clicked() {
 
-	qnode->setDisplayCoordinatesSignal(ui.checkBoxDisplayCoordinates->isChecked());
-	qnode->setDisplayCoordinatesFrame(ui.comboBoxCoordinates->currentIndex());
+	qnode_list->setDisplayCoordinatesSignal(ui_list.checkBoxDisplayCoordinates->isChecked());
+	qnode_list->setDisplayCoordinatesFrame(ui_list.comboBoxCoordinates->currentIndex());
 
 
-	qnode->setRecordCoordinatesSignal(ui.checkBoxRecordCoordinates->isChecked());
-	qnode->setRecordCoordinatesFile(ui.lineEditFile->text().toStdString());
+	qnode_list->setRecordCoordinatesSignal(ui_list.checkBoxRecordCoordinates->isChecked());
+	qnode_list->setRecordCoordinatesFile(ui_list.lineEditFile->text().toStdString());
 
-	qnode->startThread();
-	ui.pushButtonListenerStart->setEnabled(false);
+	qnode_list->startAction();
+	ui_list.pushButtonListenerStart->setEnabled(false);
 
-	ui.checkBoxDisplayCoordinates->setEnabled(false);
-	ui.comboBoxCoordinates->setEnabled(false);
-	ui.checkBoxRecordCoordinates->setEnabled(false);
-	ui.lineEditFile->setEnabled(false);
+	ui_list.checkBoxDisplayCoordinates->setEnabled(false);
+	ui_list.comboBoxCoordinates->setEnabled(false);
+	ui_list.checkBoxRecordCoordinates->setEnabled(false);
+	ui_list.lineEditFile->setEnabled(false);
 
-	ui.pushButtonListenerStop->setEnabled(true);
+	ui_list.pushButtonListenerStop->setEnabled(true);
 }
 
 /**
@@ -73,13 +82,13 @@ void WindowListener::on_pushButtonListenerStart_clicked() {
  */
 void WindowListener::on_pushButtonListenerStop_clicked() {
 
-	qnode->stopThread();
-	ui.pushButtonListenerStop->setEnabled(false);
+	qnode_list->stopAction();
+	ui_list.pushButtonListenerStop->setEnabled(false);
 
-	ui.pushButtonListenerSetup->setEnabled(true);
+	ui_list.pushButtonListenerSetup->setEnabled(true);
 
-	ui.checkBoxDisplayCoordinates->setChecked(false);
-	ui.checkBoxRecordCoordinates->setChecked(false);
+	ui_list.checkBoxDisplayCoordinates->setChecked(false);
+	ui_list.checkBoxRecordCoordinates->setChecked(false);
 }
 
 /**
@@ -88,9 +97,9 @@ void WindowListener::on_pushButtonListenerStop_clicked() {
  */
 void WindowListener::on_checkBoxDisplayCoordinates_stateChanged(int state) {
 	if (state == 2) {
-		ui.comboBoxCoordinates->setEnabled(true);
+		ui_list.comboBoxCoordinates->setEnabled(true);
 	} else if (state == 0) {
-		ui.comboBoxCoordinates->setEnabled(false);
+		ui_list.comboBoxCoordinates->setEnabled(false);
 	}
 }
 
@@ -100,20 +109,28 @@ void WindowListener::on_checkBoxDisplayCoordinates_stateChanged(int state) {
  */
 void WindowListener::on_checkBoxRecordCoordinates_stateChanged(int state) {
 	if (state == 2) {
-		ui.lineEditFile->setEnabled(true);
+		ui_list.lineEditFile->setEnabled(true);
 	} else if (state == 0) {
-		ui.lineEditFile->setEnabled(false);
+		ui_list.lineEditFile->setEnabled(false);
 	}
 }
+
+/***********************************************
+ MODEL SIGNAL METHODS
+ ***********************************************/
 
 /*
 /**
  *
  */
-void WindowListener::updateListInfo() {
-	ui.listViewInfo->scrollToBottom();
+void WindowListener::updateListView() {
+	ui_list.listViewInfo->scrollToBottom();
 
 }
+
+/***********************************************
+ GUI SETTINGS
+ ***********************************************/
 
 /**
  *
@@ -135,15 +152,15 @@ void WindowListener::readSettings() {
 		}
 	}
 
-	ui.lineEditFile->setText("coordinates.csv");
-	ui.comboBoxCoordinates->addItems(comboList);
-	ui.comboBoxCoordinates->setEnabled(false);
+	ui_list.lineEditFile->setText("coordinates.csv");
+	ui_list.comboBoxCoordinates->addItems(comboList);
+	ui_list.comboBoxCoordinates->setEnabled(false);
 
-	ui.checkBoxDisplayCoordinates->setChecked(false);
-	ui.checkBoxRecordCoordinates->setChecked(false);
+	ui_list.checkBoxDisplayCoordinates->setChecked(false);
+	ui_list.checkBoxRecordCoordinates->setChecked(false);
 
-	ui.pushButtonListenerStart->setEnabled(false);
-	ui.pushButtonListenerStop->setEnabled(false);
+	ui_list.pushButtonListenerStart->setEnabled(false);
+	ui_list.pushButtonListenerStop->setEnabled(false);
 }
 
 /**
@@ -154,13 +171,3 @@ void WindowListener::writeSettings() {
 	settings.setValue(QString("geometry"), saveGeometry());
 	settings.setValue(QString("windowState"), saveState());
 }
-
-/**
- *
- * @param event
- */
-void WindowListener::closeEvent(QCloseEvent *event) {
-	writeSettings();
-	QMainWindow::closeEvent(event);
-}
-
