@@ -140,7 +140,7 @@
 
 <<!--############################################################################################-->
 <joint name="joint_base_connector" type="fixed">
-	<origin xyz="0 0 0.8"/>
+	<origin xyz="0 0 1"/>
 	<parent link="base_link"/>
 	<child link="base_link_connector"/>
 </joint>
@@ -180,12 +180,12 @@
 	<child link="link_05_l_upper_leg"/>	
 </joint>
 <joint name="joint_06_l_knee" type="continuous">
-	<origin xyz="0 0 -0.37"/>
+	<origin xyz="0 0 -0.55"/>
 	<parent link="link_05_l_upper_leg"/>
 	<child link="link_06_l_lower_leg"/>	
 </joint>
 <joint name="joint_07_l_ankle" type="continuous">
-	<origin xyz="0 0 -0.43"/>
+	<origin xyz="0 0 -0.45"/>
 	<parent link="link_06_l_lower_leg"/>
 	<child link="link_07_l_foot"/>
 </joint>
@@ -212,12 +212,12 @@
 	<child link="link_11_r_upper_leg"/>	
 </joint>
 <joint name="joint_12_r_knee" type="continuous">
-	<origin xyz="0 0 -0.37"/>
+	<origin xyz="0 0 -0.55"/>
 	<parent link="link_11_r_upper_leg"/>
 	<child link="link_12_r_lower_leg"/>	
 </joint>
 <joint name="joint_13_r_ankle" type="continuous">
-	<origin xyz="0 0 -0.43"/>
+	<origin xyz="0 0 -0.45"/>
 	<parent link="link_12_r_lower_leg"/>
 	<child link="link_13_r_foot"/>	
 </joint>

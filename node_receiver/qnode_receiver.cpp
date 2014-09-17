@@ -48,7 +48,7 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	tf_base_link_rotation.normalize();
 	tf_base_link_message.frame_id_ = "base_link";
 	tf_base_link_message.child_frame_id_ = "base_link_connector";
-	tf_base_link_message.setOrigin(tf::Vector3(0, 0, 0.8));
+	tf_base_link_message.setOrigin(tf::Vector3(0, 0, 1));
 	tf_base_link_message.setRotation(tf_base_link_rotation);
 
 	//URDF Joints
@@ -71,8 +71,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	tf_link_child[4] = link_name[4];
 	//************************************
 	tf_joint_origin[5] = tf::Vector3(0, 0.1, 0);
-	tf_joint_origin[6] = tf::Vector3(0, 0, -0.37);
-	tf_joint_origin[7] = tf::Vector3(0, 0, -0.43);
+	tf_joint_origin[6] = tf::Vector3(0, 0, -0.55);
+	tf_joint_origin[7] = tf::Vector3(0, 0, -0.45);
 	tf_link_parent[5] = "base_link_connector";
 	tf_link_child[5] = link_name[5];
 	tf_link_parent[6] = link_name[5];
@@ -91,8 +91,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	tf_link_child[10] = link_name[10];
 	//************************************
 	tf_joint_origin[11] = tf::Vector3(0, -0.1, 0);
-	tf_joint_origin[12] = tf::Vector3(0, 0, -0.37);
-	tf_joint_origin[13] = tf::Vector3(0, 0, -0.43);
+	tf_joint_origin[12] = tf::Vector3(0, 0, -0.55);
+	tf_joint_origin[13] = tf::Vector3(0, 0, -0.45);
 	tf_link_parent[11] = "base_link_connector";
 	tf_link_child[11] = link_name[11];
 	tf_link_parent[12] = link_name[11];
@@ -163,10 +163,8 @@ void QNodeReceiver::run() {
 	//frame rotation correction
 	tf::Quaternion rotationYCorrection(0, sqrt(0.5), 0, -sqrt(0.5));
 	rotationYCorrection.normalize();
-	/*
 	tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
 	rotationZCorrection.normalize();
-	*/
 
 	ros::Duration initial_timeout(2.0);
 	ros::Time initial_start_time = ros::Time::now();
@@ -228,7 +226,7 @@ void QNodeReceiver::run() {
 				if (currentFrame != 7 && currentFrame != 13) {
 					original = original * rotationYCorrection;
 				}
-				//original = original * rotationZCorrection;
+				original = original * rotationZCorrection;
 
 				if (display_euler_signal
 						&& currentFrame == display_euler_frame) {
@@ -239,8 +237,6 @@ void QNodeReceiver::run() {
 					frame_euler_z_average += frame_euler_z;
 				}
 
-				//rotation[currentFrame] = tf::Quaternion(original.getX(),
-				//original.getY(), original.getZ(), original.getW());
 				tf_rotation[currentFrame] = tf::Quaternion(original.getY(),
 						-original.getX(), original.getZ(), original.getW());
 
