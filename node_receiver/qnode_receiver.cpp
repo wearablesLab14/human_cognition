@@ -163,8 +163,10 @@ void QNodeReceiver::run() {
 	//frame rotation correction
 	tf::Quaternion rotationYCorrection(0, sqrt(0.5), 0, -sqrt(0.5));
 	rotationYCorrection.normalize();
+	/*
 	tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
 	rotationZCorrection.normalize();
+	*/
 
 	ros::Duration initial_timeout(2.0);
 	ros::Time initial_start_time = ros::Time::now();
@@ -226,7 +228,7 @@ void QNodeReceiver::run() {
 				if (currentFrame != 7 && currentFrame != 13) {
 					original = original * rotationYCorrection;
 				}
-				original = original * rotationZCorrection;
+				//original = original * rotationZCorrection;
 
 				if (display_euler_signal
 						&& currentFrame == display_euler_frame) {
