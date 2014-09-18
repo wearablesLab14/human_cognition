@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Model frames</string>
+   <string>Frames</string>
   </property>
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
