@@ -5,7 +5,7 @@
 #include <QtGui/QMainWindow>
 
 #ifndef Q_MOC_RUN
-#include "node_common/ui_window_listener.h"
+#include "ui_window_listener.h"
 #include "../node_listener/qnode_listener.hpp"
 #endif
 

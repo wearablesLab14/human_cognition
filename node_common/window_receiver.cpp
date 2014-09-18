@@ -149,7 +149,6 @@ void WindowReceiver::on_pushButtonReceiverStart_clicked() {
 
 	ui_recv.pushButtonReceiverStop->setEnabled(true);
 	ui_recv.pushButtonResetModel->setEnabled(true);
-
 }
 
 /**

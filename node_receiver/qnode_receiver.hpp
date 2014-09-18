@@ -80,7 +80,6 @@ private:
 	int display_euler_frame;
 
 	bool reset_model_signal;
-
 	QString assign_address;
 	QString ignore_address;
 

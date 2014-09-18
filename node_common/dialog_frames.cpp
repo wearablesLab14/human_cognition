@@ -1,6 +1,10 @@
 #include "dialog_frames.hpp"
 #include "ui_dialog_frames.h"
 
+/**
+ *
+ * @param parent
+ */
 DialogFrames::DialogFrames(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DialogFrames)
@@ -14,6 +18,9 @@ DialogFrames::DialogFrames(QWidget *parent) :
 	ui->graphicsView->show();
 }
 
+/**
+ *
+ */
 DialogFrames::~DialogFrames()
 {
     delete ui;

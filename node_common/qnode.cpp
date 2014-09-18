@@ -181,7 +181,8 @@ std::string QNode::findHostAddress() {
 		if (!ifa->ifa_addr) {
 			continue;
 		}
-		if (ifa->ifa_addr->sa_family == AF_INET) { // check it is IP4
+		// check it is IP4
+		if (ifa->ifa_addr->sa_family == AF_INET) {
 			// is a valid IP4 Address
 			tmpAddrPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
 

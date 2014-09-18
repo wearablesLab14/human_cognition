@@ -11,6 +11,9 @@ namespace Ui {
 class DialogFrames;
 }
 
+/**
+ *
+ */
 class DialogFrames : public QDialog
 {
     Q_OBJECT

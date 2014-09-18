@@ -4,6 +4,12 @@
 #include "../node_common/window_receiver.hpp"
 #include "qnode_receiver.hpp"
 
+/**
+ *
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char **argv) {
 
 	int exitCode = 0;
