@@ -17,7 +17,7 @@
 <link name="link_01_b_head">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/head.dae" scale="0.035 0.03 0.035"/>			
+			<mesh filename="package://human_cognition/model/meshes/head_red.dae" scale="0.035 0.03 0.035"/>			
 		</geometry>
 		<origin xyz="0.03 0 0.06" rpy="0 0 1.57"/>	
 	</visual>
