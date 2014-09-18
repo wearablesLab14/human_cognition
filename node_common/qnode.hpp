@@ -34,7 +34,7 @@
 #define TO_ASSIGN_ADDRESS "000.000.0.000"
 #define TO_IGNORE_ADDRESS "---.---.-.---"
 
-enum DisplayLevel {
+enum DisplayType {
 	INSTRUCTION, INFO, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
 };
 
@@ -66,8 +66,8 @@ public:
 	 ***********************************************/
 	bool initNode();
 	void shutdownNode();
-	DisplayLevel getLevelForFrame(const int &frame_index);
-	void display(const DisplayLevel &level, const QString &info);
+	DisplayType getLevelForFrame(const int &frame_index);
+	void display(const DisplayType &level, const QString &info);
 
 	/***********************************************
 	 GETTER METHODS

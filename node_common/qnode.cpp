@@ -81,9 +81,9 @@ void QNode::shutdownNode() {
  * @param frame_index
  * @return
  */
-DisplayLevel QNode::getLevelForFrame(const int &frame_index) {
+DisplayType QNode::getLevelForFrame(const int &frame_index) {
 
-	DisplayLevel level;
+	DisplayType level;
 
 	if (frame_index < 2) {
 		level = FRAME01;
@@ -104,7 +104,7 @@ DisplayLevel QNode::getLevelForFrame(const int &frame_index) {
  * @param level
  * @param info
  */
-void QNode::display(const DisplayLevel &level, const QString &info) {
+void QNode::display(const DisplayType &level, const QString &info) {
 
 	QStandardItem *listViewItem = new QStandardItem();
 	listViewItem->setData(QFont("Liberation Mono", 11, 75), Qt::FontRole);
