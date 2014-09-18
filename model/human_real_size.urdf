@@ -9,17 +9,17 @@
 <link name="link_00_b_body">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/body.dae" scale="0.35 0.35 0.35"/>				
+			<mesh filename="package://human_cognition/model/meshes/body_2.dae" scale="0.4 0.35 0.31"/>				
 		</geometry>
-		<origin xyz="0 0 0.125"/>	
+		<origin xyz="0 0 0.1"/>	
 	</visual>		
 </link>
 <link name="link_01_b_head">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/head.dae" scale="0.035 0.035 0.035"/>			
+			<mesh filename="package://human_cognition/model/meshes/head.dae" scale="0.035 0.03 0.035"/>			
 		</geometry>
-		<origin xyz="0.05 0 0.15" rpy="0 0 1.57"/>	
+		<origin xyz="0.03 0 0.06" rpy="0 0 1.57"/>	
 	</visual>
 </link>
 
@@ -29,7 +29,7 @@
 		<geometry>
 			<mesh filename="package://human_cognition/model/meshes/upper_arm.dae" scale="0.3 0.3 0.3"/>			
 		</geometry>
-		<origin xyz="0 0 -0.25" rpy="0 0 0"/>		
+		<origin xyz="0 -0.01 -0.32" rpy="0 0 0"/>		
 	</visual>	
 </link>
 <link name="link_03_l_lower_arm">
@@ -37,13 +37,13 @@
 		<geometry>
 			<mesh filename="package://human_cognition/model/meshes/lower_arm.dae" scale="0.3 0.3 0.3"/>			
 		</geometry>
-		<origin xyz="0 0 -0.25" rpy="0 0 0"/>	
+		<origin xyz="0 -0.01 -0.3" rpy="0 0 0"/>	
 	</visual>
 </link>
 <link name="link_04_l_hand">
 	<visual>
 		<geometry>	
-			<mesh filename="package://human_cognition/model/meshes/hand_left.dae" scale="0.13 0.13 0.13"/>		
+			<mesh filename="package://human_cognition/model/meshes/hand_left.dae" scale="0.11 0.11 0.11"/>		
 		</geometry>
 		<origin xyz="0 0 -0.08" rpy="1.57 3.14 0"/>			
 	</visual>	
@@ -51,17 +51,17 @@
 <link name="link_05_l_upper_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/upper_leg.dae" scale="0.45 0.45 0.45"/>		
+			<mesh filename="package://human_cognition/model/meshes/upper_leg_left.dae" scale="0.4 0.4 0.5"/>		
 		</geometry>
-		<origin xyz="0 0 -0.45" rpy="0 0 0"/>	
+		<origin xyz="0 0 -0.58" rpy="0 0 0"/>	
 	</visual>	
 </link>
 <link name="link_06_l_lower_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/lower_leg.dae" scale="0.35 0.35 0.35"/>			
+			<mesh filename="package://human_cognition/model/meshes/lower_leg.dae" scale="0.45 0.45 0.38"/>			
 		</geometry>
-		<origin xyz="0 0 -0.4" rpy="0 0 0"/>			
+		<origin xyz="0 0 -0.375" rpy="0 0 0"/>			
 	</visual>
 </link>
 <link name="link_07_l_foot">
@@ -69,7 +69,7 @@
 		<geometry>			
 			<mesh filename="package://human_cognition/model/meshes/foot_left.dae" scale="0.2 0.2 0.2"/>
 		</geometry>     
-		<origin xyz="0.17 0.05 0" rpy="0 0 1.57"/>			
+		<origin xyz="0.17 0.05 0.01" rpy="0 0 1.57"/>			
 	</visual>
 </link>
 
@@ -79,7 +79,7 @@
 		<geometry>
 			<mesh filename="package://human_cognition/model/meshes/upper_arm.dae" scale="0.3 0.3 0.3"/>			
 		</geometry>
-		<origin xyz="0 0 -0.25" rpy="0 0 0"/>	
+		<origin xyz="0 0.01 -0.32" rpy="0 0 0"/>		
 	</visual>
 </link>
 <link name="link_09_r_lower_arm">
@@ -87,31 +87,31 @@
 		<geometry>
 			<mesh filename="package://human_cognition/model/meshes/lower_arm.dae" scale="0.3 0.3 0.3"/>			
 		</geometry>
-		<origin xyz="0 0 -0.25" rpy="0 0 0"/>		
+		<origin xyz="0 0.01 -0.3" rpy="0 0 0"/>		
 	</visual>
 </link>
 <link name="link_10_r_hand">
 	<visual>
 		<geometry>			
-				<mesh filename="package://human_cognition/model/meshes/hand_right.dae" scale="0.13 0.13 0.13"/>		
+				<mesh filename="package://human_cognition/model/meshes/hand_right.dae" scale="0.11 0.11 0.11"/>		
 		</geometry>
 		<origin xyz="0 0 -0.08" rpy="-1.57 0 0"/>		
 	</visual>
 </link>
 <link name="link_11_r_upper_leg">
-	<visual>
+<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/upper_leg.dae" scale="0.45 0.45 0.45"/>			
+			<mesh filename="package://human_cognition/model/meshes/upper_leg_right.dae" scale="0.4 0.4 0.5"/>		
 		</geometry>
-		<origin xyz="0 0 -0.45" rpy="0 0 0"/>		
-	</visual>
+		<origin xyz="0 0 -0.58" rpy="0 0 0"/>	
+	</visual>	
 </link>
 <link name="link_12_r_lower_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/model/meshes/lower_leg.dae" scale="0.35 0.35 0.35"/>			
+			<mesh filename="package://human_cognition/model/meshes/lower_leg.dae" scale="0.45 0.45 0.38"/>			
 		</geometry>
-		<origin xyz="0 0 -0.4" rpy="0 0 0"/>		
+		<origin xyz="0 0 -0.375" rpy="0 0 0"/>			
 	</visual>
 </link>
 <link name="link_13_r_foot">
@@ -119,7 +119,7 @@
 		<geometry>			
 			<mesh filename="package://human_cognition/model/meshes/foot_right.dae" scale="0.2 0.2 0.2"/>
 		</geometry>     
-		<origin xyz="0.17 -0.05 0" rpy="0 0 1.57"/>			
+		<origin xyz="0.17 -0.05 0.01" rpy="0 0 1.57"/>			
 	</visual>
 </link>
 
