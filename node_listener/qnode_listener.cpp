@@ -30,8 +30,7 @@ QNodeListener::QNodeListener(int argc, char** argv) :
 		QNode(argc, argv, "listener") {
 
 	display(INSTRUCTION, "1. Connect to mocap");
-	display(INSTRUCTION, "2. Start roscore process");
-	display(INSTRUCTION, "3. Start receiver");
+	display(INSTRUCTION, "2. Start receiver");
 
 	display_coordinates_signal = false;
 	display_coordinates_frame = 0;

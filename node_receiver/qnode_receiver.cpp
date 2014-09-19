@@ -9,8 +9,7 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 		QNode(argc, argv, "receiver") {
 
 	display(INSTRUCTION, "1. Connect to mocap");
-	display(INSTRUCTION, "2. Start roscore process");
-	display(INSTRUCTION, "3. Start rviz");
+	display(INSTRUCTION, "2. 'roslaunch human_cognition rviz.launch'");
 
 	udp_socket = -1;
 	udp_socket_binding = -1;

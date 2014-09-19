@@ -1,3 +1,22 @@
+/****************************************************************
+ *  Project:
+ *  	Integrating Body- and Eye-Tracking to study Cognition in the Wild
+ *	-------------------------------------------------------------
+ * 	TU Darmstadt
+ * 	Department Computer Science
+ * 	Summer term 2014
+ *	-------------------------------------------------------------
+ *	File: qnode.cpp
+ *	Description:
+ *
+ *	-------------------------------------------------------------
+ * 	Authors:
+ * 		Christian Benz 			<zneb_naitsirhc@web.de>
+ * 		Christoph Döringer 		<christoph.doeringer@gmail.com>
+ * 		Hendrik Pfeifer 		<hendrikpfeifer@gmail.com>
+ * 		Heiko Reinemuth 		<heiko.reinemuth@gmail.com>
+ ****************************************************************/
+
 #include "qnode.hpp"
 
 /**
@@ -8,6 +27,11 @@
  */
 QNode::QNode(int argc, char** argv, const std::string &name) :
 		init_argc(argc), init_argv(argv), node_name(name) {
+
+	urdf::Model model;
+	if(model.initFile("human_real_size.urdf")) {
+		display(INFO, QString("urdf parsing successful"));
+	}
 
 	link_name[0] = "link_00_b_body";
 	link_name[1] = "link_01_b_head";
