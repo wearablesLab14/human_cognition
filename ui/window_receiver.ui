@@ -34,7 +34,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/images/icon.png</normaloff>:/images/icon.png</iconset>
+    <normaloff>:/images/icon_receiver.png</normaloff>:/images/icon_receiver.png</iconset>
   </property>
   <property name="locale">
    <locale language="German" country="Germany"/>
