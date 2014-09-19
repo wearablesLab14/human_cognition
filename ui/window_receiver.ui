@@ -30,7 +30,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Human Cognition - Receiver</string>
+   <string>Receiver</string>
   </property>
   <property name="windowIcon">
    <iconset>
@@ -120,22 +120,6 @@
          <property name="verticalSpacing">
           <number>1</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="labelFrames">
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-             <pointsize>9</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Frame</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
          <item row="7" column="2">
           <widget class="QComboBox" name="comboBox_06">
            <property name="minimumSize">
@@ -2205,6 +2189,30 @@
            </property>
           </widget>
          </item>
+         <item row="0" column="0">
+          <widget class="QPushButton" name="pushButtonFrames">
+           <property name="minimumSize">
+            <size>
+             <width>90</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>90</width>
+             <height>23</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <family>Liberation Mono</family>
+            </font>
+           </property>
+           <property name="text">
+            <string>Frames</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item row="10" column="2">
@@ -2285,227 +2293,266 @@
         </widget>
        </item>
        <item row="0" column="2">
-        <layout class="QGridLayout" name="gridLayoutAction">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
          <property name="rightMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QPushButton" name="pushButtonReceiverSetup">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
+         <item>
+          <layout class="QGridLayout" name="gridLayoutReceiverAction">
+           <property name="leftMargin">
+            <number>0</number>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
+           <property name="rightMargin">
+            <number>3</number>
            </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Setup Receiver</string>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="pushButtonReceiverSetup">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Liberation Mono</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Setup Receiver</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="pushButtonReceiverStart">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Liberation Mono</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Start receiving</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPushButton" name="pushButtonReceiverStop">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Liberation Mono</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Stop receiving</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="Line" name="line">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="pushButtonReceiverStop">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
+         <item>
+          <layout class="QGridLayout" name="gridLayoutSettings">
+           <property name="leftMargin">
+            <number>3</number>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
+           <property name="rightMargin">
+            <number>3</number>
            </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Stop receiving</string>
+           <item row="2" column="0">
+            <widget class="QComboBox" name="comboBoxEuler">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBoxEuler">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
+             <property name="text">
+              <string>Display angles</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QPushButton" name="pushButtonAbout">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Liberation Mono</family>
+              </font>
+             </property>
+             <property name="text">
+              <string>About</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="Line" name="line_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QPushButton" name="pushButtonReceiverStart">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
+         <item>
+          <layout class="QGridLayout" name="gridLayoutRecordPlay">
+           <property name="leftMargin">
+            <number>3</number>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
+           <property name="rightMargin">
+            <number>0</number>
            </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Start receiving</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="checkBoxEuler">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Display angles</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="comboBoxEuler">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="pushButtonRecord">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Record</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="pushButtonPlay">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>Play</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QPushButton" name="pushButtonAbout">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>About</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QPushButton" name="pushButtonFrames">
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>23</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <family>Liberation Mono</family>
-            </font>
-           </property>
-           <property name="text">
-            <string>Frames</string>
-           </property>
-          </widget>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="pushButtonRecord">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Liberation Mono</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Record</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPushButton" name="pushButtonPlay">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <family>Liberation Mono</family>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>Play</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLineEdit" name="lineEditTitle">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>23</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>23</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </item>

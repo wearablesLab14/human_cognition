@@ -7,6 +7,9 @@ namespace Ui {
 class DialogAbout;
 }
 
+/**
+ *
+ */
 class DialogAbout : public QDialog
 {
     Q_OBJECT

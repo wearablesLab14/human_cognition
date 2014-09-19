@@ -6,9 +6,9 @@
 #include <QtGui/QMainWindow>
 
 #ifndef Q_MOC_RUN
-#include "node_common/ui_window_receiver.h"
-#include "node_common/dialog_about.hpp"
-#include "node_common/dialog_frames.hpp"
+#include "ui_window_receiver.h"
+#include "dialog_about.hpp"
+#include "dialog_frames.hpp"
 #include "../node_receiver/qnode_receiver.hpp"
 #endif
 

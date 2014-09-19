@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# coding: utf8
-
 from socket import socket,AF_INET,SOCK_DGRAM,SOL_SOCKET,SO_BROADCAST, SO_REUSEADDR
 
 PORT = 5050

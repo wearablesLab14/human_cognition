@@ -52,7 +52,6 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	tf_base_link_message.setRotation(tf_base_link_rotation);
 
 	//URDF Joints
-	//************************************
 	tf_joint_origin[0] = tf::Vector3(0, 0, 0);
 	tf_joint_origin[1] = tf::Vector3(0, 0, 0.53);
 	tf_link_parent[0] = "base_link_connector";

@@ -40,7 +40,6 @@ private:
 
 	tf::Vector3 tf_joint_coordinates[NUMBER_OF_FRAMES];
 	tf::StampedTransform tf_message[NUMBER_OF_FRAMES];
-
 };
 
 #endif

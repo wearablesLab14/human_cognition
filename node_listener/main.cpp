@@ -4,6 +4,12 @@
 #include "../node_common/window_listener.hpp"
 #include "qnode_listener.hpp"
 
+/**
+ *
+ * @param argc
+ * @param argv
+ * @return
+ */
 int main(int argc, char **argv) {
 
 	int exitCode = 0;

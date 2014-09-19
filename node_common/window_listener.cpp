@@ -73,7 +73,6 @@ void WindowListener::on_pushButtonListenerStart_clicked() {
 	ui_list.comboBoxCoordinates->setEnabled(false);
 	ui_list.checkBoxRecordCoordinates->setEnabled(false);
 	ui_list.lineEditFile->setEnabled(false);
-
 	ui_list.pushButtonListenerStop->setEnabled(true);
 }
 
