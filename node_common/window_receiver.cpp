@@ -122,6 +122,10 @@ void WindowReceiver::closeEvent(QCloseEvent *event) {
  */
 void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 
+	//TODO
+	//open rviz via console
+	system("gnome-terminal");//Abhängig von Art der Konsole, die genutzt wird (Gnome, Xterm, ...)
+
 	if (qnode_recv->readyForAction()) {
 		ui_recv.pushButtonReceiverSetup->setEnabled(false);
 
@@ -131,6 +135,7 @@ void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 		ui_recv.pushButtonResetModel->setEnabled(true);
 		ui_recv.pushButtonResetFrames->setEnabled(true);
 	}
+
 }
 
 /**
@@ -183,7 +188,8 @@ void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
  */
 void WindowReceiver::on_pushButtonRecord_clicked() {
 
-	std::string command("bash -i -c 'roslaunch human_cognition record.launch title:=");
+	std::string command(
+			"bash -i -c 'roslaunch human_cognition record.launch title:=");
 	command.append(ui_recv.lineEditTitle->text().toStdString());
 	command.append(std::string("'"));
 
@@ -200,7 +206,8 @@ void WindowReceiver::on_pushButtonRecord_clicked() {
  */
 void WindowReceiver::on_pushButtonPlay_clicked() {
 
-	std::string command("bash -i -c 'roslaunch human_cognition play.launch title:=");
+	std::string command(
+			"bash -i -c 'roslaunch human_cognition play.launch title:=");
 	command.append(ui_recv.lineEditTitle->text().toStdString());
 	command.append(std::string("'"));
 
