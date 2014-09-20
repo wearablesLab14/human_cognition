@@ -56,9 +56,12 @@ private:
 	bool socketBinding();
 	void getTimeFromSec();
 	void displayEulerAverage();
-	void resetFrameRotation();
-	void resetEuler();
-	void resetFrameData();
+
+	void initEuler();
+	void initBaseMessage();
+	void initFrameMessages();
+	void initFrameRotation();
+	void initFrameData();
 
 	int udp_socket;
 	int udp_socket_binding;
@@ -86,17 +89,14 @@ private:
 	QStringList frame_address_list;
 	int frame_inactivity_sec[NUMBER_OF_FRAMES];
 	QString frame_inactivity[NUMBER_OF_FRAMES];
-	ros::Time tf_last_message_stamp[NUMBER_OF_FRAMES];
+	ros::Time frame_last_update[NUMBER_OF_FRAMES];
 	int frame_hertz[NUMBER_OF_FRAMES];
 
-	tf::Quaternion tf_base_link_rotation;
-	tf::StampedTransform tf_base_link_message;
+	urdf::Model model;
+	tf::StampedTransform tf_base_msg;
 
-	std::string tf_link_parent[NUMBER_OF_FRAMES];
-	std::string tf_link_child[NUMBER_OF_FRAMES];
-	tf::Vector3 tf_joint_origin[NUMBER_OF_FRAMES];
-	tf::Quaternion tf_rotation[NUMBER_OF_FRAMES];
-	tf::StampedTransform tf_message[NUMBER_OF_FRAMES];
+	tf::Quaternion tf_frame_rot[NUMBER_OF_FRAMES];
+	tf::StampedTransform tf_frame_msg[NUMBER_OF_FRAMES];
 };
 
 #endif

@@ -28,11 +28,6 @@
 QNode::QNode(int argc, char** argv, const std::string &name) :
 		init_argc(argc), init_argv(argv), node_name(name) {
 
-	urdf::Model model;
-	if(model.initFile("human_real_size.urdf")) {
-		display(INFO, QString("urdf parsing successful"));
-	}
-
 	link_name[0] = "link_00_b_body";
 	link_name[1] = "link_01_b_head";
 	link_name[2] = "link_02_l_upper_arm";
@@ -47,6 +42,22 @@ QNode::QNode(int argc, char** argv, const std::string &name) :
 	link_name[11] = "link_11_r_upper_leg";
 	link_name[12] = "link_12_r_lower_leg";
 	link_name[13] = "link_13_r_foot";
+
+	joint_base_name = "joint_base_connector";
+	joint_name[0] = "joint_00_b_core";
+	joint_name[1] = "joint_01_b_neck";
+	joint_name[2] = "joint_02_l_shoulder";
+	joint_name[3] = "joint_03_l_elbow";
+	joint_name[4] = "joint_04_l_wrist";
+	joint_name[5] = "joint_05_l_hip";
+	joint_name[6] = "joint_06_l_knee";
+	joint_name[7] = "joint_07_l_ankle";
+	joint_name[8] = "joint_08_r_shoulder";
+	joint_name[9] = "joint_09_r_elbow";
+	joint_name[10] = "joint_10_r_wrist";
+	joint_name[11] = "joint_11_r_hip";
+	joint_name[12] = "joint_12_r_knee";
+	joint_name[13] = "joint_13_r_ankle";
 }
 
 /**
@@ -66,7 +77,7 @@ QNode::~QNode() {
  */
 bool QNode::initNode() {
 
-	std::string host_ip = findHostAddress();
+	std::string host_ip = getIP4HostAddress();
 	std::string master_uri = "http://" + host_ip + ":11311/";
 
 	std::map<std::string, std::string> remappings;
@@ -84,7 +95,6 @@ bool QNode::initNode() {
 	display(INFO,
 			QString("Master ").append(master_uri.c_str()).append(
 					QString(" found")));
-
 	ros::start();
 	return true;
 }
@@ -105,7 +115,7 @@ void QNode::shutdownNode() {
  * @param frame_index
  * @return
  */
-DisplayType QNode::getLevelForFrame(const int &frame_index) {
+DisplayType QNode::getFrameDisplayType(const int &frame_index) {
 
 	DisplayType level;
 
@@ -123,18 +133,19 @@ DisplayType QNode::getLevelForFrame(const int &frame_index) {
 	return level;
 }
 
-/**
+/*! \brief Appends a row to a listView model
  *
- * @param level
- * @param info
+ *
+ * @param display_type determines the style of the row
+ * @param message
  */
-void QNode::display(const DisplayType &level, const QString &info) {
+void QNode::display(const DisplayType &display_type, const QString &message) {
 
 	QStandardItem *listViewItem = new QStandardItem();
 	listViewItem->setData(QFont("Liberation Mono", 11, 75), Qt::FontRole);
-	listViewItem->setText(info);
+	listViewItem->setText(message);
 
-	switch (level) {
+	switch (display_type) {
 	case (INSTRUCTION): {
 		listViewItem->setData(QBrush(QColor(Qt::black)), Qt::ForegroundRole);
 		break;
@@ -177,9 +188,8 @@ void QNode::display(const DisplayType &level, const QString &info) {
  GETTER METHODS
  ***********************************************/
 
-/**
- *
- * @return
+/*! \brief Getter for listView model
+ * @return A listView model
  */
 QStandardItemModel* QNode::getListViewModel() {
 	return &list_view_model;
@@ -189,37 +199,56 @@ QStandardItemModel* QNode::getListViewModel() {
  PRIVATE HELPER METHODS
  ***********************************************/
 
-/**
+/*! \brief Returns IP4 host address of local machine
  *
- * @return
+ * 		Loops over linked list of network interfaces
+ * 		to find the IP4 host address of the local machine
+ * @return Host address in textual form
  */
-std::string QNode::findHostAddress() {
+std::string QNode::getIP4HostAddress() {
 
 	struct ifaddrs * ifAddrStruct = NULL;
 	struct ifaddrs * ifa = NULL;
-	void * tmpAddrPtr = NULL;
-	getifaddrs(&ifAddrStruct);
-	char addressBuffer[INET_ADDRSTRLEN];
 
+	//create linked list of network interfaces on the host machine
+	getifaddrs(&ifAddrStruct);
+
+	//pointer for internet addresses
+	void * tmpAddrPtr = NULL;
+
+	//internet address buffer
+	char address[INET_ADDRSTRLEN];
+
+	//loop over linked list of network interfaces
 	for (ifa = ifAddrStruct; ifa != NULL; ifa = ifa->ifa_next) {
+
+		//skip interface without a network address
 		if (!ifa->ifa_addr) {
 			continue;
 		}
-		// check it is IP4
+
+		//check if network address of interface is IP4
 		if (ifa->ifa_addr->sa_family == AF_INET) {
-			// is a valid IP4 Address
+
+			//set pointer to internet address
 			tmpAddrPtr = &((struct sockaddr_in *) ifa->ifa_addr)->sin_addr;
 
-			inet_ntop(AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
+			//convert internet address from binary to textual form
+			inet_ntop(AF_INET, tmpAddrPtr, address, INET_ADDRSTRLEN);
 
+			//leave loop if interface is 'wlan0'
 			if (ifa->ifa_name == "wlan0") {
 				break;
 			}
 		}
 	}
+
+	//reclaim storage
 	if (ifAddrStruct != NULL) {
 		freeifaddrs(ifAddrStruct);
 	}
-	return addressBuffer;
+
+	//return host address
+	return address;
 }
 

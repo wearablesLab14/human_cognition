@@ -11,6 +11,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	display(INSTRUCTION, "1. Connect to mocap");
 	display(INSTRUCTION, "2. 'roslaunch human_cognition rviz.launch'");
 
+	/***********************************************************/
+
 	udp_socket = -1;
 	udp_socket_binding = -1;
 	udp_socket_option = -1;
@@ -31,85 +33,22 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	//sensor address length
 	sensor_address_length = sizeof(sensor_address);
 
-	resetEuler();
+	/***********************************************************/
 
 	display_euler_signal = false;
 	display_euler_frame = 0;
 
 	reset_model_signal = false;
 
+	/***********************************************************/
+
 	assign_address = QString(TO_ASSIGN_ADDRESS);
 	ignore_address = QString(TO_IGNORE_ADDRESS);
 
-	resetFrameData();
+	/***********************************************************/
 
-	tf_base_link_rotation = tf::Quaternion(0, 0, 0, sqrt(1.0));
-	tf_base_link_rotation.normalize();
-	tf_base_link_message.frame_id_ = "base_link";
-	tf_base_link_message.child_frame_id_ = "base_link_connector";
-	tf_base_link_message.setOrigin(tf::Vector3(0, 0, 1));
-	tf_base_link_message.setRotation(tf_base_link_rotation);
-
-	//URDF Joints
-	tf_joint_origin[0] = tf::Vector3(0, 0, 0);
-	tf_joint_origin[1] = tf::Vector3(0, 0, 0.53);
-	tf_link_parent[0] = "base_link_connector";
-	tf_link_child[0] = link_name[0];
-	tf_link_parent[1] = link_name[0];
-	tf_link_child[1] = link_name[1];
-	//************************************
-	tf_joint_origin[2] = tf::Vector3(0, 0.3, 0.52);
-	tf_joint_origin[3] = tf::Vector3(0, 0, -0.25);
-	tf_joint_origin[4] = tf::Vector3(0, 0, -0.27);
-	tf_link_parent[2] = link_name[0];
-	tf_link_child[2] = link_name[2];
-	tf_link_parent[3] = link_name[2];
-	tf_link_child[3] = link_name[3];
-	tf_link_parent[4] = link_name[3];
-	tf_link_child[4] = link_name[4];
-	//************************************
-	tf_joint_origin[5] = tf::Vector3(0, 0.1, 0);
-	tf_joint_origin[6] = tf::Vector3(0, 0, -0.55);
-	tf_joint_origin[7] = tf::Vector3(0, 0, -0.45);
-	tf_link_parent[5] = "base_link_connector";
-	tf_link_child[5] = link_name[5];
-	tf_link_parent[6] = link_name[5];
-	tf_link_child[6] = link_name[6];
-	tf_link_parent[7] = link_name[6];
-	tf_link_child[7] = link_name[7];
-	//************************************
-	tf_joint_origin[8] = tf::Vector3(0, -0.3, 0.52);
-	tf_joint_origin[9] = tf::Vector3(0, 0, -0.25);
-	tf_joint_origin[10] = tf::Vector3(0, 0, -0.27);
-	tf_link_parent[8] = link_name[0];
-	tf_link_child[8] = link_name[8];
-	tf_link_parent[9] = link_name[8];
-	tf_link_child[9] = link_name[9];
-	tf_link_parent[10] = link_name[9];
-	tf_link_child[10] = link_name[10];
-	//************************************
-	tf_joint_origin[11] = tf::Vector3(0, -0.1, 0);
-	tf_joint_origin[12] = tf::Vector3(0, 0, -0.55);
-	tf_joint_origin[13] = tf::Vector3(0, 0, -0.45);
-	tf_link_parent[11] = "base_link_connector";
-	tf_link_child[11] = link_name[11];
-	tf_link_parent[12] = link_name[11];
-	tf_link_child[12] = link_name[12];
-	tf_link_parent[13] = link_name[12];
-	tf_link_child[13] = link_name[13];
-	//************************************
-
-	resetFrameRotation();
-
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-
-		//initialize TF messages
-		tf_message[i].frame_id_ = tf_link_parent[i];
-		tf_message[i].child_frame_id_ = tf_link_child[i];
-		tf_message[i].setOrigin(tf_joint_origin[i]);
-		tf_message[i].setRotation(tf_rotation[i]);
-	}
-
+	initEuler();
+	initFrameData();
 }
 
 /***********************************************
@@ -128,9 +67,17 @@ bool QNodeReceiver::readyForAction() {
 	if (!socketReady()) {
 		return false;
 	}
+	if(!model.initFile("human_real_size.urdf")) {
+		display(ERROR, QString("URDF parsing failed"));
+		return false;
+	}
+	initBaseMessage();
+	initFrameMessages();
+
 	if (ros::isStarted()) {
 		display(INFO, QString("Ready to receive"));
 	}
+
 	return true;
 }
 
@@ -153,14 +100,15 @@ void QNodeReceiver::stopAction() {
  */
 void QNodeReceiver::run() {
 
-	resetEuler();
-	resetFrameData();
+	initEuler();
+	initFrameData();
 
 	tf::TransformBroadcaster tfPublisher;
 
 	//frame rotation correction
 	tf::Quaternion rotationYCorrection(0, sqrt(0.5), 0, -sqrt(0.5));
 	rotationYCorrection.normalize();
+
 	tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
 	rotationZCorrection.normalize();
 
@@ -170,13 +118,13 @@ void QNodeReceiver::run() {
 	while (ros::ok()
 			&& ((ros::Time::now() - initial_start_time) < initial_timeout)) {
 
-		tf_base_link_message.stamp_ = ros::Time::now();
-		tfPublisher.sendTransform(tf_base_link_message);
+		tf_base_msg.stamp_ = ros::Time::now();
+		tfPublisher.sendTransform(tf_base_msg);
 
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-			tf_message[i].stamp_ = ros::Time::now();
-			tf_last_message_stamp[i] = tf_message[i].stamp_;
-			tfPublisher.sendTransform(tf_message[i]);
+			tf_frame_msg[i].stamp_ = ros::Time::now();
+			frame_last_update[i] = tf_frame_msg[i].stamp_;
+			tfPublisher.sendTransform(tf_frame_msg[i]);
 		}
 	}
 
@@ -235,7 +183,7 @@ void QNodeReceiver::run() {
 					frame_euler_z_average += frame_euler_z;
 				}
 
-				tf_rotation[currentFrame] = tf::Quaternion(original.getY(),
+				tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
 						-original.getX(), original.getZ(), original.getW());
 
 				//*********************************************************************
@@ -243,47 +191,47 @@ void QNodeReceiver::run() {
 				//kinematic
 				if (currentFrame == 2 || currentFrame == 5 || currentFrame == 8
 						|| currentFrame == 11) {
-					tf_rotation[currentFrame] = inverse(tf_rotation[0])
-							* tf_rotation[currentFrame];
+					tf_frame_rot[currentFrame] = inverse(tf_frame_rot[0])
+							* tf_frame_rot[currentFrame];
 				} else if (currentFrame != 0) {
-					tf_rotation[currentFrame] = inverse(
-							tf_rotation[currentFrame - 1])
-							* tf_rotation[currentFrame];
+					tf_frame_rot[currentFrame] = inverse(
+							tf_frame_rot[currentFrame - 1])
+							* tf_frame_rot[currentFrame];
 				}
 
-				tf_message[currentFrame].setRotation(tf_rotation[currentFrame]);
+				tf_frame_msg[currentFrame].setRotation(tf_frame_rot[currentFrame]);
 
 				frame_hertz[currentFrame] = frame_hertz[currentFrame] + 1;
 
 				if (reset_model_signal) {
-					resetFrameRotation();
+					initFrameRotation();
 					for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-						tf_message[i].setRotation(tf_rotation[i]);
+						tf_frame_msg[i].setRotation(tf_frame_rot[i]);
 					}
 					reset_model_signal = false;
 				}
 
-				tf_base_link_message.stamp_ = ros::Time::now();
-				tfPublisher.sendTransform(tf_base_link_message);
+				tf_base_msg.stamp_ = ros::Time::now();
+				tfPublisher.sendTransform(tf_base_msg);
 
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-					tf_message[i].stamp_ = ros::Time::now();
+					tf_frame_msg[i].stamp_ = ros::Time::now();
 
-					tfPublisher.sendTransform(tf_message[i]);
+					tfPublisher.sendTransform(tf_frame_msg[i]);
 
 					//update last update time for current frame
 					if (i == currentFrame) {
 
-						tf_last_message_stamp[currentFrame] =
-								tf_message[currentFrame].stamp_;
+						frame_last_update[currentFrame] =
+								tf_frame_msg[currentFrame].stamp_;
 					}
 
 					//*********************************************************************
 
 					//update data age (seconds)
-					frame_inactivity_sec[i] = tf_message[i].stamp_.sec
-							- tf_last_message_stamp[i].sec;
+					frame_inactivity_sec[i] = tf_frame_msg[i].stamp_.sec
+							- frame_last_update[i].sec;
 				}
 
 				if ((ros::Time::now() - start_time) >= timeout) {
@@ -379,6 +327,7 @@ void QNodeReceiver::addFrameAddress(QString address) {
 void QNodeReceiver::setFrameAddress(const int &frame_index, QString address) {
 	frame_address_list.replace(frame_index, address);
 	if (address != assign_address && address != ignore_address) {
+
 		QString frame("Frame ");
 		if (frame_index < 10) {
 			frame.append(QString("0%1").arg(frame_index));
@@ -386,7 +335,7 @@ void QNodeReceiver::setFrameAddress(const int &frame_index, QString address) {
 			frame.append(QString::number(frame_index));
 		}
 
-		display(getLevelForFrame(frame_index), frame.append(QString(" >>> ")).append(address));
+		display(getFrameDisplayType(frame_index), frame.append(QString(" >>> ")).append(address));
 	}
 }
 
@@ -415,7 +364,7 @@ void QNodeReceiver::setFrameInactivity(const int &frame_index, QString time) {
  */
 void QNodeReceiver::setLastUpdate(const int &frame_index,
 		const ros::Time &time) {
-	tf_last_message_stamp[frame_index] = time;
+	frame_last_update[frame_index] = time;
 }
 
 /**
@@ -549,7 +498,48 @@ void QNodeReceiver::displayEulerAverage() {
 /**
  *
  */
-void QNodeReceiver::resetEuler() {
+void QNodeReceiver::initBaseMessage() {
+
+	tf_base_msg.frame_id_ = model.getJoint(joint_base_name)->parent_link_name;
+	tf_base_msg.child_frame_id_ = model.getJoint(joint_base_name)->child_link_name;
+
+	double x = model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.x;
+	double y = model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.y;
+	double z = model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.z;
+	tf_base_msg.setOrigin(tf::Vector3(x, y, z));
+
+	tf::Quaternion tf_base_rot = tf::Quaternion(0, 0, 0, sqrt(1.0));
+	tf_base_rot.normalize();
+	tf_base_msg.setRotation(tf_base_rot);
+}
+
+/**
+ *
+ */
+void QNodeReceiver::initFrameMessages() {
+
+	initFrameRotation();
+
+	double x, y, z;
+
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		tf_frame_msg[i].frame_id_ = model.getJoint(joint_name[i])->parent_link_name;
+		tf_frame_msg[i].child_frame_id_ = model.getJoint(joint_name[i])->child_link_name;
+
+		x = model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.x;
+		y = model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.y;
+		z = model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.z;
+		tf_frame_msg[i].setOrigin(tf::Vector3(x, y, z));
+
+		tf_frame_msg[i].setRotation(tf_frame_rot[i]);
+	}
+}
+
+/**
+ *
+ */
+void QNodeReceiver::initEuler() {
 
 	frame_euler_x = 0;
 	frame_euler_y = 0;
@@ -562,18 +552,18 @@ void QNodeReceiver::resetEuler() {
 /**
  *
  */
-void QNodeReceiver::resetFrameRotation() {
+void QNodeReceiver::initFrameRotation() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		tf_rotation[i] = tf::Quaternion(0, 0, 0, sqrt(1.0));
-		tf_rotation[i].normalize();
+		tf_frame_rot[i] = tf::Quaternion(0, 0, 0, sqrt(1.0));
+		tf_frame_rot[i].normalize();
 	}
 }
 
 /**
  *
  */
-void QNodeReceiver::resetFrameData() {
+void QNodeReceiver::initFrameData() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		frame_hertz[i] = 0;

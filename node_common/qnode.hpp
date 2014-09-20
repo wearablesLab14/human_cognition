@@ -26,9 +26,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/types.h>
 #include <ifaddrs.h>
 
 #define PORT 5050
@@ -45,8 +45,9 @@ struct SensorData {
 	float q0, q1, q2, q3, exInt, eyInt, ezInt;
 }__attribute__((packed));
 
-/**
- *
+/*! \brief
+ * @author
+ * @date
  */
 class QNode: public QThread {
 Q_OBJECT
@@ -68,7 +69,7 @@ public:
 	 ***********************************************/
 	bool initNode();
 	void shutdownNode();
-	DisplayType getLevelForFrame(const int &frame_index);
+	DisplayType getFrameDisplayType(const int &frame_index);
 	void display(const DisplayType &level, const QString &info);
 
 	/***********************************************
@@ -87,7 +88,7 @@ private:
 	/***********************************************
 	 PRIVATE HELPER METHODS
 	 ***********************************************/
-	std::string findHostAddress();
+	std::string getIP4HostAddress();
 
 protected:
 	int init_argc;
@@ -95,7 +96,10 @@ protected:
 	const std::string node_name;
 
 	QStandardItemModel list_view_model;
+
 	std::string link_name[NUMBER_OF_FRAMES];
+	std::string joint_base_name;
+	std::string joint_name[NUMBER_OF_FRAMES];
 };
 
 #endif
