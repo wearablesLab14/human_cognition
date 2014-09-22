@@ -33,11 +33,12 @@
 
 #define PORT 5050
 #define NUMBER_OF_FRAMES 14
+#define SYNCH_MINIMUM 80
 #define TO_ASSIGN_ADDRESS "000.000.0.000"
 #define TO_IGNORE_ADDRESS "---.---.-.---"
 
 enum DisplayType {
-	INSTRUCTION, INFO, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
+	INSTRUCTION, INFO, WARNING, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
 };
 
 struct SensorData {
@@ -69,6 +70,7 @@ public:
 	 ***********************************************/
 	bool initNode();
 	void shutdownNode();
+	QString getFrameString(const int &frame_index);
 	DisplayType getFrameDisplayType(const int &frame_index);
 	void display(const DisplayType &level, const QString &info);
 

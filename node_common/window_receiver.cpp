@@ -122,9 +122,6 @@ void WindowReceiver::closeEvent(QCloseEvent *event) {
  */
 void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 
-	//TODO
-	//system("gnome-terminal");
-
 	if (qnode_recv->readyForAction()) {
 		ui_recv.pushButtonReceiverSetup->setEnabled(false);
 
@@ -180,42 +177,6 @@ void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
 	} else if (state == 0) {
 		ui_recv.comboBoxEuler->setEnabled(false);
 	}
-}
-
-/**
- *
- */
-void WindowReceiver::on_pushButtonRecord_clicked() {
-
-	std::string command(
-			"bash -i -c 'roslaunch human_cognition record.launch title:='");
-	command.append(ui_recv.lineEditTitle->text().toStdString());
-	command.append(std::string("'"));
-
-	//TODO killing process?
-	//TODO show output to GUI?
-	//system(command.c_str());
-
-	ui_recv.pushButtonRecord->setEnabled(false);
-	ui_recv.pushButtonPlay->setEnabled(false);
-}
-
-/**
- *
- */
-void WindowReceiver::on_pushButtonPlay_clicked() {
-
-	std::string command(
-			"bash -i -c 'roslaunch human_cognition play.launch title:=");
-	command.append(ui_recv.lineEditTitle->text().toStdString());
-	command.append(std::string("'"));
-
-	//TODO killing process?
-	//TODO show output to GUI?
-	//system(command.c_str());
-
-	ui_recv.pushButtonRecord->setEnabled(false);
-	ui_recv.pushButtonPlay->setEnabled(false);
 }
 
 /**

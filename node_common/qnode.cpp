@@ -115,17 +115,30 @@ void QNode::shutdownNode() {
  * @param frame_index
  * @return
  */
+QString QNode::getFrameString(const int &frame_index) {
+
+	if (frame_index < 10) {
+		return QString("0%1").arg(frame_index);
+	}
+	return QString::number(frame_index);
+}
+
+/**
+ *
+ * @param frame_index
+ * @return
+ */
 DisplayType QNode::getFrameDisplayType(const int &frame_index) {
 
 	DisplayType level;
 
 	if (frame_index < 2) {
 		level = FRAME01;
-	} else if(frame_index < 5) {
+	} else if (frame_index < 5) {
 		level = FRAME234;
-	} else if(frame_index < 8) {
+	} else if (frame_index < 8) {
 		level = FRAME567;
-	} else if(frame_index < 11) {
+	} else if (frame_index < 11) {
 		level = FRAME8910;
 	} else {
 		level = FRAME111213;
@@ -143,43 +156,53 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 
 	QStandardItem *listViewItem = new QStandardItem();
 	listViewItem->setData(QFont("Liberation Mono", 11, 75), Qt::FontRole);
-	listViewItem->setText(message);
+	QString text("");
 
 	switch (display_type) {
 	case (INSTRUCTION): {
+		text.append(QString("[INSTRUCTION] "));
 		listViewItem->setData(QBrush(QColor(Qt::black)), Qt::ForegroundRole);
 		break;
 	}
 	case (INFO): {
-		listViewItem->setData(QBrush(QColor(Qt::darkCyan)),
+		text.append(QString("[INFO] "));
+		listViewItem->setData(QBrush(QColor(Qt::darkCyan)), Qt::ForegroundRole);
+		break;
+	}
+	case (WARNING): {
+		text.append(QString("[WARNING] "));
+		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
 				Qt::ForegroundRole);
 		break;
 	}
 	case (ERROR): {
-		listViewItem->setData(QBrush(QColor(Qt::darkMagenta)), Qt::ForegroundRole);
+		text.append(QString("[ERROR] "));
+		listViewItem->setData(QBrush(QColor(Qt::darkMagenta)),
+				Qt::ForegroundRole);
 		break;
 	}
 	case (FRAME01): {
-		listViewItem->setData(QBrush(QColor(5,14,64)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(5, 14, 64)), Qt::ForegroundRole);
 		break;
 	}
 	case (FRAME234): {
-		listViewItem->setData(QBrush(QColor(56,118,29)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(56, 118, 29)), Qt::ForegroundRole);
 		break;
 	}
 	case (FRAME567): {
-		listViewItem->setData(QBrush(QColor(180,95,6)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(180, 95, 6)), Qt::ForegroundRole);
 		break;
 	}
 	case (FRAME8910): {
-		listViewItem->setData(QBrush(QColor(255,0,0)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(255, 0, 0)), Qt::ForegroundRole);
 		break;
 	}
 	case (FRAME111213): {
-		listViewItem->setData(QBrush(QColor(153,0,255)), Qt::ForegroundRole);
+		listViewItem->setData(QBrush(QColor(153, 0, 255)), Qt::ForegroundRole);
 		break;
 	}
 	}
+	listViewItem->setText(text.append(message));
 	list_view_model.appendRow(listViewItem);
 	Q_EMIT listViewModelUpdated();
 }

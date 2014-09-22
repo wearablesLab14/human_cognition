@@ -56,6 +56,8 @@ private:
 	bool socketBinding();
 	void getTimeFromSec();
 	void displayEulerAverage();
+	void displayFrameAsynchrony();
+	void displayFrameInactivity();
 
 	void initEuler();
 	void initBaseMessage();
@@ -89,7 +91,9 @@ private:
 	QStringList frame_address_list;
 	int frame_inactivity_sec[NUMBER_OF_FRAMES];
 	QString frame_inactivity[NUMBER_OF_FRAMES];
-	ros::Time frame_last_update[NUMBER_OF_FRAMES];
+	int frame_snr_span[NUMBER_OF_FRAMES];
+	int frame_snr_last_stamp[NUMBER_OF_FRAMES];
+	ros::Time frame_msg_last_stamp[NUMBER_OF_FRAMES];
 	int frame_hertz[NUMBER_OF_FRAMES];
 
 	urdf::Model model;

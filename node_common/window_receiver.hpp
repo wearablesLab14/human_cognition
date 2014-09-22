@@ -37,8 +37,6 @@ public Q_SLOTS:
 	void on_pushButtonReceiverStart_clicked();
 	void on_pushButtonReceiverStop_clicked();
 	void on_checkBoxEuler_stateChanged(int state);
-	void on_pushButtonRecord_clicked();
-	void on_pushButtonPlay_clicked();
 	void on_pushButtonAbout_clicked();
 	void on_pushButtonFrames_clicked();
 	void on_pushButtonSwitch_clicked();

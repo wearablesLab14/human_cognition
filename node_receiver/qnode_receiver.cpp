@@ -67,7 +67,7 @@ bool QNodeReceiver::readyForAction() {
 	if (!socketReady()) {
 		return false;
 	}
-	if(!model.initFile("human_real_size.urdf")) {
+	if (!model.initFile("human_real_size.urdf")) {
 		display(ERROR, QString("URDF parsing failed"));
 		return false;
 	}
@@ -123,7 +123,7 @@ void QNodeReceiver::run() {
 
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 			tf_frame_msg[i].stamp_ = ros::Time::now();
-			frame_last_update[i] = tf_frame_msg[i].stamp_;
+			frame_msg_last_stamp[i] = tf_frame_msg[i].stamp_;
 			tfPublisher.sendTransform(tf_frame_msg[i]);
 		}
 	}
@@ -199,7 +199,8 @@ void QNodeReceiver::run() {
 							* tf_frame_rot[currentFrame];
 				}
 
-				tf_frame_msg[currentFrame].setRotation(tf_frame_rot[currentFrame]);
+				tf_frame_msg[currentFrame].setRotation(
+						tf_frame_rot[currentFrame]);
 
 				frame_hertz[currentFrame] = frame_hertz[currentFrame] + 1;
 
@@ -223,7 +224,12 @@ void QNodeReceiver::run() {
 					//update last update time for current frame
 					if (i == currentFrame) {
 
-						frame_last_update[currentFrame] =
+						int x = sensor_packet_data.timestamp;
+						frame_snr_span[currentFrame] = x
+								- frame_snr_last_stamp[currentFrame];
+						frame_snr_last_stamp[currentFrame] = x;
+
+						frame_msg_last_stamp[currentFrame] =
 								tf_frame_msg[currentFrame].stamp_;
 					}
 
@@ -231,7 +237,7 @@ void QNodeReceiver::run() {
 
 					//update data age (seconds)
 					frame_inactivity_sec[i] = tf_frame_msg[i].stamp_.sec
-							- frame_last_update[i].sec;
+							- frame_msg_last_stamp[i].sec;
 				}
 
 				if ((ros::Time::now() - start_time) >= timeout) {
@@ -240,6 +246,9 @@ void QNodeReceiver::run() {
 							&& frame_hertz[display_euler_frame] != 0) {
 						displayEulerAverage();
 					}
+
+					displayFrameAsynchrony();
+					displayFrameInactivity();
 
 					getTimeFromSec();
 
@@ -328,14 +337,11 @@ void QNodeReceiver::setFrameAddress(const int &frame_index, QString address) {
 	frame_address_list.replace(frame_index, address);
 	if (address != assign_address && address != ignore_address) {
 
-		QString frame("Frame ");
-		if (frame_index < 10) {
-			frame.append(QString("0%1").arg(frame_index));
-		} else {
-			frame.append(QString::number(frame_index));
-		}
+		QString frame(getFrameString(frame_index));
+		frame.append(QString(" >>> "));
+		frame.append(address);
 
-		display(getFrameDisplayType(frame_index), frame.append(QString(" >>> ")).append(address));
+		display(getFrameDisplayType(frame_index), frame);
 	}
 }
 
@@ -364,7 +370,7 @@ void QNodeReceiver::setFrameInactivity(const int &frame_index, QString time) {
  */
 void QNodeReceiver::setLastUpdate(const int &frame_index,
 		const ros::Time &time) {
-	frame_last_update[frame_index] = time;
+	frame_msg_last_stamp[frame_index] = time;
 }
 
 /**
@@ -498,14 +504,53 @@ void QNodeReceiver::displayEulerAverage() {
 /**
  *
  */
+void QNodeReceiver::displayFrameAsynchrony() {
+
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		if (frame_hertz[i] != 0 && frame_hertz[i] < SYNCH_MINIMUM) {
+			QString warning(getFrameString(i));
+			warning.append(QString(" newest-last stamp: "));
+			warning.append(QString::number(frame_snr_span[i]));
+			display(WARNING, warning);
+		}
+	}
+}
+
+/**
+ *
+ */
+void QNodeReceiver::displayFrameInactivity() {
+
+	//TODO counter
+
+	QString warning("");
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		if (frame_address_list.at(i) != ignore_address && frame_hertz[i] == 0) {
+			warning.append(getFrameString(i));
+			warning.append(QString("|"));
+		}
+	}
+	warning.append(QString(" are inactive"));
+	display(WARNING, warning);
+}
+
+/**
+ *
+ */
 void QNodeReceiver::initBaseMessage() {
 
 	tf_base_msg.frame_id_ = model.getJoint(joint_base_name)->parent_link_name;
-	tf_base_msg.child_frame_id_ = model.getJoint(joint_base_name)->child_link_name;
+	tf_base_msg.child_frame_id_ =
+			model.getJoint(joint_base_name)->child_link_name;
 
-	double x = model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.x;
-	double y = model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.y;
-	double z = model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.z;
+	double x =
+			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.x;
+	double y =
+			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.y;
+	double z =
+			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.z;
 	tf_base_msg.setOrigin(tf::Vector3(x, y, z));
 
 	tf::Quaternion tf_base_rot = tf::Quaternion(0, 0, 0, sqrt(1.0));
@@ -524,12 +569,17 @@ void QNodeReceiver::initFrameMessages() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-		tf_frame_msg[i].frame_id_ = model.getJoint(joint_name[i])->parent_link_name;
-		tf_frame_msg[i].child_frame_id_ = model.getJoint(joint_name[i])->child_link_name;
+		tf_frame_msg[i].frame_id_ =
+				model.getJoint(joint_name[i])->parent_link_name;
+		tf_frame_msg[i].child_frame_id_ =
+				model.getJoint(joint_name[i])->child_link_name;
 
-		x = model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.x;
-		y = model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.y;
-		z = model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.z;
+		x =
+				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.x;
+		y =
+				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.y;
+		z =
+				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.z;
 		tf_frame_msg[i].setOrigin(tf::Vector3(x, y, z));
 
 		tf_frame_msg[i].setRotation(tf_frame_rot[i]);
@@ -567,6 +617,8 @@ void QNodeReceiver::initFrameData() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		frame_hertz[i] = 0;
+		frame_snr_span[i] = 0;
+		frame_snr_last_stamp[i] = 0;
 		frame_inactivity[i] = QTime(0, 0, 0).toString();
 	}
 }
