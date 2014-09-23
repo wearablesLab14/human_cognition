@@ -96,7 +96,8 @@ WindowReceiver::WindowReceiver(QNodeReceiver *node, QWidget *parent) :
 	QObject::connect(qnode_recv, SIGNAL(frameDataUpdated()), this,
 			SLOT(updateFrameViews()));
 
-	 QObject::connect(ui_recv.spinBoxMinHertz, SIGNAL(valueChanged(int)), this, SLOT(updateMinHertz(int)));
+	QObject::connect(ui_recv.spinBoxMinHertz, SIGNAL(valueChanged(int)), this,
+			SLOT(updateMinHertz(int)));
 
 }
 
@@ -216,33 +217,67 @@ void WindowReceiver::on_pushButtonSwitch_clicked() {
  *
  */
 void WindowReceiver::on_pushButtonResetModel_clicked() {
-	qnode_recv->setResetModelSignal(true);
+	QMessageBox box;
+	box.setText("Reset the model?");
+	box.setInformativeText(
+			"Please be aware that you should not do this while recording!");
+	box.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
+	int ret = box.exec();
+	switch (ret) {
+	case QMessageBox::Apply:
+		// Apply was clicked
+		qnode_recv->setResetModelSignal(true);
+		break;
+	case QMessageBox::Cancel:
+		// Cancel was clicked
+		break;
+	default:
+		// should never be reached
+		break;
+	}
 }
 
 /**
  *
  */
 void WindowReceiver::on_pushButtonResetFrames_clicked() {
+	QMessageBox box;
+	box.setText("Reset the frames?");
+	box.setInformativeText(
+			"Please be aware that you should not do this while recording!");
+	box.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
+	int ret = box.exec();
+	switch (ret) {
+	case QMessageBox::Apply:
+		// Apply was clicked
+		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+			if (frame_select_checkbox[i]->isChecked()) {
+				qnode_recv->setFrameAddress(i, qnode_recv->getAssignAddress());
+			}
+			qnode_recv->setFrameHertz(i, 0);
+			qnode_recv->setLastUpdate(i, ros::Time::now());
 
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		if (frame_select_checkbox[i]->isChecked()) {
-			qnode_recv->setFrameAddress(i, qnode_recv->getAssignAddress());
+			frame_select_checkbox[i]->setChecked(true);
+			frame_switch_combobox[i]->setCurrentIndex(i);
 		}
-		qnode_recv->setFrameHertz(i, 0);
-		qnode_recv->setLastUpdate(i, ros::Time::now());
-
-		frame_select_checkbox[i]->setChecked(true);
-		frame_switch_combobox[i]->setCurrentIndex(i);
+		updateFrameViews();
+		break;
+	case QMessageBox::Cancel:
+		// Cancel was clicked
+		break;
+	default:
+		// should never be reached
+		break;
 	}
-	updateFrameViews();
 }
+
 
 /**
  *
  * @param state
  */
 void WindowReceiver::on_checkBox_00_stateChanged(int state) {
-	frameSelectChanged(0, state);
+frameSelectChanged(0, state);
 }
 
 /**
@@ -250,7 +285,7 @@ void WindowReceiver::on_checkBox_00_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_01_stateChanged(int state) {
-	frameSelectChanged(1, state);
+frameSelectChanged(1, state);
 }
 
 /**
@@ -258,7 +293,7 @@ void WindowReceiver::on_checkBox_01_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_02_stateChanged(int state) {
-	frameSelectChanged(2, state);
+frameSelectChanged(2, state);
 }
 
 /**
@@ -266,7 +301,7 @@ void WindowReceiver::on_checkBox_02_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_03_stateChanged(int state) {
-	frameSelectChanged(3, state);
+frameSelectChanged(3, state);
 }
 
 /**
@@ -274,7 +309,7 @@ void WindowReceiver::on_checkBox_03_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_04_stateChanged(int state) {
-	frameSelectChanged(4, state);
+frameSelectChanged(4, state);
 }
 
 /**
@@ -282,7 +317,7 @@ void WindowReceiver::on_checkBox_04_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_05_stateChanged(int state) {
-	frameSelectChanged(5, state);
+frameSelectChanged(5, state);
 }
 
 /**
@@ -290,7 +325,7 @@ void WindowReceiver::on_checkBox_05_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_06_stateChanged(int state) {
-	frameSelectChanged(6, state);
+frameSelectChanged(6, state);
 }
 
 /**
@@ -298,7 +333,7 @@ void WindowReceiver::on_checkBox_06_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_07_stateChanged(int state) {
-	frameSelectChanged(7, state);
+frameSelectChanged(7, state);
 }
 
 /**
@@ -306,7 +341,7 @@ void WindowReceiver::on_checkBox_07_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_08_stateChanged(int state) {
-	frameSelectChanged(8, state);
+frameSelectChanged(8, state);
 }
 
 /**
@@ -314,7 +349,7 @@ void WindowReceiver::on_checkBox_08_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_09_stateChanged(int state) {
-	frameSelectChanged(9, state);
+frameSelectChanged(9, state);
 }
 
 /**
@@ -322,7 +357,7 @@ void WindowReceiver::on_checkBox_09_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_10_stateChanged(int state) {
-	frameSelectChanged(10, state);
+frameSelectChanged(10, state);
 }
 
 /**
@@ -330,7 +365,7 @@ void WindowReceiver::on_checkBox_10_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_11_stateChanged(int state) {
-	frameSelectChanged(11, state);
+frameSelectChanged(11, state);
 }
 
 /**
@@ -338,7 +373,7 @@ void WindowReceiver::on_checkBox_11_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_12_stateChanged(int state) {
-	frameSelectChanged(12, state);
+frameSelectChanged(12, state);
 }
 
 /**
@@ -346,7 +381,7 @@ void WindowReceiver::on_checkBox_12_stateChanged(int state) {
  * @param state
  */
 void WindowReceiver::on_checkBox_13_stateChanged(int state) {
-	frameSelectChanged(13, state);
+frameSelectChanged(13, state);
 }
 
 /***********************************************
@@ -357,7 +392,7 @@ void WindowReceiver::on_checkBox_13_stateChanged(int state) {
  *
  */
 void WindowReceiver::updateListView() {
-	ui_recv.listViewInfo->scrollToBottom();
+ui_recv.listViewInfo->scrollToBottom();
 
 }
 
@@ -366,19 +401,19 @@ void WindowReceiver::updateListView() {
  */
 void WindowReceiver::updateFrameViews() {
 
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		updateFrameAddressView(i);
-		updateFrameHertzView(i);
-		qnode_recv->setFrameHertz(i, 0);
-		updateFrameInactivityView(i);
-	}
+for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+	updateFrameAddressView(i);
+	updateFrameHertzView(i);
+	qnode_recv->setFrameHertz(i, 0);
+	updateFrameInactivityView(i);
+}
 }
 
 /**
  *
  */
 void WindowReceiver::updateMinHertz(int value) {
-		qnode_recv->setMinHertz(value);
+qnode_recv->setMinHertz(value);
 }
 
 /***********************************************
@@ -391,18 +426,18 @@ void WindowReceiver::updateMinHertz(int value) {
  * @param frame_index_b
  */
 void WindowReceiver::frameSwitch(const int &frame_index_a,
-		const int &frame_index_b) {
+	const int &frame_index_b) {
 
-	QString address_a = qnode_recv->getFrameAddress(frame_index_a);
-	QString address_b = qnode_recv->getFrameAddress(frame_index_b);
-	bool boolean_a = frame_select_checkbox[frame_index_a]->isChecked();
-	bool boolean_b = frame_select_checkbox[frame_index_b]->isChecked();
+QString address_a = qnode_recv->getFrameAddress(frame_index_a);
+QString address_b = qnode_recv->getFrameAddress(frame_index_b);
+bool boolean_a = frame_select_checkbox[frame_index_a]->isChecked();
+bool boolean_b = frame_select_checkbox[frame_index_b]->isChecked();
 
-	qnode_recv->setFrameAddress(frame_index_a, address_b);
-	qnode_recv->setFrameAddress(frame_index_b, address_a);
-	frame_select_checkbox[frame_index_a]->setChecked(boolean_b);
-	frame_select_checkbox[frame_index_b]->setChecked(boolean_a);
-	updateFrameViews();
+qnode_recv->setFrameAddress(frame_index_a, address_b);
+qnode_recv->setFrameAddress(frame_index_b, address_a);
+frame_select_checkbox[frame_index_a]->setChecked(boolean_b);
+frame_select_checkbox[frame_index_b]->setChecked(boolean_a);
+updateFrameViews();
 }
 
 /**
@@ -412,16 +447,14 @@ void WindowReceiver::frameSwitch(const int &frame_index_a,
  */
 void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
 
-	if (state == 2
-			&& qnode_recv->getFrameAddress(frame_index)
-					== qnode_recv->getIgnoreAddress()) {
-		qnode_recv->setFrameAddress(frame_index,
-				qnode_recv->getAssignAddress());
-	} else if (state == 0) {
-		qnode_recv->setFrameAddress(frame_index,
-				qnode_recv->getIgnoreAddress());
-	}
-	updateFrameAddressView(frame_index);
+if (state == 2
+		&& qnode_recv->getFrameAddress(frame_index)
+				== qnode_recv->getIgnoreAddress()) {
+	qnode_recv->setFrameAddress(frame_index, qnode_recv->getAssignAddress());
+} else if (state == 0) {
+	qnode_recv->setFrameAddress(frame_index, qnode_recv->getIgnoreAddress());
+}
+updateFrameAddressView(frame_index);
 }
 
 /**
@@ -429,8 +462,8 @@ void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
  * @param frame_index
  */
 void WindowReceiver::updateFrameAddressView(const int &frame_index) {
-	frame_address_line[frame_index]->setText(
-			qnode_recv->getFrameAddress(frame_index));
+frame_address_line[frame_index]->setText(
+		qnode_recv->getFrameAddress(frame_index));
 }
 
 /**
@@ -438,8 +471,8 @@ void WindowReceiver::updateFrameAddressView(const int &frame_index) {
  * @param frame_index
  */
 void WindowReceiver::updateFrameHertzView(const int &frame_index) {
-	frame_hertz_line[frame_index]->setText(
-			QString::number(qnode_recv->getFrameHertz(frame_index)));
+frame_hertz_line[frame_index]->setText(
+		QString::number(qnode_recv->getFrameHertz(frame_index)));
 }
 
 /**
@@ -447,8 +480,8 @@ void WindowReceiver::updateFrameHertzView(const int &frame_index) {
  * @param frame_index
  */
 void WindowReceiver::updateFrameInactivityView(const int &frame_index) {
-	frame_inactivity_line[frame_index]->setText(
-			qnode_recv->getFrameInactivity(frame_index));
+frame_inactivity_line[frame_index]->setText(
+		qnode_recv->getFrameInactivity(frame_index));
 }
 
 /***********************************************
@@ -460,85 +493,85 @@ void WindowReceiver::updateFrameInactivityView(const int &frame_index) {
  */
 void WindowReceiver::readSettings() {
 
-	QSettings settings(QString("TU Darmstadt"),
-			QString("human_cognition_receiver"));
+QSettings settings(QString("TU Darmstadt"),
+		QString("human_cognition_receiver"));
 
-	restoreGeometry(settings.value(QString("geometry")).toByteArray());
-	restoreState(settings.value(QString("windowState")).toByteArray());
+restoreGeometry(settings.value(QString("geometry")).toByteArray());
+restoreState(settings.value(QString("windowState")).toByteArray());
 
-	qnode_recv->clearAllFrameAddresses();
-	int size = settings.beginReadArray("addressList");
-	if (size == NUMBER_OF_FRAMES) {
-		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-			settings.setArrayIndex(i);
-			qnode_recv->addFrameAddress(
-					settings.value("address", qnode_recv->getAssignAddress()).toString());
-		}
-		settings.endArray();
+qnode_recv->clearAllFrameAddresses();
+int size = settings.beginReadArray("addressList");
+if (size == NUMBER_OF_FRAMES) {
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+		settings.setArrayIndex(i);
+		qnode_recv->addFrameAddress(
+				settings.value("address", qnode_recv->getAssignAddress()).toString());
+	}
+	settings.endArray();
+} else {
+	settings.endArray();
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+		qnode_recv->addFrameAddress(qnode_recv->getAssignAddress());
+	}
+}
+
+QStringList comboList;
+comboList.clear();
+for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+	if (i < 10) {
+		comboList.append(QString("0%1").arg(i));
 	} else {
-		settings.endArray();
-		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-			qnode_recv->addFrameAddress(qnode_recv->getAssignAddress());
-		}
+		comboList.append(QString("%1").arg(i));
 	}
+}
+ui_recv.comboBoxEuler->addItems(comboList);
+ui_recv.comboBoxEuler->setEnabled(false);
 
-	QStringList comboList;
-	comboList.clear();
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		if (i < 10) {
-			comboList.append(QString("0%1").arg(i));
-		} else {
-			comboList.append(QString("%1").arg(i));
-		}
+for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+	frame_switch_combobox[i]->addItems(comboList);
+	frame_switch_combobox[i]->setCurrentIndex(i);
+}
+
+ui_recv.checkBoxEuler->setChecked(false);
+
+ui_recv.pushButtonReceiverStart->setEnabled(false);
+ui_recv.pushButtonReceiverStop->setEnabled(false);
+ui_recv.pushButtonResetModel->setEnabled(false);
+ui_recv.pushButtonResetFrames->setEnabled(false);
+
+ui_recv.spinBoxMinHertz->setRange(50, 80);
+int value = settings.value("minHertz", 50).toInt();
+ui_recv.spinBoxMinHertz->setValue(value);
+qnode_recv->setMinHertz(value);
+
+for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+	if (qnode_recv->getFrameAddress(i) == qnode_recv->getIgnoreAddress()) {
+		frame_select_checkbox[i]->setChecked(false);
+	} else {
+		frame_select_checkbox[i]->setChecked(true);
 	}
-	ui_recv.comboBoxEuler->addItems(comboList);
-	ui_recv.comboBoxEuler->setEnabled(false);
-
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		frame_switch_combobox[i]->addItems(comboList);
-		frame_switch_combobox[i]->setCurrentIndex(i);
-	}
-
-	ui_recv.checkBoxEuler->setChecked(false);
-
-	ui_recv.pushButtonReceiverStart->setEnabled(false);
-	ui_recv.pushButtonReceiverStop->setEnabled(false);
-	ui_recv.pushButtonResetModel->setEnabled(false);
-	ui_recv.pushButtonResetFrames->setEnabled(false);
-
-	ui_recv.spinBoxMinHertz->setRange(50, 80);
-	int value = settings.value("minHertz", 50).toInt();
-	ui_recv.spinBoxMinHertz->setValue(value);
-	qnode_recv->setMinHertz(value);
-
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-
-		if (qnode_recv->getFrameAddress(i) == qnode_recv->getIgnoreAddress()) {
-			frame_select_checkbox[i]->setChecked(false);
-		} else {
-			frame_select_checkbox[i]->setChecked(true);
-		}
-		updateFrameAddressView(i);
-		updateFrameHertzView(i);
-		updateFrameInactivityView(i);
-	}
+	updateFrameAddressView(i);
+	updateFrameHertzView(i);
+	updateFrameInactivityView(i);
+}
 }
 
 /**
  *
  */
 void WindowReceiver::writeSettings() {
-	QSettings settings(QString("TU Darmstadt"),
-			QString("human_cognition_receiver"));
-	settings.setValue(QString("geometry"), saveGeometry());
-	settings.setValue(QString("windowState"), saveState());
+QSettings settings(QString("TU Darmstadt"),
+		QString("human_cognition_receiver"));
+settings.setValue(QString("geometry"), saveGeometry());
+settings.setValue(QString("windowState"), saveState());
 
-	settings.setValue("minHertz", ui_recv.spinBoxMinHertz->value());
+settings.setValue("minHertz", ui_recv.spinBoxMinHertz->value());
 
-	settings.beginWriteArray("addressList");
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		settings.setArrayIndex(i);
-		settings.setValue("address", qnode_recv->getFrameAddress(i));
-	}
-	settings.endArray();
+settings.beginWriteArray("addressList");
+for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+	settings.setArrayIndex(i);
+	settings.setValue("address", qnode_recv->getFrameAddress(i));
+}
+settings.endArray();
 }
