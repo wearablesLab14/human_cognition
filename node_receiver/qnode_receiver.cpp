@@ -176,17 +176,14 @@ void QNodeReceiver::run() {
 				}
 				original = original * rotationZCorrection;
 
-				if (display_euler_signal
-						&& currentFrame == display_euler_frame) {
-					tf::Matrix3x3(original).getRPY(frame_euler_x, frame_euler_y,
-							frame_euler_z);
-					frame_euler_x_average += frame_euler_x;
-					frame_euler_y_average += frame_euler_y;
-					frame_euler_z_average += frame_euler_z;
-				}
-
 				tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
 						-original.getX(), original.getZ(), original.getW());
+
+				if (display_euler_signal
+						&& currentFrame == display_euler_frame) {
+					tf::Matrix3x3(original).getRPY(frame_euler_y, frame_euler_x,
+							frame_euler_z);
+				}
 
 				//*********************************************************************
 
@@ -246,11 +243,19 @@ void QNodeReceiver::run() {
 
 					if (display_euler_signal
 							&& frame_hertz[display_euler_frame] != 0) {
-						displayEulerAverage();
+
+						display(INFO,
+								QString("x-axis %1, y-axis %2, z-axis %3").arg(
+										QString::number(frame_euler_x, 'f', 3)).arg(
+										QString::number(frame_euler_y, 'f', 3)).arg(
+										QString::number(frame_euler_z, 'f',
+												3)));
 					}
 
-					displayFrameAsynchrony();
-					displayFrameInactivity();
+					if(!display_euler_signal) {
+						displayFrameAsynchrony();
+						displayFrameInactivity();
+					}
 
 					getTimeFromSec();
 
@@ -493,24 +498,6 @@ void QNodeReceiver::getTimeFromSec() {
 /**
  *
  */
-void QNodeReceiver::displayEulerAverage() {
-
-	frame_euler_x_average /= frame_hertz[display_euler_frame];
-	frame_euler_y_average /= frame_hertz[display_euler_frame];
-	frame_euler_z_average /= frame_hertz[display_euler_frame];
-
-	display(INFO,
-			QString("%1, %2, %3").arg(frame_euler_x_average).arg(
-					frame_euler_y_average).arg(frame_euler_z_average));
-
-	frame_euler_x_average = 0;
-	frame_euler_y_average = 0;
-	frame_euler_z_average = 0;
-}
-
-/**
- *
- */
 void QNodeReceiver::displayFrameAsynchrony() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
@@ -605,9 +592,6 @@ void QNodeReceiver::initEuler() {
 	frame_euler_x = 0;
 	frame_euler_y = 0;
 	frame_euler_z = 0;
-	frame_euler_x_average = 0;
-	frame_euler_y_average = 0;
-	frame_euler_z_average = 0;
 }
 
 /**

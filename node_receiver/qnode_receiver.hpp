@@ -56,7 +56,6 @@ private:
 	bool socketOption();
 	bool socketBinding();
 	void getTimeFromSec();
-	void displayEulerAverage();
 	void displayFrameAsynchrony();
 	void displayFrameInactivity();
 
@@ -78,9 +77,6 @@ private:
 	double frame_euler_x;
 	double frame_euler_y;
 	double frame_euler_z;
-	double frame_euler_x_average;
-	double frame_euler_y_average;
-	double frame_euler_z_average;
 
 	bool display_euler_signal;
 	int display_euler_frame;

@@ -177,8 +177,10 @@ void WindowReceiver::on_pushButtonReceiverStop_clicked() {
 void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
 	if (state == 2) {
 		ui_recv.comboBoxEuler->setEnabled(true);
+		ui_recv.spinBoxMinHertz->setEnabled(false);
 	} else if (state == 0) {
 		ui_recv.comboBoxEuler->setEnabled(false);
+		ui_recv.spinBoxMinHertz->setEnabled(true);
 	}
 }
 
