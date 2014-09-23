@@ -159,24 +159,30 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 	QString text("");
 
 	switch (display_type) {
-	case (INSTRUCTION): {
-		text.append(QString("[INSTRUCTION] "));
+	case (TIP): {
+		text.append(QString("[TIP]: "));
 		listViewItem->setData(QBrush(QColor(Qt::black)), Qt::ForegroundRole);
 		break;
 	}
 	case (INFO): {
-		text.append(QString("[INFO] "));
+		text.append(QString("[INFO]: "));
 		listViewItem->setData(QBrush(QColor(Qt::darkCyan)), Qt::ForegroundRole);
 		break;
 	}
-	case (WARNING): {
-		text.append(QString("[WARNING] "));
+	case (ASYNCH): {
+		text.append(QString("[ASYNCH]: "));
+		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
+				Qt::ForegroundRole);
+		break;
+	}
+	case (INACTIVE): {
+		text.append(QString("[INACTIVE]: "));
 		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
 				Qt::ForegroundRole);
 		break;
 	}
 	case (ERROR): {
-		text.append(QString("[ERROR] "));
+		text.append(QString("[ERROR]: "));
 		listViewItem->setData(QBrush(QColor(Qt::darkMagenta)),
 				Qt::ForegroundRole);
 		break;

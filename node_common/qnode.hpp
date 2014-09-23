@@ -7,6 +7,8 @@
 
 #include <ros/network.h>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 #include <tf/tf.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
@@ -33,12 +35,11 @@
 
 #define PORT 5050
 #define NUMBER_OF_FRAMES 14
-#define SYNCH_MINIMUM 80
 #define TO_ASSIGN_ADDRESS "000.000.0.000"
 #define TO_IGNORE_ADDRESS "---.---.-.---"
 
 enum DisplayType {
-	INSTRUCTION, INFO, WARNING, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
+	TIP, INFO, ASYNCH, INACTIVE, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
 };
 
 struct SensorData {

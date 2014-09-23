@@ -29,6 +29,7 @@ public Q_SLOTS:
 	 ***********************************************/
 	void updateListView();
 	void updateFrameViews();
+	void updateMinHertz(int value);
 
 	/***********************************************
 	 GUI ACTION METHODS

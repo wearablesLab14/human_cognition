@@ -45,6 +45,7 @@ public:
 	virtual void setResetModelSignal(const bool &boolean);
 	virtual void setDisplayEulerSignal(const bool &boolean);
 	virtual void setDisplayEulerFrame(const int &frame_index);
+	virtual void setMinHertz(int value);
 
 private:
 	/***********************************************
@@ -83,6 +84,8 @@ private:
 
 	bool display_euler_signal;
 	int display_euler_frame;
+
+	int minHertz;
 
 	bool reset_model_signal;
 	QString assign_address;

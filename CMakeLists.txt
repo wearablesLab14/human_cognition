@@ -5,6 +5,7 @@ find_package(catkin)
 find_package(catkin REQUIRED COMPONENTS qt_build roscpp tf urdf)
 
 include_directories(${catkin_INCLUDE_DIRS})
+include_directories($CMAKE_CURRENT_BINARY_DIR}/node_common)
 
 rosbuild_prepare_qt4(QtCore QtGui) 
 

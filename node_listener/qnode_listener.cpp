@@ -29,8 +29,8 @@ private:
 QNodeListener::QNodeListener(int argc, char** argv) :
 		QNode(argc, argv, "listener") {
 
-	display(INSTRUCTION, "1. Connect to mocap");
-	display(INSTRUCTION, "2. Start receiver");
+	display(TIP, "1. Connect to mocap");
+	display(TIP, "2. Start receiver");
 
 	display_coordinates_signal = false;
 	display_coordinates_frame = 0;
@@ -80,6 +80,8 @@ void QNodeListener::run() {
 	echoListener echoListener;
 	std::ofstream coordinates;
 
+	ros::Time::useSystemTime();
+
 	if (record_coordinates_signal) {
 		coordinates.open(record_coordinates_file.c_str(),
 				std::ios::out | std::ios::app);
@@ -94,6 +96,8 @@ void QNodeListener::run() {
 
 	ros::Duration timeout(1.0);
 	ros::Time start_time = ros::Time::now();
+
+
 
 	while (ros::ok()) {
 
@@ -111,7 +115,7 @@ void QNodeListener::run() {
 			if (record_coordinates_signal) {
 
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-					coordinates << i << ";" << tf_joint_coordinates[i].getX()
+					coordinates << i << ";" << to_iso_string(ros::Time::now().toBoost()) << ";" <<tf_joint_coordinates[i].getX()
 							<< ";" << tf_joint_coordinates[i].getY() << ";"
 							<< tf_joint_coordinates[i].getZ() << "\n";
 				}
@@ -141,8 +145,8 @@ void QNodeListener::run() {
 
 		} catch (tf::TransformException& ex) {
 
-			display(INSTRUCTION, QString(ex.what()));
-			display(INSTRUCTION,
+			display(ERROR, QString(ex.what()));
+			display(ERROR,
 					QString::fromStdString(
 							echoListener.tf.allFramesAsString()));
 

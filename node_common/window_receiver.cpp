@@ -96,6 +96,8 @@ WindowReceiver::WindowReceiver(QNodeReceiver *node, QWidget *parent) :
 	QObject::connect(qnode_recv, SIGNAL(frameDataUpdated()), this,
 			SLOT(updateFrameViews()));
 
+	 QObject::connect(ui_recv.spinBoxMinHertz, SIGNAL(valueChanged(int)), this, SLOT(updateMinHertz(int)));
+
 }
 
 /**
@@ -372,6 +374,13 @@ void WindowReceiver::updateFrameViews() {
 	}
 }
 
+/**
+ *
+ */
+void WindowReceiver::updateMinHertz(int value) {
+		qnode_recv->setMinHertz(value);
+}
+
 /***********************************************
  PRIVATE GUI METHODS
  ***********************************************/
@@ -497,6 +506,11 @@ void WindowReceiver::readSettings() {
 	ui_recv.pushButtonResetModel->setEnabled(false);
 	ui_recv.pushButtonResetFrames->setEnabled(false);
 
+	ui_recv.spinBoxMinHertz->setRange(50, 80);
+	int value = settings.value("minHertz", 50).toInt();
+	ui_recv.spinBoxMinHertz->setValue(value);
+	qnode_recv->setMinHertz(value);
+
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
 		if (qnode_recv->getFrameAddress(i) == qnode_recv->getIgnoreAddress()) {
@@ -518,6 +532,8 @@ void WindowReceiver::writeSettings() {
 			QString("human_cognition_receiver"));
 	settings.setValue(QString("geometry"), saveGeometry());
 	settings.setValue(QString("windowState"), saveState());
+
+	settings.setValue("minHertz", ui_recv.spinBoxMinHertz->value());
 
 	settings.beginWriteArray("addressList");
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {

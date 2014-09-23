@@ -8,8 +8,8 @@
 QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 		QNode(argc, argv, "receiver") {
 
-	display(INSTRUCTION, "1. Connect to mocap");
-	display(INSTRUCTION, "2. 'roslaunch human_cognition rviz.launch'");
+	display(TIP, "1. Connect to mocap");
+	display(TIP, "2. 'roslaunch human_cognition rviz.launch'");
 
 	/***********************************************************/
 
@@ -37,6 +37,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 
 	display_euler_signal = false;
 	display_euler_frame = 0;
+
+	minHertz = 0;
 
 	reset_model_signal = false;
 
@@ -397,6 +399,11 @@ void QNodeReceiver::setDisplayEulerFrame(const int &frame_index) {
 	display_euler_frame = frame_index;
 }
 
+
+void QNodeReceiver::setMinHertz(int value) {
+	minHertz = value;
+}
+
 /**
  *
  * @return
@@ -508,11 +515,11 @@ void QNodeReceiver::displayFrameAsynchrony() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-		if (frame_hertz[i] != 0 && frame_hertz[i] < SYNCH_MINIMUM) {
+		if (frame_hertz[i] != 0 && frame_hertz[i] < minHertz) {
 			QString warning(getFrameString(i));
 			warning.append(QString(" newest-last stamp: "));
 			warning.append(QString::number(frame_snr_span[i]));
-			display(WARNING, warning);
+			display(ASYNCH, warning);
 		}
 	}
 }
@@ -522,18 +529,22 @@ void QNodeReceiver::displayFrameAsynchrony() {
  */
 void QNodeReceiver::displayFrameInactivity() {
 
-	//TODO counter
+	int count = 0;
 
 	QString warning("");
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
 		if (frame_address_list.at(i) != ignore_address && frame_hertz[i] == 0) {
+			count++;
 			warning.append(getFrameString(i));
-			warning.append(QString("|"));
+			warning.append(QString(" "));
 		}
 	}
-	warning.append(QString(" are inactive"));
-	display(WARNING, warning);
+	if(count > 0) {
+		display(INACTIVE, warning);
+	} else {
+		display(INFO, QString("All selected frames are active"));
+	}
 }
 
 /**
