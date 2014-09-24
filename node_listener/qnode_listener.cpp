@@ -37,17 +37,6 @@ QNodeListener::QNodeListener(int argc, char** argv) :
 
 	record_coordinates_signal = false;
 	record_coordinates_file = "coordinates.csv";
-
-	time_t t = time(0);   // get time now
-	struct tm * now = localtime( & t );
-
-	QString test("");
-	test.append(QString::number(now->tm_year + 1900));
-	test.append(QString::number(now->tm_mon + 1));
-	test.append(QString::number(now->tm_mday));
-	test.append(QString::number(now->tm_hour));
-	test.append(QString::number(now->tm_min));
-	test.append(QString::number(now->tm_sec));
 }
 
 /***********************************************
@@ -88,23 +77,8 @@ void QNodeListener::stopAction() {
  */
 void QNodeListener::run() {
 
-	ros::Time::useSystemTime();
-
-	// conversion of the UTC ros time into GMT+1
-	std::string test2 = to_iso_string(ros::Time::now().toBoost());
-	std::string hoursString = test2.substr(9, 2);
-	int hours = atoi(hoursString.c_str());
-	hours += 2;
-	std::stringstream ss;
-	ss << hours;
-	std::string str = ss.str();
-	test2.replace(9, 2, str);
-
-	display(INFO, QString::fromStdString(test2));
-
 	echoListener echoListener;
 	std::ofstream coordinates;
-
 
 	if (record_coordinates_signal) {
 		coordinates.open(record_coordinates_file.c_str(),
@@ -114,14 +88,21 @@ void QNodeListener::run() {
 	std::string source_frameid = "/base_link";
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		echoListener.tf.waitForTransform(source_frameid, link_name[i],
-				ros::Time(0), ros::Duration(1.0));
+
+		if (echoListener.tf.waitForTransform(source_frameid, link_name[i],
+				ros::Time(0), ros::Duration(0.3))) {
+			display(getFrameDisplayType(i),
+					getFrameString(i).append(QString(" found")));
+		} else {
+			display(getFrameDisplayType(i),
+					getFrameString(i).append(QString(" not found")));
+		}
 	}
 
 	ros::Duration timeout(1.0);
 	ros::Time start_time = ros::Time::now();
 
-
+	int oldnsec = 0;
 
 	while (ros::ok()) {
 
@@ -132,47 +113,56 @@ void QNodeListener::run() {
 						ros::Time(0), tf_message[i]);
 			}
 
-			for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-				tf_joint_coordinates[i] = tf_message[i].getOrigin();
-			}
+			if (tf_message[0].stamp_.nsec != oldnsec) {
 
-			if (record_coordinates_signal) {
+				oldnsec = tf_message[0].stamp_.nsec;
 
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-					coordinates << i << ";" << to_iso_string(tf_message[i].stamp_.toBoost()) << ";" <<tf_joint_coordinates[i].getX()
-							<< ";" << tf_joint_coordinates[i].getY() << ";"
-							<< tf_joint_coordinates[i].getZ() << "\n";
+					tf_joint_coordinates[i] = tf_message[i].getOrigin();
+				}
+
+				if (record_coordinates_signal) {
+
+					for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+						coordinates << i << ";"
+								<< rosTimeToGMTPlus1(tf_message[i].stamp_)
+								<< ";" << tf_joint_coordinates[i].getX() << ";"
+								<< tf_joint_coordinates[i].getY() << ";"
+								<< tf_joint_coordinates[i].getZ() << "\n";
+					}
 				}
 			}
 
-			if (display_coordinates_signal
-					&& (ros::Time::now() - start_time) >= timeout) {
+			if ((ros::Time::now() - start_time) >= timeout) {
 
-				QString msg(link_name[display_coordinates_frame].c_str());
-				msg.append(QString(" x: "));
-				msg.append(
-						QString::number(
-								tf_joint_coordinates[display_coordinates_frame].getX()));
-				msg.append(QString(" y: "));
-				msg.append(
-						QString::number(
-								tf_joint_coordinates[display_coordinates_frame].getY()));
-				msg.append(QString(" z: "));
-				msg.append(
-						QString::number(
-								tf_joint_coordinates[display_coordinates_frame].getZ()));
+				if (display_coordinates_signal) {
 
-				display(getFrameDisplayType(display_coordinates_frame), msg);
+					QString msg(link_name[display_coordinates_frame].c_str());
+					msg.append(QString(" x: "));
+					msg.append(
+							QString::number(
+									tf_joint_coordinates[display_coordinates_frame].getX()));
+					msg.append(QString(" y: "));
+					msg.append(
+							QString::number(
+									tf_joint_coordinates[display_coordinates_frame].getY()));
+					msg.append(QString(" z: "));
+					msg.append(
+							QString::number(
+									tf_joint_coordinates[display_coordinates_frame].getZ()));
+
+					display(getFrameDisplayType(display_coordinates_frame),
+							msg);
+				}
+
+				if (record_coordinates_signal) {
+					display(INFO, QString("Recording coordinates"));
+				}
 
 				start_time = ros::Time::now();
 			}
 
 		} catch (tf::TransformException& ex) {
-
-			display(ERROR, QString(ex.what()));
-			display(ERROR,
-					QString::fromStdString(
-							echoListener.tf.allFramesAsString()));
 
 		}
 	}

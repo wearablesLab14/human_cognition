@@ -107,12 +107,16 @@ void QNodeReceiver::run() {
 
 	tf::TransformBroadcaster tfPublisher;
 
+	//******************************************************************
+
 	//frame rotation correction
 	tf::Quaternion rotationYCorrection(0, sqrt(0.5), 0, -sqrt(0.5));
 	rotationYCorrection.normalize();
 
 	tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
 	rotationZCorrection.normalize();
+
+	//******************************************************************
 
 	ros::Duration initial_timeout(2.0);
 	ros::Time initial_start_time = ros::Time::now();
@@ -170,6 +174,8 @@ void QNodeReceiver::run() {
 						sensor_packet_data.q0);
 				original.normalize();
 
+				//******************************************************************
+
 				//correct original rotation
 				if (currentFrame != 7 && currentFrame != 13) {
 					original = original * rotationYCorrection;
@@ -178,6 +184,8 @@ void QNodeReceiver::run() {
 
 				tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
 						-original.getX(), original.getZ(), original.getW());
+
+				//******************************************************************
 
 				if (display_euler_signal
 						&& currentFrame == display_euler_frame) {
@@ -223,13 +231,20 @@ void QNodeReceiver::run() {
 					//update last update time for current frame
 					if (i == currentFrame) {
 
-						int x = sensor_packet_data.timestamp;
-						frame_snr_span[currentFrame] = x
-								- frame_snr_last_stamp[currentFrame];
-						frame_snr_last_stamp[currentFrame] = x;
+						ros::Time curr_stamp = tf_frame_msg[currentFrame].stamp_;
+						ros::Time last_stamp = frame_msg_last_stamp[currentFrame];
 
-						frame_msg_last_stamp[currentFrame] =
-								tf_frame_msg[currentFrame].stamp_;
+						frame_snr_span_sec[currentFrame] = curr_stamp.sec - last_stamp.sec;
+
+						if (curr_stamp.sec == last_stamp.sec) {
+							frame_snr_span_nsec[currentFrame] = curr_stamp.nsec
+									- last_stamp.nsec;
+						} else {
+							frame_snr_span_nsec[currentFrame] = curr_stamp.nsec
+									+ (1000000000 - last_stamp.nsec);
+						}
+
+						frame_msg_last_stamp[currentFrame] = curr_stamp;
 					}
 
 					//*********************************************************************
@@ -505,7 +520,12 @@ void QNodeReceiver::displayFrameAsynchrony() {
 		if (frame_hertz[i] != 0 && frame_hertz[i] < minHertz) {
 			QString warning(getFrameString(i));
 			warning.append(QString(" newest-last stamp: "));
-			warning.append(QString::number(frame_snr_span[i]));
+			if(frame_snr_span_sec[i] != 0) {
+				warning.append(QString::number(frame_snr_span_sec[i]));
+				warning.append(QString(" sec. "));
+			}
+			warning.append(QString::number(frame_snr_span_nsec[i]));
+			warning.append(QString(" nanosec. "));
 			display(ASYNCH, warning);
 		}
 	}
@@ -612,8 +632,7 @@ void QNodeReceiver::initFrameData() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		frame_hertz[i] = 0;
-		frame_snr_span[i] = 0;
-		frame_snr_last_stamp[i] = 0;
+		frame_snr_span_nsec[i] = 0;
 		frame_inactivity[i] = QTime(0, 0, 0).toString();
 	}
 }

@@ -7,7 +7,6 @@
 
 #include <ros/network.h>
 
-#include <ctime>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <tf/tf.h>
@@ -75,6 +74,7 @@ public:
 	QString getFrameString(const int &frame_index);
 	DisplayType getFrameDisplayType(const int &frame_index);
 	void display(const DisplayType &level, const QString &info);
+	std::string rosTimeToGMTPlus1(ros::Time stamp);
 
 	/***********************************************
 	 GETTER METHODS

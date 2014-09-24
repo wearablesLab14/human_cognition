@@ -213,6 +213,23 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 	Q_EMIT listViewModelUpdated();
 }
 
+/**
+ *
+ * @param stamp
+ * @return
+ */
+std::string QNode::rosTimeToGMTPlus1(ros::Time stamp) {
+	std::string time_str = to_iso_string(stamp.toBoost());
+	std::string hoursString = time_str.substr(9, 2);
+	int hours = atoi(hoursString.c_str());
+	hours += 2;
+	std::stringstream ss;
+	ss << hours;
+	std::string str = ss.str();
+	time_str.replace(9, 2, str);
+	return time_str;
+}
+
 /***********************************************
  GETTER METHODS
  ***********************************************/
