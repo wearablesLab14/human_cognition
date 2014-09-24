@@ -90,7 +90,15 @@ void QNodeListener::run() {
 
 	ros::Time::useSystemTime();
 
+	// conversion of the UTC ros time into GMT+1
 	std::string test2 = to_iso_string(ros::Time::now().toBoost());
+	std::string hoursString = test2.substr(9, 2);
+	int hours = atoi(hoursString.c_str());
+	hours += 2;
+	std::stringstream ss;
+	ss << hours;
+	std::string str = ss.str();
+	test2.replace(9, 2, str);
 
 	display(INFO, QString::fromStdString(test2));
 
