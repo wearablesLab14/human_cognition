@@ -27,9 +27,9 @@
 <link name="link_02_l_upper_arm">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/upper_arm.dae" scale="0.3 0.3 0.3"/>			
+			<mesh filename="package://human_cognition/meshes/upper_arm.dae" scale="0.3 0.3 0.25"/>			
 		</geometry>
-		<origin xyz="0 -0.01 -0.32" rpy="0 0 0"/>		
+		<origin xyz="0 -0.01 -0.30" rpy="0 0 0"/>		
 	</visual>	
 </link>
 <link name="link_03_l_lower_arm">
@@ -77,9 +77,9 @@
 <link name="link_08_r_upper_arm">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/upper_arm.dae" scale="0.3 0.3 0.3"/>			
+			<mesh filename="package://human_cognition/meshes/upper_arm.dae" scale="0.3 0.3 0.25"/>			
 		</geometry>
-		<origin xyz="0 0.01 -0.32" rpy="0 0 0"/>		
+		<origin xyz="0 0.01 -0.30" rpy="0 0 0"/>		
 	</visual>
 </link>
 <link name="link_09_r_lower_arm">
