@@ -7,6 +7,7 @@
 
 #include <ros/network.h>
 
+#include <ctime>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <tf/tf.h>

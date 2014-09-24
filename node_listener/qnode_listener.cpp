@@ -37,6 +37,17 @@ QNodeListener::QNodeListener(int argc, char** argv) :
 
 	record_coordinates_signal = false;
 	record_coordinates_file = "coordinates.csv";
+
+	time_t t = time(0);   // get time now
+	struct tm * now = localtime( & t );
+
+	QString test("");
+	test.append(QString::number(now->tm_year + 1900));
+	test.append(QString::number(now->tm_mon + 1));
+	test.append(QString::number(now->tm_mday));
+	test.append(QString::number(now->tm_hour));
+	test.append(QString::number(now->tm_min));
+	test.append(QString::number(now->tm_sec));
 }
 
 /***********************************************
@@ -77,10 +88,15 @@ void QNodeListener::stopAction() {
  */
 void QNodeListener::run() {
 
+	ros::Time::useSystemTime();
+
+	std::string test2 = to_iso_string(ros::Time::now().toBoost());
+
+	display(INFO, QString::fromStdString(test2));
+
 	echoListener echoListener;
 	std::ofstream coordinates;
 
-	ros::Time::useSystemTime();
 
 	if (record_coordinates_signal) {
 		coordinates.open(record_coordinates_file.c_str(),
@@ -115,7 +131,7 @@ void QNodeListener::run() {
 			if (record_coordinates_signal) {
 
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-					coordinates << i << ";" << to_iso_string(ros::Time::now().toBoost()) << ";" <<tf_joint_coordinates[i].getX()
+					coordinates << i << ";" << to_iso_string(tf_message[i].stamp_.toBoost()) << ";" <<tf_joint_coordinates[i].getX()
 							<< ";" << tf_joint_coordinates[i].getY() << ";"
 							<< tf_joint_coordinates[i].getZ() << "\n";
 				}
