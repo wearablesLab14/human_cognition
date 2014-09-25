@@ -97,6 +97,7 @@ private:
 
 	urdf::Model model;
 	tf::StampedTransform tf_base_msg;
+	tf::Quaternion tf_base_rot;
 
 	tf::Quaternion tf_frame_rot[NUMBER_OF_FRAMES];
 	tf::StampedTransform tf_frame_msg[NUMBER_OF_FRAMES];

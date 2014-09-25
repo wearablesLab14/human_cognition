@@ -134,7 +134,7 @@ void QNodeReceiver::run() {
 		}
 	}
 
-	int currentFrame;
+	int currFrame;
 	QString currentAddress;
 
 	display(INFO, QString("Receiving has started"));
@@ -155,61 +155,88 @@ void QNodeReceiver::run() {
 
 			currentAddress = QString(inet_ntoa(sensor_address.sin_addr));
 
-			currentFrame = frame_address_list.indexOf(currentAddress, 0);
+			currFrame = frame_address_list.indexOf(currentAddress, 0);
 
-			if (currentFrame < 0) {
+			if (currFrame < 0) {
 
-				currentFrame = frame_address_list.indexOf(assign_address, 0);
+				currFrame = frame_address_list.indexOf(assign_address, 0);
 
-				if (currentFrame >= 0) {
-					setFrameAddress(currentFrame, currentAddress);
+				if (currFrame >= 0) {
+					setFrameAddress(currFrame, currentAddress);
 				}
 
 			}
 
-			if (currentFrame >= 0 && currentFrame < NUMBER_OF_FRAMES) {
+			if (currFrame >= 0 && currFrame < NUMBER_OF_FRAMES) {
 
-				tf::Quaternion original(sensor_packet_data.q1,
+				tf::Quaternion quat(sensor_packet_data.q1,
 						sensor_packet_data.q2, sensor_packet_data.q3,
 						sensor_packet_data.q0);
-				original.normalize();
+				quat.normalize();
 
 				//******************************************************************
 
 				//correct original rotation
-				if (currentFrame != 7 && currentFrame != 13) {
-					original = original * rotationYCorrection;
+				if (currFrame != 7 && currFrame != 13) {
+					quat = quat * rotationYCorrection;
+					quat.normalize();
 				}
-				original = original * rotationZCorrection;
+				//original = original * rotationZCorrection;
 
-				tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
-						-original.getX(), original.getZ(), original.getW());
+				//tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
+				//-original.getX(), original.getZ(), original.getW());
+
+				if (currFrame < 2) {
+					tf_frame_rot[currFrame] = tf::Quaternion(quat.getX(),
+							quat.getY(), quat.getZ(), quat.getW());
+				} else if (currFrame < 5) {
+					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
+							-quat.getY(), quat.getZ(), quat.getW());
+				} else if (currFrame < 8) {
+
+				} else if (currFrame < 11) {
+					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
+							-quat.getY(), quat.getZ(), quat.getW());
+				} else {
+
+				}
 
 				//******************************************************************
 
-				if (display_euler_signal
-						&& currentFrame == display_euler_frame) {
-					tf::Matrix3x3(original).getRPY(frame_euler_y, frame_euler_x,
+				if (display_euler_signal && currFrame == display_euler_frame) {
+					tf::Matrix3x3(quat).getRPY(frame_euler_y, frame_euler_x,
 							frame_euler_z);
 				}
 
 				//*********************************************************************
 
 				//kinematic
-				if (currentFrame == 2 || currentFrame == 5 || currentFrame == 8
-						|| currentFrame == 11) {
-					tf_frame_rot[currentFrame] = inverse(tf_frame_rot[0])
-							* tf_frame_rot[currentFrame];
-				} else if (currentFrame != 0) {
-					tf_frame_rot[currentFrame] = inverse(
-							tf_frame_rot[currentFrame - 1])
-							* tf_frame_rot[currentFrame];
+				if (currFrame == 0 || currFrame == 2 || currFrame == 5
+						|| currFrame == 8 || currFrame == 11) {
+					//tf_frame_rot[currFrame] = inverse(tf_base_rot)
+					//* tf_frame_rot[currFrame];
+				} else {
+					tf_frame_rot[currFrame] = inverse(
+							tf_frame_rot[currFrame - 1])
+							* tf_frame_rot[currFrame];
 				}
+				tf_frame_rot[currFrame].normalize();
 
-				tf_frame_msg[currentFrame].setRotation(
-						tf_frame_rot[currentFrame]);
+				/*
+				 if (currentFrame == 2 || currentFrame == 5 || currentFrame == 8
+				 || currentFrame == 11) {
+				 tf_frame_rot[currentFrame] = inverse(tf_frame_rot[0])
+				 * tf_frame_rot[currentFrame];
+				 } else if (currentFrame != 0) {
+				 tf_frame_rot[currentFrame] = inverse(
+				 tf_frame_rot[currentFrame - 1])
+				 * tf_frame_rot[currentFrame];
+				 }
+				 */
 
-				frame_hertz[currentFrame] = frame_hertz[currentFrame] + 1;
+				tf_frame_msg[currFrame].setRotation(tf_frame_rot[currFrame]);
+
+				frame_hertz[currFrame] = frame_hertz[currFrame] + 1;
 
 				if (reset_model_signal) {
 					initFrameRotation();
@@ -229,22 +256,23 @@ void QNodeReceiver::run() {
 					tfPublisher.sendTransform(tf_frame_msg[i]);
 
 					//update last update time for current frame
-					if (i == currentFrame) {
+					if (i == currFrame) {
 
-						ros::Time curr_stamp = tf_frame_msg[currentFrame].stamp_;
-						ros::Time last_stamp = frame_msg_last_stamp[currentFrame];
+						ros::Time curr_stamp = tf_frame_msg[currFrame].stamp_;
+						ros::Time last_stamp = frame_msg_last_stamp[currFrame];
 
-						frame_snr_span_sec[currentFrame] = curr_stamp.sec - last_stamp.sec;
+						frame_snr_span_sec[currFrame] = curr_stamp.sec
+								- last_stamp.sec;
 
 						if (curr_stamp.sec == last_stamp.sec) {
-							frame_snr_span_nsec[currentFrame] = curr_stamp.nsec
+							frame_snr_span_nsec[currFrame] = curr_stamp.nsec
 									- last_stamp.nsec;
 						} else {
-							frame_snr_span_nsec[currentFrame] = curr_stamp.nsec
+							frame_snr_span_nsec[currFrame] = curr_stamp.nsec
 									+ (1000000000 - last_stamp.nsec);
 						}
 
-						frame_msg_last_stamp[currentFrame] = curr_stamp;
+						frame_msg_last_stamp[currFrame] = curr_stamp;
 					}
 
 					//*********************************************************************
@@ -267,7 +295,7 @@ void QNodeReceiver::run() {
 												3)));
 					}
 
-					if(!display_euler_signal) {
+					if (!display_euler_signal) {
 						displayFrameAsynchrony();
 						displayFrameInactivity();
 					}
@@ -419,7 +447,6 @@ void QNodeReceiver::setDisplayEulerFrame(const int &frame_index) {
 	display_euler_frame = frame_index;
 }
 
-
 void QNodeReceiver::setMinHertz(int value) {
 	minHertz = value;
 }
@@ -520,7 +547,7 @@ void QNodeReceiver::displayFrameAsynchrony() {
 		if (frame_hertz[i] != 0 && frame_hertz[i] < minHertz) {
 			QString warning(getFrameString(i));
 			warning.append(QString(" newest-last stamp: "));
-			if(frame_snr_span_sec[i] != 0) {
+			if (frame_snr_span_sec[i] != 0) {
 				warning.append(QString::number(frame_snr_span_sec[i]));
 				warning.append(QString(" sec. "));
 			}
@@ -547,7 +574,7 @@ void QNodeReceiver::displayFrameInactivity() {
 			warning.append(QString(" "));
 		}
 	}
-	if(count > 0) {
+	if (count > 0) {
 		display(INACTIVE, warning);
 	} else {
 		display(INFO, QString("All selected frames are active"));
@@ -571,7 +598,7 @@ void QNodeReceiver::initBaseMessage() {
 			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.z;
 	tf_base_msg.setOrigin(tf::Vector3(x, y, z));
 
-	tf::Quaternion tf_base_rot = tf::Quaternion(0, 0, 0, sqrt(1.0));
+	tf_base_rot = tf::Quaternion(0, 0, 0, sqrt(1.0));
 	tf_base_rot.normalize();
 	tf_base_msg.setRotation(tf_base_rot);
 }
@@ -599,7 +626,6 @@ void QNodeReceiver::initFrameMessages() {
 		z =
 				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.z;
 		tf_frame_msg[i].setOrigin(tf::Vector3(x, y, z));
-
 		tf_frame_msg[i].setRotation(tf_frame_rot[i]);
 	}
 }
