@@ -51,7 +51,7 @@
 <link name="link_05_l_upper_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/upper_leg_left.dae" scale="0.4 0.4 0.5"/>		
+			<mesh filename="package://human_cognition/meshes/upper_leg.dae" scale="0.4 0.4 0.5"/>		
 		</geometry>
 		<origin xyz="0 0 -0.58" rpy="0 0 0"/>	
 	</visual>	
@@ -69,7 +69,7 @@
 		<geometry>			
 			<mesh filename="package://human_cognition/meshes/foot_left.dae" scale="0.2 0.2 0.2"/>
 		</geometry>     
-		<origin xyz="0.17 0.05 0.01" rpy="0 0 1.57"/>			
+		<origin xyz="0.03 0 0" rpy="0 0 -1.57"/>			
 	</visual>
 </link>
 
@@ -101,7 +101,7 @@
 <link name="link_11_r_upper_leg">
 <visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/upper_leg_right.dae" scale="0.4 0.4 0.5"/>		
+			<mesh filename="package://human_cognition/meshes/upper_leg.dae" scale="0.4 0.4 0.5"/>		
 		</geometry>
 		<origin xyz="0 0 -0.58" rpy="0 0 0"/>	
 	</visual>	
@@ -119,7 +119,7 @@
 		<geometry>			
 			<mesh filename="package://human_cognition/meshes/foot_right.dae" scale="0.2 0.2 0.2"/>
 		</geometry>     
-		<origin xyz="0.17 -0.05 0.01" rpy="0 0 1.57"/>			
+		<origin xyz="0.03 0 0" rpy="0 0 -1.57"/>			
 	</visual>
 </link>
 
@@ -165,7 +165,7 @@
 </joint>
 <joint name="joint_05_l_hip" type="continuous">
 	<origin xyz="0 0.1 0"/>
-	<parent link="base_link_connector"/>
+	<parent link="link_00_b_body"/>
 	<child link="link_05_l_upper_leg"/>	
 </joint>
 <joint name="joint_06_l_knee" type="continuous">
@@ -197,7 +197,7 @@
 </joint>
 <joint name="joint_11_r_hip" type="continuous">
 	<origin xyz="0 -0.1 0"/>
-	<parent link="base_link_connector"/>
+	<parent link="link_00_b_body"/>
 	<child link="link_11_r_upper_leg"/>	
 </joint>
 <joint name="joint_12_r_knee" type="continuous">

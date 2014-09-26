@@ -113,8 +113,8 @@ void QNodeReceiver::run() {
 	tf::Quaternion rotationYCorrection(0, sqrt(0.5), 0, -sqrt(0.5));
 	rotationYCorrection.normalize();
 
-	tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
-	rotationZCorrection.normalize();
+	//tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
+	//rotationZCorrection.normalize();
 
 	//******************************************************************
 
@@ -181,11 +181,12 @@ void QNodeReceiver::run() {
 					quat = quat * rotationYCorrection;
 					quat.normalize();
 				}
-				//original = original * rotationZCorrection;
 
+				//old
 				//tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
 				//-original.getX(), original.getZ(), original.getW());
 
+				//new
 				if (currFrame < 2) {
 					tf_frame_rot[currFrame] = tf::Quaternion(quat.getX(),
 							quat.getY(), quat.getZ(), quat.getW());
@@ -193,12 +194,14 @@ void QNodeReceiver::run() {
 					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
 							-quat.getY(), quat.getZ(), quat.getW());
 				} else if (currFrame < 8) {
-
+					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
+							-quat.getY(), quat.getZ(), quat.getW());
 				} else if (currFrame < 11) {
 					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
 							-quat.getY(), quat.getZ(), quat.getW());
 				} else {
-
+					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
+							-quat.getY(), quat.getZ(), quat.getW());
 				}
 
 				//******************************************************************
@@ -210,12 +213,9 @@ void QNodeReceiver::run() {
 
 				//*********************************************************************
 
-				//kinematic
-				if (currFrame == 0 || currFrame == 2 || currFrame == 5
-						|| currFrame == 8 || currFrame == 11) {
-					//tf_frame_rot[currFrame] = inverse(tf_base_rot)
-					//* tf_frame_rot[currFrame];
-				} else {
+				//new kinematic
+				if (currFrame != 0 && currFrame != 2 && currFrame != 5
+						&& currFrame != 8 && currFrame != 11) {
 					tf_frame_rot[currFrame] = inverse(
 							tf_frame_rot[currFrame - 1])
 							* tf_frame_rot[currFrame];
@@ -223,6 +223,7 @@ void QNodeReceiver::run() {
 				tf_frame_rot[currFrame].normalize();
 
 				/*
+				 * old:
 				 if (currentFrame == 2 || currentFrame == 5 || currentFrame == 8
 				 || currentFrame == 11) {
 				 tf_frame_rot[currentFrame] = inverse(tf_frame_rot[0])
@@ -247,6 +248,7 @@ void QNodeReceiver::run() {
 				}
 
 				tf_base_msg.stamp_ = ros::Time::now();
+				tf_base_msg.setRotation(tf_base_rot);
 				tfPublisher.sendTransform(tf_base_msg);
 
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
