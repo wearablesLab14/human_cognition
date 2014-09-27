@@ -8,6 +8,8 @@
  *	-------------------------------------------------------------
  *	File: qnode.cpp
  *	Description:
+ *		Base class to setup a ROS node with basic methods
+ *		and variables used by multiple specialized node classes
  *
  *	-------------------------------------------------------------
  * 	Authors:
@@ -19,48 +21,50 @@
 
 #include "qnode.hpp"
 
-/**
+/*! \brief Constructor of QNode class
  *
- * @param argc
- * @param argv
- * @param name
+ * @param argc Arguments
+ * @param argv Arguments
+ * @param name Node name
  */
 QNode::QNode(int argc, char** argv, const std::string &name) :
 		init_argc(argc), init_argv(argv), node_name(name) {
 
-	link_name[0] = "link_00_b_body";
-	link_name[1] = "link_01_b_head";
-	link_name[2] = "link_02_l_upper_arm";
-	link_name[3] = "link_03_l_lower_arm";
-	link_name[4] = "link_04_l_hand";
-	link_name[5] = "link_05_l_upper_leg";
-	link_name[6] = "link_06_l_lower_leg";
-	link_name[7] = "link_07_l_foot";
-	link_name[8] = "link_08_r_upper_arm";
-	link_name[9] = "link_09_r_lower_arm";
-	link_name[10] = "link_10_r_hand";
-	link_name[11] = "link_11_r_upper_leg";
-	link_name[12] = "link_12_r_lower_leg";
-	link_name[13] = "link_13_r_foot";
+	//initialize urdf link names
+	frameLinkName[0] = "link_00_b_body";
+	frameLinkName[1] = "link_01_b_head";
+	frameLinkName[2] = "link_02_l_upper_arm";
+	frameLinkName[3] = "link_03_l_lower_arm";
+	frameLinkName[4] = "link_04_l_hand";
+	frameLinkName[5] = "link_05_l_upper_leg";
+	frameLinkName[6] = "link_06_l_lower_leg";
+	frameLinkName[7] = "link_07_l_foot";
+	frameLinkName[8] = "link_08_r_upper_arm";
+	frameLinkName[9] = "link_09_r_lower_arm";
+	frameLinkName[10] = "link_10_r_hand";
+	frameLinkName[11] = "link_11_r_upper_leg";
+	frameLinkName[12] = "link_12_r_lower_leg";
+	frameLinkName[13] = "link_13_r_foot";
 
-	joint_base_name = "joint_base_connector";
-	joint_name[0] = "joint_00_b_core";
-	joint_name[1] = "joint_01_b_neck";
-	joint_name[2] = "joint_02_l_shoulder";
-	joint_name[3] = "joint_03_l_elbow";
-	joint_name[4] = "joint_04_l_wrist";
-	joint_name[5] = "joint_05_l_hip";
-	joint_name[6] = "joint_06_l_knee";
-	joint_name[7] = "joint_07_l_ankle";
-	joint_name[8] = "joint_08_r_shoulder";
-	joint_name[9] = "joint_09_r_elbow";
-	joint_name[10] = "joint_10_r_wrist";
-	joint_name[11] = "joint_11_r_hip";
-	joint_name[12] = "joint_12_r_knee";
-	joint_name[13] = "joint_13_r_ankle";
+	//initialize urdf joint names
+	baseJointName = "joint_base_connector";
+	frameJointName[0] = "joint_00_b_core";
+	frameJointName[1] = "joint_01_b_neck";
+	frameJointName[2] = "joint_02_l_shoulder";
+	frameJointName[3] = "joint_03_l_elbow";
+	frameJointName[4] = "joint_04_l_wrist";
+	frameJointName[5] = "joint_05_l_hip";
+	frameJointName[6] = "joint_06_l_knee";
+	frameJointName[7] = "joint_07_l_ankle";
+	frameJointName[8] = "joint_08_r_shoulder";
+	frameJointName[9] = "joint_09_r_elbow";
+	frameJointName[10] = "joint_10_r_wrist";
+	frameJointName[11] = "joint_11_r_hip";
+	frameJointName[12] = "joint_12_r_knee";
+	frameJointName[13] = "joint_13_r_ankle";
 }
 
-/**
+/*! \brief Destructor of QNode class
  *
  */
 QNode::~QNode() {
@@ -71,49 +75,69 @@ QNode::~QNode() {
  BASIC METHODS
  ***********************************************/
 
-/**
+/*! \brief Initializes a ROS node
  *
- * @return
+ *		Connects with ROS master process,
+ *		initializes a ROS node and starts it
+ * @retval TRUE Initialization of ROS node successful
+ * @retval FALSE Initialization of ROS node failed
  */
 bool QNode::initNode() {
 
-	std::string host_ip = getIP4HostAddress();
-	std::string master_uri = "http://" + host_ip + ":11311/";
+	//local IP4 host address
+	std::string hostAddress = getIP4HostAddress();
 
+	//URI of ROS master process
+	std::string masterURI = "http://" + hostAddress + ":11311/";
+
+	//remappings for ROS node initialization
 	std::map<std::string, std::string> remappings;
-	remappings["__hostname"] = host_ip;
-	remappings["__master"] = master_uri;
+	remappings["__hostname"] = hostAddress;
+	remappings["__master"] = masterURI;
 
+	//initialize ROS node
 	ros::init(remappings, node_name);
 
+	//display error message and return early if ROS master wasn't found
 	if (!ros::master::check()) {
 		display(ERROR,
-				QString("Master ").append(master_uri.c_str()).append(
+				QString("Master ").append(masterURI.c_str()).append(
 						QString(" not found")));
 		return false;
 	}
+
+	//display info message if ROS master was found
 	display(INFO,
-			QString("Master ").append(master_uri.c_str()).append(
+			QString("Master ").append(masterURI.c_str()).append(
 					QString(" found")));
+
+	//start ROS node
 	ros::start();
+
 	return true;
 }
 
-/**
+/*! \brief Shuts a ROS node down
  *
  */
 void QNode::shutdownNode() {
+
+	//if ROS node is started
 	if (ros::isStarted()) {
+
+		//shut node down
 		ros::shutdown();
+
+		//wait for node to be shut down
 		ros::waitForShutdown();
 	}
 	wait();
 }
 
-/**
+/*! \brief Returns a QString representation for a frame
  *
- * @param frame_index
- * @return
+ * @param frame_index The index of a frame
+ * @return QString representation of a frame index
  */
 QString QNode::getFrameString(const int &frame_index) {
 
@@ -123,41 +147,47 @@ QString QNode::getFrameString(const int &frame_index) {
 	return QString::number(frame_index);
 }
 
-/**
+/*! \brief Returns a Display type for a frame
  *
- * @param frame_index
+ * @param frame_index The index of a frame
  * @return
  */
 DisplayType QNode::getFrameDisplayType(const int &frame_index) {
 
-	DisplayType level;
+	DisplayType type;
 
 	if (frame_index < 2) {
-		level = FRAME01;
+		type = FRAME01;
 	} else if (frame_index < 5) {
-		level = FRAME234;
+		type = FRAME234;
 	} else if (frame_index < 8) {
-		level = FRAME567;
+		type = FRAME567;
 	} else if (frame_index < 11) {
-		level = FRAME8910;
+		type = FRAME8910;
 	} else {
-		level = FRAME111213;
+		type = FRAME111213;
 	}
-	return level;
+	return type;
 }
 
 /*! \brief Appends a row to a listView model
  *
- *
- * @param display_type determines the style of the row
- * @param message
+ *		Appends a row in a given style with a given message to a listView model
+ * @param display_type Determines the style of the row
+ * @param message The message to be displayed
  */
 void QNode::display(const DisplayType &display_type, const QString &message) {
 
+	//listView item to be added
 	QStandardItem *listViewItem = new QStandardItem();
-	listViewItem->setData(QFont("Liberation Mono", 11, 75), Qt::FontRole);
+
+	//set font of listView item
+	listViewItem->setData(QFont("Liberation Mono", 9, 75), Qt::FontRole);
+
+	//listView item text
 	QString text("");
 
+	//set a certain style for a certain display type
 	switch (display_type) {
 	case (TIP): {
 		text.append(QString("[TIP]: "));
@@ -169,8 +199,14 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 		listViewItem->setData(QBrush(QColor(Qt::darkCyan)), Qt::ForegroundRole);
 		break;
 	}
-	case (ASYNCH): {
-		text.append(QString("[ASYNCH]: "));
+	case (ERROR): {
+		text.append(QString("[ERROR]: "));
+		listViewItem->setData(QBrush(QColor(Qt::darkMagenta)),
+				Qt::ForegroundRole);
+		break;
+	}
+	case (EULER): {
+		text.append(QString("[EULER]: "));
 		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
 				Qt::ForegroundRole);
 		break;
@@ -181,9 +217,9 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 				Qt::ForegroundRole);
 		break;
 	}
-	case (ERROR): {
-		text.append(QString("[ERROR]: "));
-		listViewItem->setData(QBrush(QColor(Qt::darkMagenta)),
+	case (ASYNCH): {
+		text.append(QString("[ASYNCH]: "));
+		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
 				Qt::ForegroundRole);
 		break;
 	}
@@ -208,26 +244,46 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 		break;
 	}
 	}
+
+	//set text of listView item
 	listViewItem->setText(text.append(message));
-	list_view_model.appendRow(listViewItem);
+
+	//add listView item to listView model
+	listViewModel.appendRow(listViewItem);
+
+	//tell GUI to scroll down the listView
 	Q_EMIT listViewModelUpdated();
 }
 
-/**
+/*! \brief Returns string representation of a ROS timestamp for a desired timezone
  *
- * @param stamp
- * @return
+ * @param stamp A given ROS timestamp
+ * @param time_zone Offset for the desired timezone
+ * @return String representation of ROS time
  */
-std::string QNode::rosTimeToGMTPlus1(ros::Time stamp) {
-	std::string time_str = to_iso_string(stamp.toBoost());
-	std::string hoursString = time_str.substr(9, 2);
+std::string QNode::rosTimeToTimezone(ros::Time stamp, const int &time_zone) {
+
+	//string representation of given timestamp
+	std::string timeStr = to_iso_string(stamp.toBoost());
+
+	//substring of given timestamp which holds hours
+	std::string hoursString = timeStr.substr(9, 2);
+
+	//hours in integer form
 	int hours = atoi(hoursString.c_str());
-	hours += 2;
+
+	//add desired timezone offset to hours variable
+	hours += time_zone;
+
+	//convert hours integer variable to string
 	std::stringstream ss;
 	ss << hours;
 	std::string str = ss.str();
-	time_str.replace(9, 2, str);
-	return time_str;
+
+	//replace substring which holds hours with new hours string
+	timeStr.replace(9, 2, str);
+
+	return timeStr;
 }
 
 /***********************************************
@@ -238,7 +294,7 @@ std::string QNode::rosTimeToGMTPlus1(ros::Time stamp) {
  * @return A listView model
  */
 QStandardItemModel* QNode::getListViewModel() {
-	return &list_view_model;
+	return &listViewModel;
 }
 
 /***********************************************
@@ -297,4 +353,3 @@ std::string QNode::getIP4HostAddress() {
 	//return host address
 	return address;
 }
-

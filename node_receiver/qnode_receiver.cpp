@@ -1,55 +1,89 @@
+/****************************************************************
+ *  Project:
+ *  	Integrating Body- and Eye-Tracking to study Cognition in the Wild
+ *	-------------------------------------------------------------
+ * 	TU Darmstadt
+ * 	Department Computer Science
+ * 	Summer term 2014
+ *	-------------------------------------------------------------
+ *	File: qnode_receiver.cpp
+ *	Description:
+ *		Specialized node class to setup a ROS node for
+ *		receiving UDP packets with rotation data, applying
+ *		kinematic equations and publishing ROS tf messages
+ *		to move a human model in ROS rviz
+ *
+ *	-------------------------------------------------------------
+ * 	Authors:
+ * 		Christian Benz 			<zneb_naitsirhc@web.de>
+ * 		Christoph Döringer 		<christoph.doeringer@gmail.com>
+ * 		Hendrik Pfeifer 		<hendrikpfeifer@gmail.com>
+ * 		Heiko Reinemuth 		<heiko.reinemuth@gmail.com>
+ ****************************************************************/
+
 #include "qnode_receiver.hpp"
 
-/**
+/*! \brief Constructor of QNodeReceiver class
  *
- * @param argc
- * @param argv
+ *		Displays messages and initializes variables
+ * @param argc Arguments
+ * @param argv Arguments
  */
 QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 		QNode(argc, argv, "receiver") {
 
 	display(TIP, "1. Connect to mocap");
-	display(TIP, "2. 'roslaunch human_cognition rviz.launch'");
+	display(TIP, "2. 'roscore'");
+	display(TIP, "3. 'roslaunch human_cognition rviz.launch'");
+	display(TIP, "'roslaunch human_cognition record.launch title:=myTitle'");
+	display(TIP, "'roslaunch human_cognition play.launch title:=myTitle'");
 
 	/***********************************************************/
 
-	udp_socket = -1;
-	udp_socket_binding = -1;
-	udp_socket_option = -1;
-	sensor_address_length = 0;
-	sensor_packet_size = 0;
+	//initialize socket and address variables
+	udpSocket = -1;
+	udpSocketBinding = -1;
+	udpSocketOption = -1;
+	sensorAddressLength = 0;
+	sensorPacketSize = 0;
 
 	//set socket address to 0
-	memset((char *) &socket_address, 0, sizeof(socket_address));
+	memset((char *) &socketAddress, 0, sizeof(socketAddress));
 
 	//set sensor address to 0
-	memset((char *) &sensor_address, 0, sizeof(sensor_address));
+	memset((char *) &sensorAddress, 0, sizeof(sensorAddress));
 
 	//fill socket address
-	socket_address.sin_family = AF_INET;
-	socket_address.sin_addr.s_addr = htonl(INADDR_ANY);
-	socket_address.sin_port = htons(PORT);
+	socketAddress.sin_family = AF_INET;
+	socketAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	socketAddress.sin_port = htons(PORT);
 
 	//sensor address length
-	sensor_address_length = sizeof(sensor_address);
+	sensorAddressLength = sizeof(sensorAddress);
 
 	/***********************************************************/
 
-	display_euler_signal = false;
-	display_euler_frame = 0;
-
-	minHertz = 0;
-
-	reset_model_signal = false;
-
-	/***********************************************************/
-
-	assign_address = QString(TO_ASSIGN_ADDRESS);
-	ignore_address = QString(TO_IGNORE_ADDRESS);
+	//initialize settings variables
+	signalPerformance = false;
+	signalEuler = false;
+	frameEuler = 0;
+	signalInactivity = false;
+	signalAsync = false;
+	valueAsync = 0;
+	signalResetModel = false;
 
 	/***********************************************************/
 
+	//initialize address placeholders
+	stdAssignAddress = QString(TO_ASSIGN_ADDRESS);
+	stdIgnoreAddress = QString(TO_IGNORE_ADDRESS);
+
+	/***********************************************************/
+
+	//initialize euler variables
 	initEuler();
+
+	//initialize frame variables
 	initFrameData();
 }
 
@@ -57,260 +91,352 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
  IMPLEMENTATION OF PURE VIRTUAL METHODS
  ***********************************************/
 
-/**
+/*! \brief Initializes a receiver node
  *
- * @return
+ *		Initializes a ROS node, a socket for receiving
+ *		and ROS tf messages
+ * @retval TRUE Initialization successful
+ * @retval FALSE Initialization failed
  */
 bool QNodeReceiver::readyForAction() {
 
+	//return early if initialization of ROS node failed
 	if (!initNode()) {
 		return false;
 	}
+
+	//return early if socket setup failed
 	if (!socketReady()) {
 		return false;
 	}
-	if (!model.initFile("human_real_size.urdf")) {
-		display(ERROR, QString("URDF parsing failed"));
-		return false;
-	}
-	initBaseMessage();
-	initFrameMessages();
 
+	//initialize ROS tf messages
+	initMessages();
+
+	//display a ready to receive message if node is started
 	if (ros::isStarted()) {
 		display(INFO, QString("Ready to receive"));
 	}
-
 	return true;
 }
 
-/**
+/*! \brief Starts a QThread
  *
  */
 void QNodeReceiver::startAction() {
 	start();
 }
 
-/**
+/*! \brief Shuts a ROS node down
  *
  */
 void QNodeReceiver::stopAction() {
 	shutdownNode();
 }
 
-/**
+/*! \brief Run method of QThread
  *
  */
 void QNodeReceiver::run() {
 
+	//reset euler variables
 	initEuler();
+
+	//reset frame variables
 	initFrameData();
 
+	//******************************************************************
+
+	//tf message publisher
 	tf::TransformBroadcaster tfPublisher;
 
 	//******************************************************************
 
-	//frame rotation correction
-	tf::Quaternion rotationYCorrection(0, sqrt(0.5), 0, -sqrt(0.5));
-	rotationYCorrection.normalize();
-
-	//tf::Quaternion rotationZCorrection(0, 0, sqrt(0.5), -sqrt(0.5));
-	//rotationZCorrection.normalize();
+	//frame y-axis rotation correction
+	tf::Quaternion yRotCorr(0, sqrt(0.5), 0, -sqrt(0.5));
+	yRotCorr.normalize();
 
 	//******************************************************************
 
-	ros::Duration initial_timeout(2.0);
-	ros::Time initial_start_time = ros::Time::now();
+	//duration of initial publishing
+	ros::Duration initialTimeout(2.0);
 
-	while (ros::ok()
-			&& ((ros::Time::now() - initial_start_time) < initial_timeout)) {
+	//start time of initial publisher loop
+	ros::Time initialStartTime = ros::Time::now();
 
-		tf_base_msg.stamp_ = ros::Time::now();
-		tfPublisher.sendTransform(tf_base_msg);
+	//******************************************************************
 
+	//publish initial tf data for a fixed duration
+	while (ros::ok() && ((ros::Time::now() - initialStartTime) < initialTimeout)) {
+
+		//******************************************************************
+
+		//update timestamp of base tf message
+		tfBaseMsg.stamp_ = ros::Time::now();
+
+		//publish base tf message
+		tfPublisher.sendTransform(tfBaseMsg);
+
+		//******************************************************************
+
+		//for all frames
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-			tf_frame_msg[i].stamp_ = ros::Time::now();
-			frame_msg_last_stamp[i] = tf_frame_msg[i].stamp_;
-			tfPublisher.sendTransform(tf_frame_msg[i]);
+
+			//update timestamp of frame tf message
+			tfFrameMsg[i].stamp_ = ros::Time::now();
+
+			//update/initialize  last stamp of frame with current stamp
+			frameLastMsgStamp[i] = tfFrameMsg[i].stamp_;
+
+			//publish frame tf message
+			tfPublisher.sendTransform(tfFrameMsg[i]);
 		}
 	}
 
+	//******************************************************************
+
+	//current frame of sensor data packet
 	int currFrame;
-	QString currentAddress;
+
+	//current address of sensor data packet
+	QString currAddress;
+
+	//******************************************************************
+
+	//duration of one second for Hertz calculation and GUI updates
+	ros::Duration oneSecInterval(1.0);
+
+	//start time of receive loop
+	ros::Time receiveStartTime = ros::Time::now();
+
+	//******************************************************************
 
 	display(INFO, QString("Receiving has started"));
 
-	ros::Duration timeout(1.0);
-	ros::Time start_time = ros::Time::now();
-
-	//receive sensor packets while ROS is ok
+	//receive sensor data packets while ROS is okay
 	while (ros::ok()) {
 
+		//******************************************************************
+
 		//receive bytes to fill struct
-		sensor_packet_size = recvfrom(udp_socket, (char*) &sensor_packet_data,
-				sizeof(sensor_packet_data), 0,
-				(struct sockaddr *) &sensor_address, &sensor_address_length);
+		sensorPacketSize = recvfrom(udpSocket, (char*) &sensorPacketData,
+				sizeof(sensorPacketData), 0, (struct sockaddr *) &sensorAddress,
+				&sensorAddressLength);
 
 		//if bytes were received
-		if (sensor_packet_size > 0) {
+		if (sensorPacketSize > 0) {
 
-			currentAddress = QString(inet_ntoa(sensor_address.sin_addr));
+			//******************************************************************
 
-			currFrame = frame_address_list.indexOf(currentAddress, 0);
+			//update current address with address of sensor data packet
+			currAddress = QString(inet_ntoa(sensorAddress.sin_addr));
 
+			//search address list for current address and return index if found
+			currFrame = frameAddressList.indexOf(currAddress, 0);
+
+			//******************************************************************
+
+			//if current address wasn't found
 			if (currFrame < 0) {
 
-				currFrame = frame_address_list.indexOf(assign_address, 0);
+				//search address list for an empty spot and return index if found
+				currFrame = frameAddressList.indexOf(stdAssignAddress, 0);
 
+				//if an empty spot was found
 				if (currFrame >= 0) {
-					setFrameAddress(currFrame, currentAddress);
-				}
 
+					//add current address to address list at current frame's position
+					setFrameAddress(currFrame, currAddress);
+				}
 			}
 
+			//if current frame is valid
 			if (currFrame >= 0 && currFrame < NUMBER_OF_FRAMES) {
 
-				tf::Quaternion quat(sensor_packet_data.q1,
-						sensor_packet_data.q2, sensor_packet_data.q3,
-						sensor_packet_data.q0);
+				//******************************************************************
+
+				//initialize rotation data (quaternion) with rotation data of sensor data packet
+				tf::Quaternion quat(sensorPacketData.q1, sensorPacketData.q2,
+						sensorPacketData.q3, sensorPacketData.q0);
+
+				//normalize rotation data (quaternion)
 				quat.normalize();
 
 				//******************************************************************
 
-				//correct original rotation
+				//correct original rotation for all frames except the feet frames
 				if (currFrame != 7 && currFrame != 13) {
-					quat = quat * rotationYCorrection;
+
+					//multiply rotation data with rotation correction
+					quat = quat * yRotCorr;
+
+					//normalize rotation data
 					quat.normalize();
-				}
-
-				//old
-				//tf_frame_rot[currentFrame] = tf::Quaternion(original.getY(),
-				//-original.getX(), original.getZ(), original.getW());
-
-				//new
-				if (currFrame < 2) {
-					tf_frame_rot[currFrame] = tf::Quaternion(quat.getX(),
-							quat.getY(), quat.getZ(), quat.getW());
-				} else if (currFrame < 5) {
-					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
-							-quat.getY(), quat.getZ(), quat.getW());
-				} else if (currFrame < 8) {
-					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
-							-quat.getY(), quat.getZ(), quat.getW());
-				} else if (currFrame < 11) {
-					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
-							-quat.getY(), quat.getZ(), quat.getW());
-				} else {
-					tf_frame_rot[currFrame] = tf::Quaternion(-quat.getX(),
-							-quat.getY(), quat.getZ(), quat.getW());
 				}
 
 				//******************************************************************
 
-				if (display_euler_signal && currFrame == display_euler_frame) {
-					tf::Matrix3x3(quat).getRPY(frame_euler_y, frame_euler_x,
-							frame_euler_z);
+				//update frame rotation with new rotation data
+				if (currFrame < 2) {
+
+					//if current frame is a base frame:
+					tfFrameRot[currFrame] = tf::Quaternion(quat.getX(),
+							quat.getY(), quat.getZ(), quat.getW());
+				} else {
+					tfFrameRot[currFrame] = tf::Quaternion(-quat.getX(),
+							-quat.getY(), quat.getZ(), quat.getW());
 				}
+				//normalize rotation data
+				tfFrameRot[currFrame].normalize();
 
 				//*********************************************************************
 
-				//new kinematic
+				//apply kinematic equation for selected frames
 				if (currFrame != 0 && currFrame != 2 && currFrame != 5
 						&& currFrame != 8 && currFrame != 11) {
-					tf_frame_rot[currFrame] = inverse(
-							tf_frame_rot[currFrame - 1])
-							* tf_frame_rot[currFrame];
+
+					//multiply rotation data of frame with inverse rotation of its parent
+					tfFrameRot[currFrame] = inverse(tfFrameRot[currFrame - 1])
+							* tfFrameRot[currFrame];
 				}
-				tf_frame_rot[currFrame].normalize();
+				//normalize rotation data
+				tfFrameRot[currFrame].normalize();
 
-				/*
-				 * old:
-				 if (currentFrame == 2 || currentFrame == 5 || currentFrame == 8
-				 || currentFrame == 11) {
-				 tf_frame_rot[currentFrame] = inverse(tf_frame_rot[0])
-				 * tf_frame_rot[currentFrame];
-				 } else if (currentFrame != 0) {
-				 tf_frame_rot[currentFrame] = inverse(
-				 tf_frame_rot[currentFrame - 1])
-				 * tf_frame_rot[currentFrame];
-				 }
-				 */
+				//******************************************************************
 
-				tf_frame_msg[currFrame].setRotation(tf_frame_rot[currFrame]);
+				//assign message of current frame with updated rotation data
+				tfFrameMsg[currFrame].setRotation(tfFrameRot[currFrame]);
 
-				frame_hertz[currFrame] = frame_hertz[currFrame] + 1;
+				//******************************************************************
 
-				if (reset_model_signal) {
+				//count number of frame updates
+				frameUpdateCount[currFrame] = frameUpdateCount[currFrame] + 1;
+
+				//******************************************************************
+
+				//if euler angles should be displayed and current frame is the desired frame
+				if (signalEuler && currFrame == frameEuler) {
+
+					//calculate roll, pitch and yaw from rotation data of sensor data packet
+					tf::Matrix3x3(quat).getRPY(frameEulerY, frameEulerX,
+							frameEulerZ);
+				}
+
+				//******************************************************************
+
+				//if human model should be resetted
+				if (signalResetModel) {
+
+					//reset rotations of all frames
 					initFrameRotation();
 					for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-						tf_frame_msg[i].setRotation(tf_frame_rot[i]);
+						tfFrameMsg[i].setRotation(tfFrameRot[i]);
 					}
-					reset_model_signal = false;
+					signalResetModel = false;
 				}
 
-				tf_base_msg.stamp_ = ros::Time::now();
-				tf_base_msg.setRotation(tf_base_rot);
-				tfPublisher.sendTransform(tf_base_msg);
+				//******************************************************************
 
+				//update timestamp of base tf message
+				tfBaseMsg.stamp_ = ros::Time::now();
+
+				//publish base tf message
+				tfPublisher.sendTransform(tfBaseMsg);
+
+				//*********************************************************************
+
+				//loop over all frames
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-					tf_frame_msg[i].stamp_ = ros::Time::now();
+					//update timestamp of frame tf message
+					tfFrameMsg[i].stamp_ = ros::Time::now();
 
-					tfPublisher.sendTransform(tf_frame_msg[i]);
+					//publish frame tf message
+					tfPublisher.sendTransform(tfFrameMsg[i]);
 
-					//update last update time for current frame
-					if (i == currFrame) {
+					//if asynchronity should be displayed and frame is current frame
+					if (!signalPerformance && signalAsync && i == currFrame) {
 
-						ros::Time curr_stamp = tf_frame_msg[currFrame].stamp_;
-						ros::Time last_stamp = frame_msg_last_stamp[currFrame];
+						//*********************************************************************
 
-						frame_snr_span_sec[currFrame] = curr_stamp.sec
-								- last_stamp.sec;
+						//current stamp of frame
+						ros::Time currStamp = tfFrameMsg[currFrame].stamp_;
 
-						if (curr_stamp.sec == last_stamp.sec) {
-							frame_snr_span_nsec[currFrame] = curr_stamp.nsec
-									- last_stamp.nsec;
+						//last stamp of frame
+						ros::Time lastStamp = frameLastMsgStamp[currFrame];
+
+						//calculate time span in seconds between latest and last frame update
+						frameAsynchSpanSec[currFrame] = currStamp.sec
+								- lastStamp.sec;
+
+						//calculate time span in nanoseconds between latest and last frame update
+						if (currStamp.sec == lastStamp.sec) {
+							frameAsynchSpanNsec[currFrame] = currStamp.nsec
+									- lastStamp.nsec;
 						} else {
-							frame_snr_span_nsec[currFrame] = curr_stamp.nsec
-									+ (1000000000 - last_stamp.nsec);
+							frameAsynchSpanNsec[currFrame] = currStamp.nsec
+									+ (ONE_SEC - lastStamp.nsec);
 						}
 
-						frame_msg_last_stamp[currFrame] = curr_stamp;
+						//update last stamp of frame
+						frameLastMsgStamp[currFrame] =
+								tfFrameMsg[currFrame].stamp_;
+					}
+				}
+
+				//if one second interval is reached
+				if ((ros::Time::now() - receiveStartTime) >= oneSecInterval) {
+
+					//*********************************************************************
+
+					//if performance mode is unchecked
+					if (!signalPerformance) {
+
+						//if euler angles should be displayed
+						if (signalEuler) {
+
+							//display the latest euler angles for a desired frame
+							displayFrameEuler();
+						}
+
+						//if frame inactivity should be displayed
+						if (signalInactivity) {
+
+							//display inactivity status for all frames
+							displayFrameInactivity();
+						}
+
+						//if asynchronity should be displayed
+						if (signalAsync) {
+
+							//display asynchronity status for active frames
+							displayFrameAsync();
+						}
 					}
 
 					//*********************************************************************
 
-					//update data age (seconds)
-					frame_inactivity_sec[i] = tf_frame_msg[i].stamp_.sec
-							- frame_msg_last_stamp[i].sec;
-				}
+					//loop over all frames
+					for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-				if ((ros::Time::now() - start_time) >= timeout) {
+						//update hertz value to display
+						frameHertzToDisplay[i] = frameUpdateCount[i];
 
-					if (display_euler_signal
-							&& frame_hertz[display_euler_frame] != 0) {
-
-						display(INFO,
-								QString("x-axis %1, y-axis %2, z-axis %3").arg(
-										QString::number(frame_euler_x, 'f', 3)).arg(
-										QString::number(frame_euler_y, 'f', 3)).arg(
-										QString::number(frame_euler_z, 'f',
-												3)));
+						//reset update counter
+						frameUpdateCount[i] = 0;
 					}
 
-					if (!display_euler_signal) {
-						displayFrameAsynchrony();
-						displayFrameInactivity();
-					}
-
-					getTimeFromSec();
-
+					//tell GUI to updated frame info
 					Q_EMIT frameDataUpdated();
 
-					start_time = ros::Time::now();
+					//set interval start time to now
+					receiveStartTime = ros::Time::now();
 				}
 			}
 		}
 	}
+
+	//display message if run method finishes
 	display(INFO, QString("Receiving has stopped"));
 }
 
@@ -318,155 +444,153 @@ void QNodeReceiver::run() {
  GETTER
  ***********************************************/
 
-/**
+/*! \brief Returns standard assign placeholder address
  *
- * @return
+ * @return Standard assign placeholder address
  */
 QString QNodeReceiver::getAssignAddress() {
-	return assign_address;
+	return stdAssignAddress;
 }
 
-/**
+/*! \brief Returns standard ignore placeholder address
  *
- * @return
+ * @return Standard ignore placeholder address
  */
 QString QNodeReceiver::getIgnoreAddress() {
-	return ignore_address;
+	return stdIgnoreAddress;
 }
 
-/**
+/*! \brief Returns a frames address for a given index
  *
- * @param frame_index
- * @return
+ * @param frame_index The index of a frame
+ * @return The address of the given frame
  */
 QString QNodeReceiver::getFrameAddress(const int &frame_index) {
-	return frame_address_list.at(frame_index);
+	return frameAddressList.at(frame_index);
 }
 
-/**
+/*! \brief Returns a frames hertz value to display for a given index
  *
- * @param frame_index
- * @return
+ * @param frame_index The index of a frame
+ * @return The hertz value to display of the given frame
  */
-int QNodeReceiver::getFrameHertz(const int &frame_index) {
-	return frame_hertz[frame_index];
-}
-
-/**
- *
- * @param frame_index
- * @return
- */
-QString QNodeReceiver::getFrameInactivity(const int &frame_index) {
-	return frame_inactivity[frame_index];
+int QNodeReceiver::getFrameHertzToDisplay(const int &frame_index) {
+	return frameHertzToDisplay[frame_index];
 }
 
 /***********************************************
  SETTER
  ***********************************************/
 
-/**
+/*! \brief Adds a address to the list of frame addresses
  *
- */
-void QNodeReceiver::clearAllFrameAddresses() {
-	frame_address_list.clear();
-}
-
-/**
- *
- * @param address
+ * @param address The address to be added
  */
 void QNodeReceiver::addFrameAddress(QString address) {
-	frame_address_list.append(address);
+	frameAddressList.append(address);
 }
 
-/**
+/*! \brief Sets address for a given frame
  *
- * @param frame_index
- * @param address
+ * @param frame_index The index of a frame
+ * @param address The address of a frame
  */
 void QNodeReceiver::setFrameAddress(const int &frame_index, QString address) {
-	frame_address_list.replace(frame_index, address);
-	if (address != assign_address && address != ignore_address) {
 
+	//replace address at the given frame index with the given address
+	frameAddressList.replace(frame_index, address);
+
+	//if the given address is not one of the placeholder addresses
+	if (address != stdAssignAddress && address != stdIgnoreAddress) {
+
+		//display frame message with given frame index and address
 		QString frame(getFrameString(frame_index));
 		frame.append(QString(" >>> "));
 		frame.append(address);
-
 		display(getFrameDisplayType(frame_index), frame);
 	}
 }
 
-/**
+/*! \brief Sets reset model signal
  *
- * @param frame_index
- * @param value
+ * @param boolean Boolean value to be set
  */
-void QNodeReceiver::setFrameHertz(const int &frame_index, const int &value) {
-	frame_hertz[frame_index] = value;
+void QNodeReceiver::setSignalResetModel(const bool &boolean) {
+	signalResetModel = boolean;
 }
 
-/**
+/*! \brief Sets performance signal
  *
- * @param frame_index
- * @param time
+ * @param boolean Boolean value to be set
  */
-void QNodeReceiver::setFrameInactivity(const int &frame_index, QString time) {
-	frame_inactivity[frame_index] = time;
+void QNodeReceiver::setSignalPerformance(const bool &boolean) {
+	signalEuler = boolean;
 }
 
-/**
+/*! \brief Sets euler signal
  *
- * @param frame_index
- * @param time
+ * @param boolean Boolean value to be set
  */
-void QNodeReceiver::setLastUpdate(const int &frame_index,
-		const ros::Time &time) {
-	frame_msg_last_stamp[frame_index] = time;
+void QNodeReceiver::setSignalEuler(const bool &boolean) {
+	signalEuler = boolean;
 }
 
-/**
+/*! \brief Sets euler frame to be displayed
  *
- * @param boolean
+ * @param frame_index The index of a frame
  */
-void QNodeReceiver::setResetModelSignal(const bool &boolean) {
-	reset_model_signal = boolean;
+void QNodeReceiver::setFrameEuler(const int &frame_index) {
+	frameEuler = frame_index;
 }
 
-/**
+/*! \brief Sets inactivity signal
  *
- * @param boolean
+ * @param boolean Boolean value to be set
  */
-void QNodeReceiver::setDisplayEulerSignal(const bool &boolean) {
-	display_euler_signal = boolean;
+void QNodeReceiver::setSignalInactivity(const bool &boolean) {
+	signalInactivity = boolean;
 }
 
-/**
+/*! \brief Sets asynchronity signal
  *
- * @param frame_index
+ * @param boolean Boolean value to be set
  */
-void QNodeReceiver::setDisplayEulerFrame(const int &frame_index) {
-	display_euler_frame = frame_index;
+void QNodeReceiver::setSignalAsync(const bool &boolean) {
+	signalAsync = boolean;
 }
 
-void QNodeReceiver::setMinHertz(int value) {
-	minHertz = value;
-}
-
-/**
+/*! \brief Sets asynchronity value
  *
- * @return
+ * @param value The minimum hertz value
+ */
+void QNodeReceiver::setValueAsync(const int &value) {
+	valueAsync = value;
+}
+
+/***********************************************
+ PRIVATE HELPER METHODS
+ ***********************************************/
+
+/*! \brief Initializes socket for receiving
+ *
+ * @retval TRUE Socket initialization was successful
+ * @retval FALSE Socket initialization failed
  */
 bool QNodeReceiver::socketReady() {
 
+	//display error message and return early if socket creation failed
 	if (!socketCreation()) {
 		display(ERROR, QString("Socket creation failed!"));
 		return false;
 	}
+
+	//display error message and return early if socket option setting failed
 	if (!socketOption()) {
 		display(ERROR, QString("Socket option setting failed!"));
 		return false;
 	}
+
+	//display error message and return early if socket binding failed
 	if (!socketBinding()) {
 		display(ERROR, QString("Socket binding failed!"));
 		return false;
@@ -474,193 +598,232 @@ bool QNodeReceiver::socketReady() {
 	return true;
 }
 
-/**
+/*! \brief Creates an UDP socket for receiving
  *
- * @return
+ * @retval TRUE Socket creation successful
+ * @retval FALSE Socket creation failed
  */
 bool QNodeReceiver::socketCreation() {
 
 	//create socket
-	udp_socket = socket(AF_INET, SOCK_DGRAM, 0);
+	udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
 
-	int flags = fcntl(udp_socket, F_GETFL);
-	flags |= O_NONBLOCK;
-	fcntl(udp_socket, F_SETFL, flags);
+	//TODO
+	/*
+	 int flags = fcntl(udpSocket, F_GETFL);
+	 flags |= O_NONBLOCK;
+	 fcntl(udpSocket, F_SETFL, flags);
+	 */
 
-	if (udp_socket < 0) {
+	//return early if socket creation failed
+	if (udpSocket < 0) {
 		return false;
 	}
 	return true;
 }
 
-/**
+/*! \brief Sets UDP socket option
  *
- * @return
+ * @retval TRUE Socket option setting successful
+ * @retval FALSE Socket option setting failed
  */
 bool QNodeReceiver::socketOption() {
 
 	//set socket option (allow other sockets to bind to this port)
 	int optval = 1;
-	udp_socket_option = setsockopt(udp_socket, SOL_SOCKET, SO_REUSEADDR,
-			&optval, sizeof optval);
-	if (udp_socket_option < 0) {
+	udpSocketOption = setsockopt(udpSocket, SOL_SOCKET, SO_REUSEADDR, &optval,
+			sizeof optval);
+
+	//return early if socket option setting failed
+	if (udpSocketOption < 0) {
 		return false;
 	}
 	return true;
 }
 
-/**
+/*! \brief Bind UDP socket to port
  *
- * @return
+ * @retval TRUE Socket binding successful
+ * @retval FALSE Socket binding failed
  */
 bool QNodeReceiver::socketBinding() {
 
 	//bind socket to port
-	udp_socket_binding = bind(udp_socket, (struct sockaddr *) &socket_address,
-			sizeof(socket_address));
+	udpSocketBinding = bind(udpSocket, (struct sockaddr *) &socketAddress,
+			sizeof(socketAddress));
 
-	if (udp_socket_binding < 0) {
+	//return early if socket binding failed
+	if (udpSocketBinding < 0) {
 		return false;
 	}
 	return true;
 }
 
-/**
+/*! \brief Initialize tf messages
  *
  */
-void QNodeReceiver::getTimeFromSec() {
+void QNodeReceiver::initMessages() {
 
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		int h = (frame_inactivity_sec[i] / 60 / 60) % 24;
-		int m = (frame_inactivity_sec[i] / 60) % 60;
-		int s = frame_inactivity_sec[i] % 60;
-		QTime time(h, m, s);
-		frame_inactivity[i] = time.toString();
-	}
-}
+	if (model.initFile("human_real_size.urdf")) {
 
-/**
- *
- */
-void QNodeReceiver::displayFrameAsynchrony() {
+		display(INFO, QString("URDF parsing successful"));
 
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+		double x, y, z;
 
-		if (frame_hertz[i] != 0 && frame_hertz[i] < minHertz) {
-			QString warning(getFrameString(i));
-			warning.append(QString(" newest-last stamp: "));
-			if (frame_snr_span_sec[i] != 0) {
-				warning.append(QString::number(frame_snr_span_sec[i]));
-				warning.append(QString(" sec. "));
-			}
-			warning.append(QString::number(frame_snr_span_nsec[i]));
-			warning.append(QString(" nanosec. "));
-			display(ASYNCH, warning);
-		}
-	}
-}
-
-/**
- *
- */
-void QNodeReceiver::displayFrameInactivity() {
-
-	int count = 0;
-
-	QString warning("");
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-
-		if (frame_address_list.at(i) != ignore_address && frame_hertz[i] == 0) {
-			count++;
-			warning.append(getFrameString(i));
-			warning.append(QString(" "));
-		}
-	}
-	if (count > 0) {
-		display(INACTIVE, warning);
-	} else {
-		display(INFO, QString("All selected frames are active"));
-	}
-}
-
-/**
- *
- */
-void QNodeReceiver::initBaseMessage() {
-
-	tf_base_msg.frame_id_ = model.getJoint(joint_base_name)->parent_link_name;
-	tf_base_msg.child_frame_id_ =
-			model.getJoint(joint_base_name)->child_link_name;
-
-	double x =
-			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.x;
-	double y =
-			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.y;
-	double z =
-			model.getJoint(joint_base_name)->parent_to_joint_origin_transform.position.z;
-	tf_base_msg.setOrigin(tf::Vector3(x, y, z));
-
-	tf_base_rot = tf::Quaternion(0, 0, 0, sqrt(1.0));
-	tf_base_rot.normalize();
-	tf_base_msg.setRotation(tf_base_rot);
-}
-
-/**
- *
- */
-void QNodeReceiver::initFrameMessages() {
-
-	initFrameRotation();
-
-	double x, y, z;
-
-	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-
-		tf_frame_msg[i].frame_id_ =
-				model.getJoint(joint_name[i])->parent_link_name;
-		tf_frame_msg[i].child_frame_id_ =
-				model.getJoint(joint_name[i])->child_link_name;
+		tfBaseMsg.frame_id_ = model.getJoint(baseJointName)->parent_link_name;
+		tfBaseMsg.child_frame_id_ =
+				model.getJoint(baseJointName)->child_link_name;
 
 		x =
-				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.x;
+				model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.x;
 		y =
-				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.y;
+				model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.y;
 		z =
-				model.getJoint(joint_name[i])->parent_to_joint_origin_transform.position.z;
-		tf_frame_msg[i].setOrigin(tf::Vector3(x, y, z));
-		tf_frame_msg[i].setRotation(tf_frame_rot[i]);
+				model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.z;
+		tfBaseMsg.setOrigin(tf::Vector3(x, y, z));
+
+		tfBaseRot = tf::Quaternion(0, 0, 0, sqrt(1.0));
+		tfBaseRot.normalize();
+		tfBaseMsg.setRotation(tfBaseRot);
+
+		initFrameRotation();
+
+		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+			tfFrameMsg[i].frame_id_ =
+					model.getJoint(frameJointName[i])->parent_link_name;
+			tfFrameMsg[i].child_frame_id_ =
+					model.getJoint(frameJointName[i])->child_link_name;
+
+			x =
+					model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.x;
+			y =
+					model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.y;
+			z =
+					model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.z;
+			tfFrameMsg[i].setOrigin(tf::Vector3(x, y, z));
+			tfFrameMsg[i].setRotation(tfFrameRot[i]);
+		}
+	} else {
+		display(INFO, QString("URDF parsing failed"));
+
 	}
 }
 
-/**
+/*! \brief Initialize euler variables
  *
  */
 void QNodeReceiver::initEuler() {
 
-	frame_euler_x = 0;
-	frame_euler_y = 0;
-	frame_euler_z = 0;
+	frameEulerX = 0;
+	frameEulerY = 0;
+	frameEulerZ = 0;
 }
 
-/**
+/*! \brief Initialize frame rotation
  *
  */
 void QNodeReceiver::initFrameRotation() {
 
+	//loop over all frames
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		tf_frame_rot[i] = tf::Quaternion(0, 0, 0, sqrt(1.0));
-		tf_frame_rot[i].normalize();
+
+		//initial rotation for all frames
+		tfFrameRot[i] = tf::Quaternion(0, 0, 0, sqrt(1.0));
+
+		//normalize rotation
+		tfFrameRot[i].normalize();
 	}
 }
 
-/**
+/*! \brief Initialize frame variables
  *
  */
 void QNodeReceiver::initFrameData() {
 
+	//loop over all frames
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		frame_hertz[i] = 0;
-		frame_snr_span_nsec[i] = 0;
-		frame_inactivity[i] = QTime(0, 0, 0).toString();
+		frameUpdateCount[i] = 0;
+		frameHertzToDisplay[i] = 0;
+		frameAsynchSpanSec[i] = 0;
+		frameAsynchSpanNsec[i] = 0;
+	}
+}
+/*! \brief Display latest euler angles for the desired euler frame
+ *
+ */
+void QNodeReceiver::displayFrameEuler() {
+	display(EULER,
+			QString("x-axis %1, y-axis %2, z-axis %3").arg(
+					QString::number(frameEulerX, 'f', 3)).arg(
+					QString::number(frameEulerY, 'f', 3)).arg(
+					QString::number(frameEulerZ, 'f', 3)));
+}
+
+/*! \brief Display inactivity status for all frames
+ *
+ */
+void QNodeReceiver::displayFrameInactivity() {
+
+	//number of inactive frames
+	int inactiveFramesCount = 0;
+
+	//warning text to be displayed
+	QString inactivityWarning("");
+
+	//loop over all frames
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		//if frame address isn't a ignore placeholder address
+		//and the current hertz value is zero
+		if (frameAddressList.at(i) != stdIgnoreAddress
+				&& frameHertzToDisplay[i] == 0) {
+
+			//increase counter of inactive frames
+			inactiveFramesCount++;
+
+			//add frame string to warning
+			inactivityWarning.append(getFrameString(i));
+			inactivityWarning.append(QString(" "));
+		}
+	}
+	//if at least one frame is inactive
+	if (inactiveFramesCount > 0) {
+		display(INACTIVE, inactivityWarning);
+		//if all selected frames are active
+	} else {
+		display(INACTIVE, QString("All selected frames are active"));
+	}
+}
+
+/*! \brief Display asynchronity status for all frames
+ *
+ */
+void QNodeReceiver::displayFrameAsync() {
+
+	//loop over all frames
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		//if frame is active and current hertz value is under a fixed minimum limit
+		if (frameHertzToDisplay[i] != 0
+				&& frameHertzToDisplay[i] < valueAsync) {
+
+			//warning text to be displayed
+			QString asynchronityWarning(getFrameString(i));
+
+			//add asynchronity info to warning text
+			asynchronityWarning.append(QString(" < "));
+			asynchronityWarning.append(QString::number(valueAsync));
+			asynchronityWarning.append(QString("Hz (latest-last stamp: "));
+			if (frameAsynchSpanSec[i] != 0) {
+				asynchronityWarning.append(
+						QString::number(frameAsynchSpanSec[i]));
+				asynchronityWarning.append(QString(" sec. "));
+			}
+			asynchronityWarning.append(QString::number(frameAsynchSpanNsec[i]));
+			asynchronityWarning.append(QString(" nsec.)"));
+
+			display(ASYNCH, asynchronityWarning);
+		}
 	}
 }

@@ -29,7 +29,6 @@ public Q_SLOTS:
 	 ***********************************************/
 	void updateListView();
 	void updateFrameViews();
-	void updateMinHertz(int value);
 
 	/***********************************************
 	 GUI ACTION METHODS
@@ -37,9 +36,12 @@ public Q_SLOTS:
 	void on_pushButtonReceiverSetup_clicked();
 	void on_pushButtonReceiverStart_clicked();
 	void on_pushButtonReceiverStop_clicked();
-	void on_checkBoxEuler_stateChanged(int state);
 	void on_pushButtonAbout_clicked();
+	void on_pushButtonHelp_clicked();
 	void on_pushButtonFrames_clicked();
+	void on_checkBoxPerformance_stateChanged(int state);
+	void on_checkBoxEuler_stateChanged(int state);
+	void on_checkBoxAsync_stateChanged(int state);
 	void on_pushButtonSwitch_clicked();
 	void on_checkBox_00_stateChanged(int state);
 	void on_checkBox_01_stateChanged(int state);
@@ -66,7 +68,6 @@ private:
 	void frameSelectChanged(const int &frame_index, int state);
 	void updateFrameAddressView(const int &frame_index);
 	void updateFrameHertzView(const int &frame_index);
-	void updateFrameInactivityView(const int &frame_index);
 
 	/***********************************************
 	 GUI SETTINGS
@@ -79,11 +80,10 @@ private:
 	DialogAbout dialogAbout;
 	DialogFrames dialogFrames;
 
-	QCheckBox* frame_select_checkbox[NUMBER_OF_FRAMES];
-	QComboBox* frame_switch_combobox[NUMBER_OF_FRAMES];
-	QLineEdit* frame_address_line[NUMBER_OF_FRAMES];
-	QLineEdit* frame_hertz_line[NUMBER_OF_FRAMES];
-	QLineEdit* frame_inactivity_line[NUMBER_OF_FRAMES];
+	QCheckBox* frameSelectCheckBox[NUMBER_OF_FRAMES];
+	QComboBox* frameSwitchComboBox[NUMBER_OF_FRAMES];
+	QLineEdit* frameAddressLineEdit[NUMBER_OF_FRAMES];
+	QLineEdit* frameHertzLineEdit[NUMBER_OF_FRAMES];
 };
 
 #endif

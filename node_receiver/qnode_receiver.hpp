@@ -6,8 +6,11 @@
 #include "../node_common/qnode.hpp"
 #endif
 
-/**
- *
+/*! \brief Specialized node class for receiving UDP packets
+ * @author Christian Benz <zneb_naitsirhc@web.de>
+ * @author Christoph Döringer <christoph.doeringer@gmail.com>
+ * @author Hendrik Pfeifer <hendrikpfeifer@gmail.com>
+ * @author Heiko Reinemuth <heiko.reinemuth@gmail.com>
  */
 class QNodeReceiver: public QNode {
 
@@ -30,22 +33,20 @@ public:
 	virtual QString getAssignAddress();
 	virtual QString getIgnoreAddress();
 	virtual QString getFrameAddress(const int &frame_index);
-	virtual int getFrameHertz(const int &frame_index);
-	virtual QString getFrameInactivity(const int &frame_index);
+	virtual int getFrameHertzToDisplay(const int &frame_index);
 
 	/***********************************************
 	 SETTER
 	 ***********************************************/
-	virtual void clearAllFrameAddresses();
 	virtual void addFrameAddress(QString address);
 	virtual void setFrameAddress(const int &frame_index, QString address);
-	virtual void setFrameHertz(const int &frame_index, const int &value);
-	virtual void setFrameInactivity(const int &frame_index, QString time);
-	virtual void setLastUpdate(const int &frame_index, const ros::Time &time);
-	virtual void setResetModelSignal(const bool &boolean);
-	virtual void setDisplayEulerSignal(const bool &boolean);
-	virtual void setDisplayEulerFrame(const int &frame_index);
-	virtual void setMinHertz(int value);
+	virtual void setSignalResetModel(const bool &boolean);
+	virtual void setSignalPerformance(const bool &boolean);
+	virtual void setSignalEuler(const bool &boolean);
+	virtual void setFrameEuler(const int &frame_index);
+	virtual void setSignalInactivity(const bool &boolean);
+	virtual void setSignalAsync(const bool &boolean);
+	virtual void setValueAsync(const int &value);
 
 private:
 	/***********************************************
@@ -55,52 +56,74 @@ private:
 	bool socketCreation();
 	bool socketOption();
 	bool socketBinding();
-	void getTimeFromSec();
-	void displayFrameAsynchrony();
-	void displayFrameInactivity();
-
 	void initEuler();
-	void initBaseMessage();
-	void initFrameMessages();
+	void initMessages();
 	void initFrameRotation();
 	void initFrameData();
+	void displayFrameEuler();
+	void displayFrameInactivity();
+	void displayFrameAsync();
 
-	int udp_socket;
-	int udp_socket_binding;
-	int udp_socket_option;
-	struct sockaddr_in socket_address;
-	struct sockaddr_in sensor_address;
-	socklen_t sensor_address_length;
-	SensorData sensor_packet_data;
-	int sensor_packet_size;
+	//socket and address variables
+	int udpSocket;
+	int udpSocketBinding;
+	int udpSocketOption;
+	struct sockaddr_in socketAddress;
+	struct sockaddr_in sensorAddress;
+	socklen_t sensorAddressLength;
+	SensorData sensorPacketData;
+	int sensorPacketSize;
 
-	double frame_euler_x;
-	double frame_euler_y;
-	double frame_euler_z;
+	//settings variables
+	bool signalPerformance;
+	bool signalEuler;
+	int frameEuler;
+	bool signalInactivity;
+	bool signalAsync;
+	int valueAsync;
+	bool signalResetModel;
 
-	bool display_euler_signal;
-	int display_euler_frame;
+	//address placeholders
+	QString stdAssignAddress;
+	QString stdIgnoreAddress;
 
-	int minHertz;
+	//euler angle variables
+	double frameEulerX;
+	double frameEulerY;
+	double frameEulerZ;
 
-	bool reset_model_signal;
-	QString assign_address;
-	QString ignore_address;
+	//list of frame ip addresses
+	QStringList frameAddressList;
 
-	QStringList frame_address_list;
-	int frame_inactivity_sec[NUMBER_OF_FRAMES];
-	QString frame_inactivity[NUMBER_OF_FRAMES];
-	int frame_snr_span_sec[NUMBER_OF_FRAMES];
-	int frame_snr_span_nsec[NUMBER_OF_FRAMES];
-	ros::Time frame_msg_last_stamp[NUMBER_OF_FRAMES];
-	int frame_hertz[NUMBER_OF_FRAMES];
+	//current count of frame updates
+	int frameUpdateCount[NUMBER_OF_FRAMES];
 
+	//total count of frame updates in one second
+	int frameHertzToDisplay[NUMBER_OF_FRAMES];
+
+	//last frame message stamp
+	ros::Time frameLastMsgStamp[NUMBER_OF_FRAMES];
+
+	//time between the latest and the last frame message stamp in seconds
+	int frameAsynchSpanSec[NUMBER_OF_FRAMES];
+
+	//time between the latest and the last frame message stamp in nanoseconds
+	int frameAsynchSpanNsec[NUMBER_OF_FRAMES];
+
+	//urdf data model
 	urdf::Model model;
-	tf::StampedTransform tf_base_msg;
-	tf::Quaternion tf_base_rot;
 
-	tf::Quaternion tf_frame_rot[NUMBER_OF_FRAMES];
-	tf::StampedTransform tf_frame_msg[NUMBER_OF_FRAMES];
+	//base connector rotation
+	tf::Quaternion tfBaseRot;
+
+	//base connector message
+	tf::StampedTransform tfBaseMsg;
+
+	//frame rotation
+	tf::Quaternion tfFrameRot[NUMBER_OF_FRAMES];
+
+	//frame message
+	tf::StampedTransform tfFrameMsg[NUMBER_OF_FRAMES];
 };
 
 #endif

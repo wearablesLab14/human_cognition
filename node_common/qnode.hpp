@@ -5,17 +5,15 @@
 #include <ros/ros.h>
 #endif
 
+//ROS includes
 #include <ros/network.h>
-
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 #include <tf/tf.h>
 #include <tf/transform_datatypes.h>
 #include <tf/transform_broadcaster.h>
 #include <tf/transform_listener.h>
-
 #include <urdf/model.h>
 
+//QT includes
 #include <QStringList>
 #include <QThread>
 #include <QString>
@@ -25,6 +23,7 @@
 #include <QSettings>
 #include <QTime>
 
+//other includes
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -32,24 +31,41 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
+//macros
 #define PORT 5050
+#define ONE_SEC 1000000000
 #define NUMBER_OF_FRAMES 14
 #define TO_ASSIGN_ADDRESS "000.000.0.000"
 #define TO_IGNORE_ADDRESS "---.---.-.---"
 
+//display type enums
 enum DisplayType {
-	TIP, INFO, ASYNCH, INACTIVE, ERROR, FRAME01, FRAME234, FRAME567, FRAME8910, FRAME111213
+	TIP,
+	INFO,
+	ERROR,
+	EULER,
+	INACTIVE,
+	ASYNCH,
+	FRAME01,
+	FRAME234,
+	FRAME567,
+	FRAME8910,
+	FRAME111213
 };
 
+//struct for sensor packet data
 struct SensorData {
 	uint32_t timestamp;
 	float q0, q1, q2, q3, exInt, eyInt, ezInt;
 }__attribute__((packed));
 
-/*! \brief
- * @author
- * @date
+/*! \brief Base class to setup a ROS node
+ * @author Christian Benz <zneb_naitsirhc@web.de>
+ * @author Christoph Döringer <christoph.doeringer@gmail.com>
+ * @author Hendrik Pfeifer <hendrikpfeifer@gmail.com>
+ * @author Heiko Reinemuth <heiko.reinemuth@gmail.com>
  */
 class QNode: public QThread {
 Q_OBJECT
@@ -74,7 +90,7 @@ public:
 	QString getFrameString(const int &frame_index);
 	DisplayType getFrameDisplayType(const int &frame_index);
 	void display(const DisplayType &level, const QString &info);
-	std::string rosTimeToGMTPlus1(ros::Time stamp);
+	std::string rosTimeToTimezone(ros::Time stamp, const int &time_zone);
 
 	/***********************************************
 	 GETTER METHODS
@@ -97,13 +113,19 @@ private:
 protected:
 	int init_argc;
 	char** init_argv;
+
+	//node name
 	const std::string node_name;
 
-	QStandardItemModel list_view_model;
+	//standard listView model for nodes
+	QStandardItemModel listViewModel;
 
-	std::string link_name[NUMBER_OF_FRAMES];
-	std::string joint_base_name;
-	std::string joint_name[NUMBER_OF_FRAMES];
+	//urdf link names
+	std::string frameLinkName[NUMBER_OF_FRAMES];
+
+	//urdf joint names
+	std::string baseJointName;
+	std::string frameJointName[NUMBER_OF_FRAMES];
 };
 
 #endif

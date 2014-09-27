@@ -89,7 +89,7 @@ void QNodeListener::run() {
 
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-		if (echoListener.tf.waitForTransform(source_frameid, link_name[i],
+		if (echoListener.tf.waitForTransform(source_frameid, frameLinkName[i],
 				ros::Time(0), ros::Duration(0.3))) {
 			display(getFrameDisplayType(i),
 					getFrameString(i).append(QString(" found")));
@@ -109,7 +109,7 @@ void QNodeListener::run() {
 		try {
 
 			for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-				echoListener.tf.lookupTransform(source_frameid, link_name[i],
+				echoListener.tf.lookupTransform(source_frameid, frameLinkName[i],
 						ros::Time(0), tf_message[i]);
 			}
 
@@ -125,7 +125,7 @@ void QNodeListener::run() {
 
 					for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 						coordinates << i << ";"
-								<< rosTimeToGMTPlus1(tf_message[i].stamp_)
+								<< rosTimeToTimezone(tf_message[i].stamp_, 2)
 								<< ";" << tf_joint_coordinates[i].getX() << ";"
 								<< tf_joint_coordinates[i].getY() << ";"
 								<< tf_joint_coordinates[i].getZ() << "\n";
@@ -137,7 +137,7 @@ void QNodeListener::run() {
 
 				if (display_coordinates_signal) {
 
-					QString msg(link_name[display_coordinates_frame].c_str());
+					QString msg(frameLinkName[display_coordinates_frame].c_str());
 					msg.append(QString(" x: "));
 					msg.append(
 							QString::number(
