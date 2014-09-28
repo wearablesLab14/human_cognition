@@ -122,7 +122,7 @@ WindowReceiver::~WindowReceiver() {
  */
 void WindowReceiver::closeEvent(QCloseEvent *event) {
 
-	//save GUI state, values and lists into QSettings
+	//save GUI state, values and lists in QSettings
 	writeSettings();
 
 	//close window
@@ -297,153 +297,155 @@ void WindowReceiver::on_checkBoxAsync_stateChanged(int state) {
 	}
 }
 
-/**
+/*! \brief Opens the 'About' dialog window
  *
  */
 void WindowReceiver::on_pushButtonAbout_clicked() {
-
 	dialogAbout.setModal(true);
 	dialogAbout.exec();
 }
 
-/**
+/*! \brief Opens the 'Help' dialog window
  *
  */
 void WindowReceiver::on_pushButtonHelp_clicked() {
-
 	dialogHelp.setModal(true);
 	dialogHelp.exec();
 }
 
-/**
+/*! \brief Opens the 'Frames' dialog window
  *
  */
 void WindowReceiver::on_pushButtonFrames_clicked() {
-
 	dialogFrames.setModal(true);
 	dialogFrames.exec();
 }
 
-/**
+/*! \brief Switch all frames with their selected switch frames
  *
  */
 void WindowReceiver::on_pushButtonSwitch_clicked() {
 
+	//loop over all frames
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		//switch frames if a frame has not his own index as its selected switch frame
 		if (i != frameSwitchComboBox[i]->currentIndex()) {
 			frameSwitch(i, frameSwitchComboBox[i]->currentIndex());
+
+			//reset current index of frame's switch comboBox
 			frameSwitchComboBox[i]->setCurrentIndex(i);
 		}
 	}
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_00_stateChanged(int state) {
 	frameSelectChanged(0, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_01_stateChanged(int state) {
 	frameSelectChanged(1, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_02_stateChanged(int state) {
 	frameSelectChanged(2, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_03_stateChanged(int state) {
 	frameSelectChanged(3, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_04_stateChanged(int state) {
 	frameSelectChanged(4, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_05_stateChanged(int state) {
 	frameSelectChanged(5, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_06_stateChanged(int state) {
 	frameSelectChanged(6, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_07_stateChanged(int state) {
 	frameSelectChanged(7, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_08_stateChanged(int state) {
 	frameSelectChanged(8, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_09_stateChanged(int state) {
 	frameSelectChanged(9, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_10_stateChanged(int state) {
 	frameSelectChanged(10, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_11_stateChanged(int state) {
 	frameSelectChanged(11, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_12_stateChanged(int state) {
 	frameSelectChanged(12, state);
 }
 
-/**
+/*! \brief Changes frame selection and address depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBox_13_stateChanged(int state) {
 	frameSelectChanged(13, state);
@@ -541,21 +543,25 @@ void WindowReceiver::on_pushButtonResetFrames_clicked() {
  MODEL SIGNAL METHODS
  ***********************************************/
 
-/**
+/*! \brief Scrolls listView to the bottom
  *
  */
 void WindowReceiver::updateListView() {
 	uiRecv.listViewInfo->scrollToBottom();
-
 }
 
-/**
+/*! \brief Updates all frame views
  *
  */
 void WindowReceiver::updateFrameViews() {
 
+	//loop over all frames
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		//update frame address
 		updateFrameAddressView(i);
+
+		//update frame hertz
 		updateFrameHertzView(i);
 	}
 }
@@ -564,64 +570,78 @@ void WindowReceiver::updateFrameViews() {
  PRIVATE GUI METHODS
  ***********************************************/
 
-/**
+/*! \brief Switches frame selection and address
  *
- * @param frame_index_a
- * @param frame_index_b
+ * @param frame_index_a Frame A to be switched with frame B
+ * @param frame_index_b Frame B to be switched with frame A
  */
 void WindowReceiver::frameSwitch(const int &frame_index_a,
 		const int &frame_index_b) {
 
+	//save both frame addresses
 	QString address_a = qnodeRecv->getFrameAddress(frame_index_a);
 	QString address_b = qnodeRecv->getFrameAddress(frame_index_b);
+
+	//save both frame selections
 	bool boolean_a = frameSelectCheckBox[frame_index_a]->isChecked();
 	bool boolean_b = frameSelectCheckBox[frame_index_b]->isChecked();
 
+	//switch frame addresses
 	qnodeRecv->setFrameAddress(frame_index_a, address_b);
 	qnodeRecv->setFrameAddress(frame_index_b, address_a);
+
+	//switch frame selections
 	frameSelectCheckBox[frame_index_a]->setChecked(boolean_b);
 	frameSelectCheckBox[frame_index_b]->setChecked(boolean_a);
+
+	//update all frame views
 	updateFrameViews();
 }
 
-/**
+/*! \brief Changes frame address depending on the changed selection state
  *
- * @param frame_index
- * @param state
+ * @param frame_index The index of the frame
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
 
+	//set frame address to placeholder assign address if frame is now selected
+	//and current frame address is the placeholder ignore address
 	if (state == 2
 			&& qnodeRecv->getFrameAddress(frame_index)
 					== qnodeRecv->getIgnoreAddress()) {
 		qnodeRecv->setFrameAddress(frame_index,
 				qnodeRecv->getAssignAddress());
+
+	//set frame address to placeholder ignore address if frame is not selected anymore
 	} else if (state == 0) {
 		qnodeRecv->setFrameAddress(frame_index,
 				qnodeRecv->getIgnoreAddress());
 	}
+
+	//update frame address view
 	updateFrameAddressView(frame_index);
 }
 
-/**
+/*! \brief Update frame address view
  *
- * @param frame_index
+ * @param frame_index The index of the frame
  */
 void WindowReceiver::updateFrameAddressView(const int &frame_index) {
 	frameAddressLineEdit[frame_index]->setText(
 			qnodeRecv->getFrameAddress(frame_index));
 }
 
-/**
+/*! \brief Update frame hertz view
  *
- * @param frame_index
+ * @param frame_index The index of the frame
  */
 void WindowReceiver::updateFrameHertzView(const int &frame_index) {
 	frameHertzLineEdit[frame_index]->setText(
 			QString::number(qnodeRecv->getFrameHertzToDisplay(frame_index)));
 }
 
-/**
+/*! \brief Restores GUI state, values and lists from QSettings
  *
  */
 void WindowReceiver::readSettings() {
@@ -705,7 +725,7 @@ void WindowReceiver::readSettings() {
 	uiRecv.pushButtonResetFrames->setEnabled(false);
 }
 
-/**
+/*! \brief Saves GUI state, values and lists in QSettings
  *
  */
 void WindowReceiver::writeSettings() {

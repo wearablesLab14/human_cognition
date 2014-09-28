@@ -36,7 +36,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	display(TIP, "2. Start ROS master process with 'roscore'");
 	display(TIP, "Start RVIZ and load human model with 'roslaunch human_cognition rviz.launch'");
 	display(TIP, "Record tf messages with 'roslaunch human_cognition record.launch title:=myTitle'");
-	display(TIP, "Play tf messages 'roslaunch human_cognition play.launch title:=myTitle'");
+	display(TIP, "Click 'reset' button in RVIZ");
+	display(TIP, "Play tf messages with 'roslaunch human_cognition play.launch title:=myTitle'");
 
 	/***********************************************************/
 
