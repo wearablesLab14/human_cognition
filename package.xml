@@ -1,32 +1,33 @@
 <?xml version="1.0"?>
 <package>
   <name>human_cognition</name>
-  <version>0.1.0</version>
+  <version>1.0.0</version>
   <description>
    	human_cognition
   </description>
-  <maintainer email="zneb_naitsirhc@web.de">ChristianBenz</maintainer>  
-  <maintainer email="christoph.doeringer@gmail.com">ChristophDöringer</maintainer>
-  <maintainer email="hendrikpfeifer@gmail.com">HendrikPfeifer</maintainer>
-  <maintainer email="heiko.reinemuth@gmail.com">HeikoReinemuth</maintainer>
-  <author>ChristianBenz</author>
-  <author>ChristophDöringer</author>
-  <author>HendrikPfeifer</author>
-  <author>HeikoReinemuth</author>
+  
+  		<maintainer email="zneb_naitsirhc@web.de">ChristianBenz</maintainer>  
+   			<author>ChristianBenz</author>
+  		<maintainer email="christoph.doeringer@gmail.com">ChristophDöringer</maintainer>
+   			<author>ChristophDöringer</author>
+  		<maintainer email="hendrikpfeifer@gmail.com">HendrikPfeifer</maintainer>
+  			<author>HendrikPfeifer</author>
+ 		<maintainer email="heiko.reinemuth@gmail.com">HeikoReinemuth</maintainer>
+ 			<author>HeikoReinemuth</author>  
+ 			
   <license>BSD</license>
-
-  <buildtool_depend>catkin</buildtool_depend>
+  
+  <buildtool_depend>catkin</buildtool_depend>  
   
   <build_depend>qt_build</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>libqt4-dev</build_depend>
   <build_depend>tf</build_depend> 
-  <build_depend>urdf</build_depend> 
+  <build_depend>urdf</build_depend>   
      
   <run_depend>qt_build</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>libqt4-dev</run_depend>
   <run_depend>tf</run_depend>    
-  <run_depend>urdf</run_depend> 
-  
+  <run_depend>urdf</run_depend>   
 </package>

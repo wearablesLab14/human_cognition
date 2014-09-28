@@ -82,7 +82,7 @@ private:
 	//receiver node
 	QNodeReceiver *qnodeRecv;
 
-	//dialog windows
+	//dialog window objects
 	DialogAbout dialogAbout;
 	DialogHelp dialogHelp;
 	DialogFrames dialogFrames;

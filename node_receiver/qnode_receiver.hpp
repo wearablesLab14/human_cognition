@@ -74,6 +74,10 @@ private:
 	SensorData sensorPacketData;
 	int sensorPacketSize;
 
+	//address placeholders
+	QString stdAssignAddress;
+	QString stdIgnoreAddress;
+
 	//settings variables
 	bool signalPerformance;
 	bool signalEuler;
@@ -82,10 +86,6 @@ private:
 	bool signalAsync;
 	int valueAsync;
 	bool signalResetModel;
-
-	//address placeholders
-	QString stdAssignAddress;
-	QString stdIgnoreAddress;
 
 	//euler angle variables
 	double frameEulerX;

@@ -1,6 +1,8 @@
 set(QT_RESOURCES ${CMAKE_CURRENT_SOURCE_DIR}/../resources/images.qrc)
+
 set(QT_RECEIVER ${CMAKE_CURRENT_SOURCE_DIR}/../ui/window_receiver.ui)
 set(QT_LISTENER ${CMAKE_CURRENT_SOURCE_DIR}/../ui/window_listener.ui)
+
 set(QT_DIALOG_ABOUT ${CMAKE_CURRENT_SOURCE_DIR}/../ui/dialog_about.ui)
 set(QT_DIALOG_HELP ${CMAKE_CURRENT_SOURCE_DIR}/../ui/dialog_help.ui)
 set(QT_DIALOG_FRAMES ${CMAKE_CURRENT_SOURCE_DIR}/../ui/dialog_frames.ui)

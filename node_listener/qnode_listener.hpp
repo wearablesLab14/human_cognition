@@ -6,8 +6,11 @@
 #include "../node_common/qnode.hpp"
 #endif
 
-/**
- *
+/*! \brief Specialized node class for listening to ROS tf messages
+ * @author Christian Benz <zneb_naitsirhc@web.de>
+ * @author Christoph Döringer <christoph.doeringer@gmail.com>
+ * @author Hendrik Pfeifer <hendrikpfeifer@gmail.com>
+ * @author Heiko Reinemuth <heiko.reinemuth@gmail.com>
  */
 class QNodeListener: public QNode {
 
@@ -27,19 +30,28 @@ public:
 	/***********************************************
 	 SETTER
 	 ***********************************************/
-	virtual void setDisplayCoordinatesSignal(const bool &boolean);
-	virtual void setDisplayCoordinatesFrame(const int &frame_index);
-	virtual void setRecordCoordinatesSignal(const bool &boolean);
-	virtual void setRecordCoordinatesFile(std::string file_name);
+	virtual void setSignalCoordinates(const bool &boolean);
+	virtual void setFrameCoordinates(const int &frame_index);
+	virtual void setSignalRecord(const bool &boolean);
+	virtual void setFileRecord(std::string file_name);
 
 private:
-	bool display_coordinates_signal;
-	int display_coordinates_frame;
-	bool record_coordinates_signal;
-	std::string record_coordinates_file;
+	/***********************************************
+	 PRIVATE HELPER METHODS
+	 ***********************************************/
+	void displayCoordinates();
 
-	tf::Vector3 tf_joint_coordinates[NUMBER_OF_FRAMES];
-	tf::StampedTransform tf_message[NUMBER_OF_FRAMES];
+	//settings variables
+	bool signalCoordinates;
+	int frameCoordinates;
+	bool signalRecord;
+	std::string fileRecord;
+
+	//absolute coordinates of a frame's parent joint
+	tf::Vector3 absoluteJointCoordinates[NUMBER_OF_FRAMES];
+
+	//frame message
+	tf::StampedTransform frameMsg[NUMBER_OF_FRAMES];
 };
 
 #endif

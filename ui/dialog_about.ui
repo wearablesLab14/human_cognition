@@ -34,7 +34,7 @@
      <height>621</height>
     </rect>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QGridLayout" name="gridLayoutAbout">
     <item row="0" column="0">
      <widget class="QTextBrowser" name="textBrowser">
       <property name="html">

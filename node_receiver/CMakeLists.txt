@@ -5,5 +5,7 @@ QT4_WRAP_CPP(QT_MOC_HPP ${QT_MOC})
 file(GLOB_RECURSE QT_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} FOLLOW_SYMLINKS *.cpp)
 
 add_executable(receiver ${QT_SOURCES} ${QT_MOC_HPP})
+
 target_link_libraries(receiver human_cognition)
+
 install(TARGETS receiver RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

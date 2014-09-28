@@ -1878,21 +1878,6 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="2">
-        <widget class="QListView" name="listViewInfo">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>150</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>11</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="2">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="leftMargin">
@@ -1997,7 +1982,7 @@
           </widget>
          </item>
          <item>
-          <layout class="QGridLayout" name="gridLayoutInfo">
+          <layout class="QGridLayout" name="gridLayoutProjectInfo">
            <property name="leftMargin">
             <number>3</number>
            </property>
@@ -2211,6 +2196,28 @@
             </widget>
            </item>
           </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="2">
+        <layout class="QGridLayout" name="gridLayoutInfo">
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QListView" name="listViewInfo">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>150</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+            </font>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

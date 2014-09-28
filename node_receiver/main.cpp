@@ -17,6 +17,7 @@
  * 		Heiko Reinemuth 		<heiko.reinemuth@gmail.com>
  ****************************************************************/
 
+//QT includes
 #include <QtGui>
 #include <QApplication>
 
@@ -55,7 +56,6 @@ int main(int argc, char **argv) {
 		//process GUI events
 		recvApp.processEvents();
 	}
-
 	exitCode = recvApp.exec();
 
 	return exitCode;

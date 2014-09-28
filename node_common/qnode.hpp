@@ -24,6 +24,10 @@
 #include <QTime>
 
 //other includes
+#include <ctime>
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -90,7 +94,7 @@ public:
 	QString getFrameString(const int &frame_index);
 	DisplayType getFrameDisplayType(const int &frame_index);
 	void display(const DisplayType &level, const QString &info);
-	std::string rosTimeToTimezone(ros::Time stamp, const int &time_zone);
+	std::string rosTimeToLocalTime(ros::Time stamp);
 
 	/***********************************************
 	 GETTER METHODS

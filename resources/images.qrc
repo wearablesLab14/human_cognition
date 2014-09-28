@@ -1,9 +1,7 @@
 <RCC>
-    <qresource prefix="/" >
-    
+    <qresource prefix="/" >    
         <file>images/icon_receiver.png</file>
         <file>images/icon_listener.png</file>
-        <file>images/frames.png</file>   
-             
+        <file>images/frames.png</file>                
     </qresource>
 </RCC>

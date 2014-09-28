@@ -207,13 +207,13 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 		break;
 	}
 	case (EULER): {
-		text.append(QString("[EULER]: "));
+		text.append(QString("[EULER ANGLES]: "));
 		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
 				Qt::ForegroundRole);
 		break;
 	}
 	case (INACTIVE): {
-		text.append(QString("[INACTIVE]: "));
+		text.append(QString("[INACTIVE FRAMES]: "));
 		listViewItem->setData(QBrush(QColor(Qt::darkYellow)),
 				Qt::ForegroundRole);
 		break;
@@ -244,7 +244,7 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 		listViewItem->setData(QBrush(QColor(153, 0, 255)), Qt::ForegroundRole);
 		break;
 	}
-	//should never be reached
+		//should never be reached
 	default: {
 		break;
 	}
@@ -260,30 +260,24 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 	Q_EMIT listViewModelUpdated();
 }
 
-/*! \brief Returns readable ROS timestamp for a desired timezone
+/*! \brief Returns readable ROS timestamp for local time
  *
- *		Converts a ROS timestamp to a desired timezone and returns a readable string representation
+ *		Converts a ROS timestamp to local time and returns a readable string representation
  * @param stamp A given ROS timestamp
- * @param time_zone Offset for the desired timezone
  * @return String representation of ROS time
  */
-std::string QNode::rosTimeToTimezone(ros::Time stamp, const int &time_zone) {
+std::string QNode::rosTimeToLocalTime(ros::Time stamp) {
 
 	//string representation of given timestamp
 	std::string timeStr = to_iso_string(stamp.toBoost());
 
-	//substring of given timestamp which holds hours
-	std::string hoursString = timeStr.substr(9, 2);
-
-	//hours in integer form
-	int hours = atoi(hoursString.c_str());
-
-	//add desired timezone offset to hours variable
-	hours += time_zone;
+	//local system time
+	time_t t = time(0);
+	struct tm * now = localtime(&t);
 
 	//convert hours integer variable to string
 	std::stringstream ss;
-	ss << hours;
+	ss << now->tm_hour;
 	std::string str = ss.str();
 
 	//replace substring which holds hours with new hours string

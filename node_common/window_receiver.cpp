@@ -100,7 +100,7 @@ WindowReceiver::WindowReceiver(QNodeReceiver *node, QWidget *parent) :
 	//restore GUI state, values and lists from QSettings
 	readSettings();
 
-	//assign listView with listView model
+	//set listView model
 	uiRecv.listViewInfo->setModel(qnodeRecv->getListViewModel());
 
 	//connect signal calls of node with GUI update methods
@@ -138,7 +138,7 @@ void WindowReceiver::closeEvent(QCloseEvent *event) {
  */
 void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 
-	//init receiver node and socket for receiving
+	//initialize receiver node and socket for receiving
 	if (qnodeRecv->readyForAction()) {
 
 		//disable following GUI elements
@@ -162,7 +162,7 @@ void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 	}
 }
 
-/*! \brief Start thread for receiving, enables and disables GUI elements
+/*! \brief Starts thread for receiving, enables and disables GUI elements
  *
  */
 void WindowReceiver::on_pushButtonReceiverStart_clicked() {
@@ -207,14 +207,6 @@ void WindowReceiver::on_pushButtonReceiverStop_clicked() {
 
 	//enable following GUI elements
 	uiRecv.pushButtonReceiverSetup->setEnabled(true);
-	uiRecv.checkBoxPerformance->setEnabled(true);
-	if(!uiRecv.checkBoxPerformance->isChecked()) {
-		uiRecv.checkBoxEuler->setEnabled(true);
-		uiRecv.comboBoxEuler->setEnabled(true);
-		uiRecv.checkBoxInactivity->setEnabled(true);
-		uiRecv.checkBoxAsync->setEnabled(true);
-		uiRecv.spinBoxAsync->setEnabled(true);
-	}
 }
 
 /*! \brief Enables and disables certain GUI elements depending on the changed state
@@ -238,7 +230,7 @@ void WindowReceiver::on_checkBoxPerformance_stateChanged(int state) {
 		uiRecv.checkBoxInactivity->setChecked(false);
 		uiRecv.checkBoxAsync->setChecked(false);
 
-	//performance modus is unchecked
+		//performance modus is unchecked
 	} else if (state == 0) {
 
 		//enable following GUI elements
@@ -247,11 +239,11 @@ void WindowReceiver::on_checkBoxPerformance_stateChanged(int state) {
 		uiRecv.checkBoxAsync->setEnabled(true);
 
 		//enable euler comboBox only if euler checkBox is checked
-		if(uiRecv.checkBoxEuler->isChecked()) {
+		if (uiRecv.checkBoxEuler->isChecked()) {
 			uiRecv.comboBoxEuler->setEnabled(true);
 		}
 		//enable async spinBox only if async checkBox is checked
-		if(uiRecv.checkBoxAsync->isChecked()) {
+		if (uiRecv.checkBoxAsync->isChecked()) {
 			uiRecv.spinBoxAsync->setEnabled(true);
 		}
 	}
@@ -266,13 +258,13 @@ void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
 	//if euler angles is checked
 	if (state == 2) {
 
-		//enable following GUI elements
+		//enable following GUI element
 		uiRecv.comboBoxEuler->setEnabled(true);
 
-	//if euler angles is unchecked
+		//if euler angles is unchecked
 	} else if (state == 0) {
 
-		//disable following GUI elements
+		//disable following GUI element
 		uiRecv.comboBoxEuler->setEnabled(false);
 	}
 }
@@ -286,13 +278,13 @@ void WindowReceiver::on_checkBoxAsync_stateChanged(int state) {
 	//if async is checked
 	if (state == 2) {
 
-		//enable following GUI elements
+		//enable following GUI element
 		uiRecv.spinBoxAsync->setEnabled(true);
 
-	//if async is unchecked
+		//if async is unchecked
 	} else if (state == 0) {
 
-		//disable following GUI elements
+		//disable following GUI element
 		uiRecv.spinBoxAsync->setEnabled(false);
 	}
 }
@@ -610,13 +602,11 @@ void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
 	if (state == 2
 			&& qnodeRecv->getFrameAddress(frame_index)
 					== qnodeRecv->getIgnoreAddress()) {
-		qnodeRecv->setFrameAddress(frame_index,
-				qnodeRecv->getAssignAddress());
+		qnodeRecv->setFrameAddress(frame_index, qnodeRecv->getAssignAddress());
 
-	//set frame address to placeholder ignore address if frame is not selected anymore
+		//set frame address to placeholder ignore address if frame is not selected anymore
 	} else if (state == 0) {
-		qnodeRecv->setFrameAddress(frame_index,
-				qnodeRecv->getIgnoreAddress());
+		qnodeRecv->setFrameAddress(frame_index, qnodeRecv->getIgnoreAddress());
 	}
 
 	//update frame address view
@@ -669,9 +659,9 @@ void WindowReceiver::readSettings() {
 	uiRecv.comboBoxEuler->setCurrentIndex(
 			settings.value(QString("key_frame_euler"), 0).toInt());
 	uiRecv.checkBoxInactivity->setChecked(
-					settings.value(QString("key_signal_inactivity"), false).toBool());
+			settings.value(QString("key_signal_inactivity"), false).toBool());
 	uiRecv.checkBoxAsync->setChecked(
-				settings.value(QString("key_signal_async"), false).toBool());
+			settings.value(QString("key_signal_async"), false).toBool());
 	uiRecv.spinBoxAsync->setValue(
 			settings.value(QString("key_value_async"), 30).toInt());
 
@@ -746,11 +736,10 @@ void WindowReceiver::writeSettings() {
 	settings.setValue(QString("key_frame_euler"),
 			uiRecv.comboBoxEuler->currentIndex());
 	settings.setValue(QString("key_signal_inactivity"),
-					uiRecv.checkBoxInactivity->isChecked());
+			uiRecv.checkBoxInactivity->isChecked());
 	settings.setValue(QString("key_signal_async"),
-				uiRecv.checkBoxAsync->isChecked());
-	settings.setValue(QString("key_value_async"),
-			uiRecv.spinBoxAsync->value());
+			uiRecv.checkBoxAsync->isChecked());
+	settings.setValue(QString("key_value_async"), uiRecv.spinBoxAsync->value());
 
 	//start writing address list
 	settings.beginWriteArray(QString("key_address_list"));

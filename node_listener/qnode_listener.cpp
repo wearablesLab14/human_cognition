@@ -1,174 +1,253 @@
+/****************************************************************
+ *  Project:
+ *  	Integrating Body- and Eye-Tracking to study Cognition in the Wild
+ *	-------------------------------------------------------------
+ * 	TU Darmstadt
+ * 	Department Computer Science
+ * 	Summer term 2014
+ *	-------------------------------------------------------------
+ *	File: qnode_listener.cpp
+ *	Description:
+ *		Specialized node class to setup a ROS node for
+ *		listening to ROS tf messages
+ *
+ *	-------------------------------------------------------------
+ * 	Authors:
+ * 		Christian Benz 			<zneb_naitsirhc@web.de>
+ * 		Christoph Döringer 		<christoph.doeringer@gmail.com>
+ * 		Hendrik Pfeifer 		<hendrikpfeifer@gmail.com>
+ * 		Heiko Reinemuth 		<heiko.reinemuth@gmail.com>
+ ****************************************************************/
+
 #include "qnode_listener.hpp"
 
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-
-/**
+/*! \brief EchoListener class
  *
  */
-class echoListener {
+class EchoListener {
 public:
+	//listener for tf messages
 	tf::TransformListener tf;
-	echoListener() {
+	EchoListener() {
 	}
 	;
-
-	~echoListener() {
+	~EchoListener() {
 	}
 	;
 
 private:
 };
 
-/**
+/*! \brief Constructor of QNodeListener class
  *
- * @param argc
- * @param argv
+ *		Displays messages and initializes variables
+ * @param argc Arguments
+ * @param argv Arguments
  */
 QNodeListener::QNodeListener(int argc, char** argv) :
 		QNode(argc, argv, "listener") {
 
 	display(TIP, "1. Connect to mocap");
-	display(TIP, "2. Start receiver");
+	display(TIP, "2. Setup and start receiver");
 
-	display_coordinates_signal = false;
-	display_coordinates_frame = 0;
+	/***********************************************************/
 
-	record_coordinates_signal = false;
-	record_coordinates_file = "coordinates.csv";
+	//initialize settings variables
+	signalCoordinates = false;
+	frameCoordinates = 0;
+	signalRecord = false;
+	fileRecord = "coordinates.csv";
 }
 
 /***********************************************
  IMPLEMENTATION OF PURE VIRTUAL METHODS
  ***********************************************/
 
-/**
+/*! \brief Initializes a listener node
  *
- * @return
+ *		Initializes a ROS node for listening *
+ * @retval TRUE Initialization successful
+ * @retval FALSE Initialization failed
  */
 bool QNodeListener::readyForAction() {
 
+	//return early if initialization of ROS node failed
 	if (!initNode()) {
 		return false;
 	}
+
+	//display a ready to listen message if node is started
 	if (ros::isStarted()) {
 		display(INFO, QString("Ready to listen"));
 	}
 	return true;
 }
 
-/**
+/*! \brief Starts QThread
  *
  */
 void QNodeListener::startAction() {
 	start();
 }
 
-/**
+/*! \brief Shuts ROS node down and stops QThread
  *
  */
 void QNodeListener::stopAction() {
 	shutdownNode();
 }
 
-/**
+/*! \brief Run method of QThread
  *
  */
 void QNodeListener::run() {
 
-	echoListener echoListener;
-	std::ofstream coordinates;
+	//EchoListener object
+	EchoListener echoListener;
 
-	if (record_coordinates_signal) {
-		coordinates.open(record_coordinates_file.c_str(),
-				std::ios::out | std::ios::app);
-	}
+	/***********************************************************/
 
-	std::string source_frameid = "/base_link";
+	//target frame into which to transform
+	std::string targetFrame = "/base_link";
 
+	//loop over all frames
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-		if (echoListener.tf.waitForTransform(source_frameid, frameLinkName[i],
+		QString message("Frame ");
+		message.append(getFrameString(i));
+
+		//wait a short duration for frame's tf message
+		if (echoListener.tf.waitForTransform(targetFrame, frameLinkName[i],
 				ros::Time(0), ros::Duration(0.3))) {
-			display(getFrameDisplayType(i),
-					getFrameString(i).append(QString(" found")));
+
+			//display frame found message if frame's tf message was received
+			display(getFrameDisplayType(i), message.append(QString(" found")));
 		} else {
+
+			//display frame not found message if frame's tf message wasn't received
 			display(getFrameDisplayType(i),
-					getFrameString(i).append(QString(" not found")));
+					message.append(QString(" NOT found")));
 		}
 	}
 
-	ros::Duration timeout(1.0);
-	ros::Time start_time = ros::Time::now();
+	/***********************************************************/
 
-	int oldnsec = 0;
+	//nanoseconds of last received tf message stamp
+	int nsecOfLastMsgStamp = 0;
 
+	//output file stream to record coordinates
+	std::ofstream fileCoordinates;
+
+	/***********************************************************/
+
+	//duration of one second for GUI updates
+	ros::Duration oneSecInterval(1.0);
+
+	//start time of listen loop
+	ros::Time listenStartTime = ros::Time::now();
+
+	/***********************************************************/
+
+	//listen for tf messages while ROS is okay
 	while (ros::ok()) {
 
 		try {
 
+			//loop over all frames
 			for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-				echoListener.tf.lookupTransform(source_frameid, frameLinkName[i],
-						ros::Time(0), tf_message[i]);
+
+				//look up latest tf message for frame
+				echoListener.tf.lookupTransform(targetFrame, frameLinkName[i],
+						ros::Time(0), frameMsg[i]);
 			}
 
-			if (tf_message[0].stamp_.nsec != oldnsec) {
+			/***********************************************************/
 
-				oldnsec = tf_message[0].stamp_.nsec;
+			//update data if nanoseconds of latest tf message stamp are not
+			//equal to nanoseconds of last received tf message stamp
+			if (frameMsg[0].stamp_.nsec != nsecOfLastMsgStamp) {
 
+				//update nanoseconds variable
+				nsecOfLastMsgStamp = frameMsg[0].stamp_.nsec;
+
+				//loop over all frames
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-					tf_joint_coordinates[i] = tf_message[i].getOrigin();
+
+					//update absolute joint coordinates for frame
+					absoluteJointCoordinates[i] = frameMsg[i].getOrigin();
 				}
 
-				if (record_coordinates_signal) {
+				/***********************************************************/
 
+				//if coordinates should be recorded
+				if (signalRecord) {
+
+					//open output file stream if it isn't open yet
+					if (!fileCoordinates.is_open()) {
+						fileCoordinates.open(fileRecord.c_str(),
+								std::ios::out | std::ios::app);
+					}
+
+					//loop over all frames
 					for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-						coordinates << i << ";"
-								<< rosTimeToTimezone(tf_message[i].stamp_, 2)
-								<< ";" << tf_joint_coordinates[i].getX() << ";"
-								<< tf_joint_coordinates[i].getY() << ";"
-								<< tf_joint_coordinates[i].getZ() << "\n";
+
+						//record frame index, readable timestamp of tf message
+						//and absolute joint coordinates for frame
+						fileCoordinates << i << ";"
+								<< rosTimeToLocalTime(frameMsg[i].stamp_) << ";"
+								<< absoluteJointCoordinates[i].getX() << ";"
+								<< absoluteJointCoordinates[i].getY() << ";"
+								<< absoluteJointCoordinates[i].getZ() << "\n";
 					}
 				}
 			}
 
-			if ((ros::Time::now() - start_time) >= timeout) {
+			/***********************************************************/
 
-				if (display_coordinates_signal) {
+			//if one second interval is reached
+			if ((ros::Time::now() - listenStartTime) >= oneSecInterval) {
 
-					QString msg(frameLinkName[display_coordinates_frame].c_str());
-					msg.append(QString(" x: "));
-					msg.append(
-							QString::number(
-									tf_joint_coordinates[display_coordinates_frame].getX()));
-					msg.append(QString(" y: "));
-					msg.append(
-							QString::number(
-									tf_joint_coordinates[display_coordinates_frame].getY()));
-					msg.append(QString(" z: "));
-					msg.append(
-							QString::number(
-									tf_joint_coordinates[display_coordinates_frame].getZ()));
+				//if coordinates should be displayed
+				if (signalCoordinates) {
 
-					display(getFrameDisplayType(display_coordinates_frame),
-							msg);
+					//display the latest coordinates for a desired frame
+					displayCoordinates();
 				}
 
-				if (record_coordinates_signal) {
-					display(INFO, QString("Recording coordinates"));
+				//if coordinates should be recorded
+				if (signalRecord) {
+
+					//display status message
+					display(INFO, QString("Recording absolute coordinates"));
 				}
 
-				start_time = ros::Time::now();
+				//set interval start time to now
+				listenStartTime = ros::Time::now();
 			}
 
+			/***********************************************************/
+
+			//catch possible exceptions by calling lookupTransform
 		} catch (tf::TransformException& ex) {
 
+			//if one second interval is reached
+			if ((ros::Time::now() - listenStartTime) >= oneSecInterval) {
+
+				//display exception message
+				display(ERROR, QString("TransformException"));
+
+				//set interval start time to now
+				listenStartTime = ros::Time::now();
+			}
 		}
 	}
-	if (record_coordinates_signal) {
-		coordinates.close();
+
+	//close output file stream if coordinates were recorded
+	if (signalRecord) {
+		fileCoordinates.close();
 	}
+
+	//display message if run method finishes
 	display(INFO, QString("Listening has stopped"));
 }
 
@@ -176,34 +255,53 @@ void QNodeListener::run() {
  SETTER
  ***********************************************/
 
-/**
+/*! \brief Sets display coordinates signal
  *
- * @param boolean
+ * @param boolean Boolean value to be set
  */
-void QNodeListener::setDisplayCoordinatesSignal(const bool &boolean) {
-	display_coordinates_signal = boolean;
+void QNodeListener::setSignalCoordinates(const bool &boolean) {
+	signalCoordinates = boolean;
 }
 
-/**
+/*! \brief Sets coordinates frame to be displayed
  *
- * @param frame_index
+ * @param frame_index The index of a frame
  */
-void QNodeListener::setDisplayCoordinatesFrame(const int &frame_index) {
-	display_coordinates_frame = frame_index;
+void QNodeListener::setFrameCoordinates(const int &frame_index) {
+	frameCoordinates = frame_index;
 }
 
-/**
+/*! \brief Sets record coordinates signal
  *
- * @param boolean
+ * @param boolean Boolean value to be set
  */
-void QNodeListener::setRecordCoordinatesSignal(const bool &boolean) {
-	record_coordinates_signal = boolean;
+void QNodeListener::setSignalRecord(const bool &boolean) {
+	signalRecord = boolean;
 }
 
-/**
+/*! \brief Sets coordinates record file
  *
- * @param file
+ * @param file The file to be created
  */
-void QNodeListener::setRecordCoordinatesFile(std::string file) {
-	record_coordinates_file = file;
+void QNodeListener::setFileRecord(std::string file) {
+	fileRecord = file;
+}
+
+/*! \brief Display latest coordinates for the desired coordinates frame
+ *
+ */
+void QNodeListener::displayCoordinates() {
+
+	QString msg(frameMsg[frameCoordinates].child_frame_id_.c_str());
+	msg.append(QString(" x: "));
+	msg.append(
+			QString::number(absoluteJointCoordinates[frameCoordinates].getX()));
+	msg.append(QString(" y: "));
+	msg.append(
+			QString::number(absoluteJointCoordinates[frameCoordinates].getY()));
+	msg.append(QString(" z: "));
+	msg.append(
+			QString::number(absoluteJointCoordinates[frameCoordinates].getZ()));
+
+	display(getFrameDisplayType(frameCoordinates), msg);
 }

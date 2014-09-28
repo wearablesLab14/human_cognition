@@ -1,4 +1,6 @@
 <launch>
-	<arg name="title" default="default_title" />					
+
+	<arg name="title" default="default_title" />	
 	<node pkg="rosbag" type="record" name="recordBag" output="screen" args="-O $(find human_cognition)/records/$(arg title).bag tf"/>	
+
 </launch>	
