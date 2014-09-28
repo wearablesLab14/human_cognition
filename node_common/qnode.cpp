@@ -244,6 +244,10 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 		listViewItem->setData(QBrush(QColor(153, 0, 255)), Qt::ForegroundRole);
 		break;
 	}
+	//should never be reached
+	default: {
+		break;
+	}
 	}
 
 	//set text of listView item

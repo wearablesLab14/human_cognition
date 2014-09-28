@@ -1,99 +1,131 @@
+/****************************************************************
+ *  Project:
+ *  	Integrating Body- and Eye-Tracking to study Cognition in the Wild
+ *	-------------------------------------------------------------
+ * 	TU Darmstadt
+ * 	Department Computer Science
+ * 	Summer term 2014
+ *	-------------------------------------------------------------
+ *	File: window_receiver.cpp
+ *	Description:
+ *		GUI class for receiver node
+ *
+ *	-------------------------------------------------------------
+ * 	Authors:
+ * 		Christian Benz 			<zneb_naitsirhc@web.de>
+ * 		Christoph Döringer 		<christoph.doeringer@gmail.com>
+ * 		Hendrik Pfeifer 		<hendrikpfeifer@gmail.com>
+ * 		Heiko Reinemuth 		<heiko.reinemuth@gmail.com>
+ ****************************************************************/
+
 #include "window_receiver.hpp"
 
 using namespace Qt;
 
-/**
+/*! \brief Constructor of WindowReceiver class
  *
- * @param node
- * @param parent
+ * @param node The node class for this GUI class
+ * @param parent Parent for this window
  */
 WindowReceiver::WindowReceiver(QNodeReceiver *node, QWidget *parent) :
-		QMainWindow(parent), qnode_recv(node) {
+		QMainWindow(parent), qnodeRecv(node) {
 
-	ui_recv.setupUi(this);
-	frameSelectCheckBox[0] = ui_recv.checkBox_00;
-	frameSelectCheckBox[1] = ui_recv.checkBox_01;
-	frameSelectCheckBox[2] = ui_recv.checkBox_02;
-	frameSelectCheckBox[3] = ui_recv.checkBox_03;
-	frameSelectCheckBox[4] = ui_recv.checkBox_04;
-	frameSelectCheckBox[5] = ui_recv.checkBox_05;
-	frameSelectCheckBox[6] = ui_recv.checkBox_06;
-	frameSelectCheckBox[7] = ui_recv.checkBox_07;
-	frameSelectCheckBox[8] = ui_recv.checkBox_08;
-	frameSelectCheckBox[9] = ui_recv.checkBox_09;
-	frameSelectCheckBox[10] = ui_recv.checkBox_10;
-	frameSelectCheckBox[11] = ui_recv.checkBox_11;
-	frameSelectCheckBox[12] = ui_recv.checkBox_12;
-	frameSelectCheckBox[13] = ui_recv.checkBox_13;
+	//setup user interface
+	uiRecv.setupUi(this);
 
-	frameSwitchComboBox[0] = ui_recv.comboBox_00;
-	frameSwitchComboBox[1] = ui_recv.comboBox_01;
-	frameSwitchComboBox[2] = ui_recv.comboBox_02;
-	frameSwitchComboBox[3] = ui_recv.comboBox_03;
-	frameSwitchComboBox[4] = ui_recv.comboBox_04;
-	frameSwitchComboBox[5] = ui_recv.comboBox_05;
-	frameSwitchComboBox[6] = ui_recv.comboBox_06;
-	frameSwitchComboBox[7] = ui_recv.comboBox_07;
-	frameSwitchComboBox[8] = ui_recv.comboBox_08;
-	frameSwitchComboBox[9] = ui_recv.comboBox_09;
-	frameSwitchComboBox[10] = ui_recv.comboBox_10;
-	frameSwitchComboBox[11] = ui_recv.comboBox_11;
-	frameSwitchComboBox[12] = ui_recv.comboBox_12;
-	frameSwitchComboBox[13] = ui_recv.comboBox_13;
+	//frame checkBoxes for frame selection
+	frameSelectCheckBox[0] = uiRecv.checkBox_00;
+	frameSelectCheckBox[1] = uiRecv.checkBox_01;
+	frameSelectCheckBox[2] = uiRecv.checkBox_02;
+	frameSelectCheckBox[3] = uiRecv.checkBox_03;
+	frameSelectCheckBox[4] = uiRecv.checkBox_04;
+	frameSelectCheckBox[5] = uiRecv.checkBox_05;
+	frameSelectCheckBox[6] = uiRecv.checkBox_06;
+	frameSelectCheckBox[7] = uiRecv.checkBox_07;
+	frameSelectCheckBox[8] = uiRecv.checkBox_08;
+	frameSelectCheckBox[9] = uiRecv.checkBox_09;
+	frameSelectCheckBox[10] = uiRecv.checkBox_10;
+	frameSelectCheckBox[11] = uiRecv.checkBox_11;
+	frameSelectCheckBox[12] = uiRecv.checkBox_12;
+	frameSelectCheckBox[13] = uiRecv.checkBox_13;
 
-	frameAddressLineEdit[0] = ui_recv.lineEditIP_00;
-	frameAddressLineEdit[1] = ui_recv.lineEditIP_01;
-	frameAddressLineEdit[2] = ui_recv.lineEditIP_02;
-	frameAddressLineEdit[3] = ui_recv.lineEditIP_03;
-	frameAddressLineEdit[4] = ui_recv.lineEditIP_04;
-	frameAddressLineEdit[5] = ui_recv.lineEditIP_05;
-	frameAddressLineEdit[6] = ui_recv.lineEditIP_06;
-	frameAddressLineEdit[7] = ui_recv.lineEditIP_07;
-	frameAddressLineEdit[8] = ui_recv.lineEditIP_08;
-	frameAddressLineEdit[9] = ui_recv.lineEditIP_09;
-	frameAddressLineEdit[10] = ui_recv.lineEditIP_10;
-	frameAddressLineEdit[11] = ui_recv.lineEditIP_11;
-	frameAddressLineEdit[12] = ui_recv.lineEditIP_12;
-	frameAddressLineEdit[13] = ui_recv.lineEditIP_13;
+	//frame comboBoxes for switch frame selection
+	frameSwitchComboBox[0] = uiRecv.comboBox_00;
+	frameSwitchComboBox[1] = uiRecv.comboBox_01;
+	frameSwitchComboBox[2] = uiRecv.comboBox_02;
+	frameSwitchComboBox[3] = uiRecv.comboBox_03;
+	frameSwitchComboBox[4] = uiRecv.comboBox_04;
+	frameSwitchComboBox[5] = uiRecv.comboBox_05;
+	frameSwitchComboBox[6] = uiRecv.comboBox_06;
+	frameSwitchComboBox[7] = uiRecv.comboBox_07;
+	frameSwitchComboBox[8] = uiRecv.comboBox_08;
+	frameSwitchComboBox[9] = uiRecv.comboBox_09;
+	frameSwitchComboBox[10] = uiRecv.comboBox_10;
+	frameSwitchComboBox[11] = uiRecv.comboBox_11;
+	frameSwitchComboBox[12] = uiRecv.comboBox_12;
+	frameSwitchComboBox[13] = uiRecv.comboBox_13;
 
-	frameHertzLineEdit[0] = ui_recv.lineEditHz_00;
-	frameHertzLineEdit[1] = ui_recv.lineEditHz_01;
-	frameHertzLineEdit[2] = ui_recv.lineEditHz_02;
-	frameHertzLineEdit[3] = ui_recv.lineEditHz_03;
-	frameHertzLineEdit[4] = ui_recv.lineEditHz_04;
-	frameHertzLineEdit[5] = ui_recv.lineEditHz_05;
-	frameHertzLineEdit[6] = ui_recv.lineEditHz_06;
-	frameHertzLineEdit[7] = ui_recv.lineEditHz_07;
-	frameHertzLineEdit[8] = ui_recv.lineEditHz_08;
-	frameHertzLineEdit[9] = ui_recv.lineEditHz_09;
-	frameHertzLineEdit[10] = ui_recv.lineEditHz_10;
-	frameHertzLineEdit[11] = ui_recv.lineEditHz_11;
-	frameHertzLineEdit[12] = ui_recv.lineEditHz_12;
-	frameHertzLineEdit[13] = ui_recv.lineEditHz_13;
+	//frame lineEdits for hertz address info
+	frameAddressLineEdit[0] = uiRecv.lineEditIP_00;
+	frameAddressLineEdit[1] = uiRecv.lineEditIP_01;
+	frameAddressLineEdit[2] = uiRecv.lineEditIP_02;
+	frameAddressLineEdit[3] = uiRecv.lineEditIP_03;
+	frameAddressLineEdit[4] = uiRecv.lineEditIP_04;
+	frameAddressLineEdit[5] = uiRecv.lineEditIP_05;
+	frameAddressLineEdit[6] = uiRecv.lineEditIP_06;
+	frameAddressLineEdit[7] = uiRecv.lineEditIP_07;
+	frameAddressLineEdit[8] = uiRecv.lineEditIP_08;
+	frameAddressLineEdit[9] = uiRecv.lineEditIP_09;
+	frameAddressLineEdit[10] = uiRecv.lineEditIP_10;
+	frameAddressLineEdit[11] = uiRecv.lineEditIP_11;
+	frameAddressLineEdit[12] = uiRecv.lineEditIP_12;
+	frameAddressLineEdit[13] = uiRecv.lineEditIP_13;
 
+	//frame lineEdits for hertz info
+	frameHertzLineEdit[0] = uiRecv.lineEditHz_00;
+	frameHertzLineEdit[1] = uiRecv.lineEditHz_01;
+	frameHertzLineEdit[2] = uiRecv.lineEditHz_02;
+	frameHertzLineEdit[3] = uiRecv.lineEditHz_03;
+	frameHertzLineEdit[4] = uiRecv.lineEditHz_04;
+	frameHertzLineEdit[5] = uiRecv.lineEditHz_05;
+	frameHertzLineEdit[6] = uiRecv.lineEditHz_06;
+	frameHertzLineEdit[7] = uiRecv.lineEditHz_07;
+	frameHertzLineEdit[8] = uiRecv.lineEditHz_08;
+	frameHertzLineEdit[9] = uiRecv.lineEditHz_09;
+	frameHertzLineEdit[10] = uiRecv.lineEditHz_10;
+	frameHertzLineEdit[11] = uiRecv.lineEditHz_11;
+	frameHertzLineEdit[12] = uiRecv.lineEditHz_12;
+	frameHertzLineEdit[13] = uiRecv.lineEditHz_13;
+
+	//restore GUI state, values and lists from QSettings
 	readSettings();
 
-	ui_recv.listViewInfo->setModel(qnode_recv->getListViewModel());
+	//assign listView with listView model
+	uiRecv.listViewInfo->setModel(qnodeRecv->getListViewModel());
 
-	QObject::connect(qnode_recv, SIGNAL(listViewModelUpdated()), this,
+	//connect signal calls of node with GUI update methods
+	QObject::connect(qnodeRecv, SIGNAL(listViewModelUpdated()), this,
 			SLOT(updateListView()));
-
-	QObject::connect(qnode_recv, SIGNAL(frameDataUpdated()), this,
+	QObject::connect(qnodeRecv, SIGNAL(frameDataUpdated()), this,
 			SLOT(updateFrameViews()));
 }
 
-/**
+/*! \brief Destructor of WindowReceiver class
  *
  */
 WindowReceiver::~WindowReceiver() {
 }
 
-/**
+/*! \brief Saves GUI state, values and lists on window close event
  *
- * @param event
+ * @param event Window closing event
  */
 void WindowReceiver::closeEvent(QCloseEvent *event) {
+
+	//save GUI state, values and lists into QSettings
 	writeSettings();
+
+	//close window
 	QMainWindow::closeEvent(event);
 }
 
@@ -101,92 +133,93 @@ void WindowReceiver::closeEvent(QCloseEvent *event) {
  GUI ACTION METHODS
  ***********************************************/
 
-/**
+/*! \brief Initializes node for receiving, enables and disables GUI elements
  *
  */
 void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 
-	if (qnode_recv->readyForAction()) {
+	//init receiver node and socket for receiving
+	if (qnodeRecv->readyForAction()) {
 
 		//disable following GUI elements
-		ui_recv.pushButtonReceiverSetup->setEnabled(false);
+		uiRecv.pushButtonReceiverSetup->setEnabled(false);
 
 		//enable following GUI elements
-		ui_recv.pushButtonReceiverStart->setEnabled(true);
-		ui_recv.checkBoxPerformance->setEnabled(true);
-		ui_recv.pushButtonSwitch->setEnabled(true);
-		ui_recv.pushButtonResetModel->setEnabled(true);
-		ui_recv.pushButtonResetFrames->setEnabled(true);
+		uiRecv.pushButtonReceiverStart->setEnabled(true);
+		uiRecv.checkBoxPerformance->setEnabled(true);
+		uiRecv.pushButtonSwitch->setEnabled(true);
+		uiRecv.pushButtonResetModel->setEnabled(true);
+		uiRecv.pushButtonResetFrames->setEnabled(true);
 
 		//enable following GUI elements only when performance is unchecked
-		if (!ui_recv.checkBoxPerformance->isChecked()) {
-			ui_recv.checkBoxEuler->setEnabled(true);
-			ui_recv.comboBoxEuler->setEnabled(true);
-			ui_recv.checkBoxInactivity->setEnabled(true);
-			ui_recv.checkBoxAsync->setEnabled(true);
-			ui_recv.spinBoxAsync->setEnabled(true);
+		if (!uiRecv.checkBoxPerformance->isChecked()) {
+			uiRecv.checkBoxEuler->setEnabled(true);
+			uiRecv.comboBoxEuler->setEnabled(true);
+			uiRecv.checkBoxInactivity->setEnabled(true);
+			uiRecv.checkBoxAsync->setEnabled(true);
+			uiRecv.spinBoxAsync->setEnabled(true);
 		}
 	}
 }
 
-/**
+/*! \brief Start thread for receiving, enables and disables GUI elements
  *
  */
 void WindowReceiver::on_pushButtonReceiverStart_clicked() {
 
 	//set node data
-	qnode_recv->setSignalPerformance(ui_recv.checkBoxPerformance->isChecked());
-	qnode_recv->setSignalEuler(ui_recv.checkBoxEuler->isChecked());
-	qnode_recv->setFrameEuler(ui_recv.comboBoxEuler->currentIndex());
-	qnode_recv->setSignalInactivity(ui_recv.checkBoxInactivity->isChecked());
-	qnode_recv->setSignalAsync(ui_recv.checkBoxAsync->isChecked());
-	qnode_recv->setValueAsync(ui_recv.spinBoxAsync->value());
+	qnodeRecv->setSignalPerformance(uiRecv.checkBoxPerformance->isChecked());
+	qnodeRecv->setSignalEuler(uiRecv.checkBoxEuler->isChecked());
+	qnodeRecv->setFrameEuler(uiRecv.comboBoxEuler->currentIndex());
+	qnodeRecv->setSignalInactivity(uiRecv.checkBoxInactivity->isChecked());
+	qnodeRecv->setSignalAsync(uiRecv.checkBoxAsync->isChecked());
+	qnodeRecv->setValueAsync(uiRecv.spinBoxAsync->value());
 
 	//start node thread
-	qnode_recv->startAction();
+	qnodeRecv->startAction();
 
 	//disable following GUI elements
-	ui_recv.pushButtonReceiverStart->setEnabled(false);
-	ui_recv.checkBoxPerformance->setEnabled(false);
-	ui_recv.checkBoxEuler->setEnabled(false);
-	ui_recv.comboBoxEuler->setEnabled(false);
-	ui_recv.checkBoxInactivity->setEnabled(false);
-	ui_recv.checkBoxAsync->setEnabled(false);
-	ui_recv.spinBoxAsync->setEnabled(false);
+	uiRecv.pushButtonReceiverStart->setEnabled(false);
+	uiRecv.checkBoxPerformance->setEnabled(false);
+	uiRecv.checkBoxEuler->setEnabled(false);
+	uiRecv.comboBoxEuler->setEnabled(false);
+	uiRecv.checkBoxInactivity->setEnabled(false);
+	uiRecv.checkBoxAsync->setEnabled(false);
+	uiRecv.spinBoxAsync->setEnabled(false);
 
 	//enable following GUI elements
-	ui_recv.pushButtonReceiverStop->setEnabled(true);
+	uiRecv.pushButtonReceiverStop->setEnabled(true);
 }
 
-/**
+/*! \brief Stops thread for receiving, enables and disables GUI elements
  *
  */
 void WindowReceiver::on_pushButtonReceiverStop_clicked() {
 
 	//stop node thread
-	qnode_recv->stopAction();
+	qnodeRecv->stopAction();
 
 	//disable following GUI elements
-	ui_recv.pushButtonReceiverStop->setEnabled(false);
-	ui_recv.pushButtonSwitch->setEnabled(false);
-	ui_recv.pushButtonResetModel->setEnabled(false);
-	ui_recv.pushButtonResetFrames->setEnabled(false);
+	uiRecv.pushButtonReceiverStop->setEnabled(false);
+	uiRecv.pushButtonSwitch->setEnabled(false);
+	uiRecv.pushButtonResetModel->setEnabled(false);
+	uiRecv.pushButtonResetFrames->setEnabled(false);
 
 	//enable following GUI elements
-	ui_recv.pushButtonReceiverSetup->setEnabled(true);
-	ui_recv.checkBoxPerformance->setEnabled(true);
-	if(!ui_recv.checkBoxPerformance->isChecked()) {
-		ui_recv.checkBoxEuler->setEnabled(true);
-		ui_recv.comboBoxEuler->setEnabled(true);
-		ui_recv.checkBoxInactivity->setEnabled(true);
-		ui_recv.checkBoxAsync->setEnabled(true);
-		ui_recv.spinBoxAsync->setEnabled(true);
+	uiRecv.pushButtonReceiverSetup->setEnabled(true);
+	uiRecv.checkBoxPerformance->setEnabled(true);
+	if(!uiRecv.checkBoxPerformance->isChecked()) {
+		uiRecv.checkBoxEuler->setEnabled(true);
+		uiRecv.comboBoxEuler->setEnabled(true);
+		uiRecv.checkBoxInactivity->setEnabled(true);
+		uiRecv.checkBoxAsync->setEnabled(true);
+		uiRecv.spinBoxAsync->setEnabled(true);
 	}
 }
 
-/**
+/*! \brief Enables and disables certain GUI elements depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBoxPerformance_stateChanged(int state) {
 
@@ -194,57 +227,59 @@ void WindowReceiver::on_checkBoxPerformance_stateChanged(int state) {
 	if (state == 2) {
 
 		//disable following GUI elements
-		ui_recv.checkBoxEuler->setEnabled(false);
-		ui_recv.comboBoxEuler->setEnabled(false);
-		ui_recv.checkBoxInactivity->setEnabled(false);
-		ui_recv.checkBoxAsync->setEnabled(false);
-		ui_recv.spinBoxAsync->setEnabled(false);
+		uiRecv.checkBoxEuler->setEnabled(false);
+		uiRecv.comboBoxEuler->setEnabled(false);
+		uiRecv.checkBoxInactivity->setEnabled(false);
+		uiRecv.checkBoxAsync->setEnabled(false);
+		uiRecv.spinBoxAsync->setEnabled(false);
 
 		//uncheck euler checkBox
-		ui_recv.checkBoxEuler->setChecked(false);
-		ui_recv.checkBoxInactivity->setChecked(false);
-		ui_recv.checkBoxAsync->setChecked(false);
+		uiRecv.checkBoxEuler->setChecked(false);
+		uiRecv.checkBoxInactivity->setChecked(false);
+		uiRecv.checkBoxAsync->setChecked(false);
 
 	//performance modus is unchecked
 	} else if (state == 0) {
 
 		//enable following GUI elements
-		ui_recv.checkBoxEuler->setEnabled(true);
-		ui_recv.checkBoxInactivity->setEnabled(true);
-		ui_recv.checkBoxAsync->setEnabled(true);
+		uiRecv.checkBoxEuler->setEnabled(true);
+		uiRecv.checkBoxInactivity->setEnabled(true);
+		uiRecv.checkBoxAsync->setEnabled(true);
 
-		if(ui_recv.checkBoxEuler->isChecked()) {
-			ui_recv.comboBoxEuler->setEnabled(true);
+		//enable euler comboBox only if euler checkBox is checked
+		if(uiRecv.checkBoxEuler->isChecked()) {
+			uiRecv.comboBoxEuler->setEnabled(true);
 		}
-		if(ui_recv.checkBoxAsync->isChecked()) {
-			ui_recv.spinBoxAsync->setEnabled(true);
+		//enable async spinBox only if async checkBox is checked
+		if(uiRecv.checkBoxAsync->isChecked()) {
+			uiRecv.spinBoxAsync->setEnabled(true);
 		}
 	}
 }
 
-/**
+/*! \brief Enables and disables the euler comboBox depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBoxEuler_stateChanged(int state) {
 
-	//if euler is checked
+	//if euler angles is checked
 	if (state == 2) {
 
 		//enable following GUI elements
-		ui_recv.comboBoxEuler->setEnabled(true);
+		uiRecv.comboBoxEuler->setEnabled(true);
 
-	//if euler is unchecked
+	//if euler angles is unchecked
 	} else if (state == 0) {
 
 		//disable following GUI elements
-		ui_recv.comboBoxEuler->setEnabled(false);
+		uiRecv.comboBoxEuler->setEnabled(false);
 	}
 }
 
-/**
+/*! \brief Enables and disables the async spinBox depending on the changed state
  *
- * @param state
+ * @param state The new state of the checkBox
  */
 void WindowReceiver::on_checkBoxAsync_stateChanged(int state) {
 
@@ -252,13 +287,13 @@ void WindowReceiver::on_checkBoxAsync_stateChanged(int state) {
 	if (state == 2) {
 
 		//enable following GUI elements
-		ui_recv.spinBoxAsync->setEnabled(true);
+		uiRecv.spinBoxAsync->setEnabled(true);
 
 	//if async is unchecked
 	} else if (state == 0) {
 
 		//disable following GUI elements
-		ui_recv.spinBoxAsync->setEnabled(false);
+		uiRecv.spinBoxAsync->setEnabled(false);
 	}
 }
 
@@ -414,58 +449,91 @@ void WindowReceiver::on_checkBox_13_stateChanged(int state) {
 	frameSelectChanged(13, state);
 }
 
-/**
+/*! \brief Resets rotation data for all frames to reset the model
  *
+ *		Opens a QMessageBox to confirm resetting and
+ *		sets the reset model signal if the action is confirmed
  */
 void WindowReceiver::on_pushButtonResetModel_clicked() {
-	QMessageBox box;
-	box.setText("Reset the model?");
-	box.setInformativeText(
-			"Please be aware that you should not do this while recording!");
-	box.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
-	int ret = box.exec();
-	switch (ret) {
-	case QMessageBox::Apply:
-		// Apply was clicked
-		qnode_recv->setSignalResetModel(true);
+
+	//open message box to confirm resetting of model
+	QMessageBox msgBox;
+	msgBox.setWindowTitle(QString("Confirm reset"));
+	msgBox.setText(QString("Are you sure you want to reset the model?"));
+	msgBox.setInformativeText(
+			QString(
+					"Please be aware that resetting the model affects a possible recording!"));
+	msgBox.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
+	int msgBoxRet = msgBox.exec();
+
+	//switch over message box return value
+	switch (msgBoxRet) {
+	//Apply was clicked
+	case QMessageBox::Apply: {
+
+		//set reset model signal
+		qnodeRecv->setSignalResetModel(true);
 		break;
-	case QMessageBox::Cancel:
-		// Cancel was clicked
+	}
+		//Cancel was clicked
+	case QMessageBox::Cancel: {
 		break;
-	default:
-		// should never be reached
+	}
+		//should never be reached
+	default: {
 		break;
+	}
 	}
 }
 
-/**
+/*! \brief Resets selection, switch frame and address for all frames
  *
+ *		Opens a QMessageBox to confirm resetting and resets
+ *		selection, switch frame and address if the action is confirmed
  */
 void WindowReceiver::on_pushButtonResetFrames_clicked() {
-	QMessageBox box;
-	box.setText("Reset the frames?");
-	box.setInformativeText(
-			"Please be aware that you should not do this while recording!");
-	box.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
-	int ret = box.exec();
-	switch (ret) {
-	case QMessageBox::Apply:
-		// Apply was clicked
+
+	//open message box to confirm resetting of frames
+	QMessageBox msgBox;
+	msgBox.setWindowTitle(QString("Confirm reset"));
+	msgBox.setText(QString("Are you sure you want to reset all frames?"));
+	msgBox.setInformativeText(
+			QString(
+					"Please be aware that resetting all frames affects a possible recording!"));
+	msgBox.setStandardButtons(QMessageBox::Apply | QMessageBox::Cancel);
+	int msgBoxRet = msgBox.exec();
+
+	//switch over message box return value
+	switch (msgBoxRet) {
+	//Apply was clicked
+	case QMessageBox::Apply: {
+
+		//loop over all frames
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+			//set frame address to standard placeholder assign address if frame is selected
 			if (frameSelectCheckBox[i]->isChecked()) {
-				qnode_recv->setFrameAddress(i, qnode_recv->getAssignAddress());
+				qnodeRecv->setFrameAddress(i, qnodeRecv->getAssignAddress());
 			}
+			//mark frame as selected
 			frameSelectCheckBox[i]->setChecked(true);
+
+			//set switch frame index to frame's own index
 			frameSwitchComboBox[i]->setCurrentIndex(i);
 		}
+
+		//update frame views
 		updateFrameViews();
 		break;
-	case QMessageBox::Cancel:
-		// Cancel was clicked
+	}
+		//Cancel was clicked
+	case QMessageBox::Cancel: {
 		break;
-	default:
-		// should never be reached
+	}
+		//should never be reached
+	default: {
 		break;
+	}
 	}
 }
 
@@ -477,7 +545,7 @@ void WindowReceiver::on_pushButtonResetFrames_clicked() {
  *
  */
 void WindowReceiver::updateListView() {
-	ui_recv.listViewInfo->scrollToBottom();
+	uiRecv.listViewInfo->scrollToBottom();
 
 }
 
@@ -504,13 +572,13 @@ void WindowReceiver::updateFrameViews() {
 void WindowReceiver::frameSwitch(const int &frame_index_a,
 		const int &frame_index_b) {
 
-	QString address_a = qnode_recv->getFrameAddress(frame_index_a);
-	QString address_b = qnode_recv->getFrameAddress(frame_index_b);
+	QString address_a = qnodeRecv->getFrameAddress(frame_index_a);
+	QString address_b = qnodeRecv->getFrameAddress(frame_index_b);
 	bool boolean_a = frameSelectCheckBox[frame_index_a]->isChecked();
 	bool boolean_b = frameSelectCheckBox[frame_index_b]->isChecked();
 
-	qnode_recv->setFrameAddress(frame_index_a, address_b);
-	qnode_recv->setFrameAddress(frame_index_b, address_a);
+	qnodeRecv->setFrameAddress(frame_index_a, address_b);
+	qnodeRecv->setFrameAddress(frame_index_b, address_a);
 	frameSelectCheckBox[frame_index_a]->setChecked(boolean_b);
 	frameSelectCheckBox[frame_index_b]->setChecked(boolean_a);
 	updateFrameViews();
@@ -524,13 +592,13 @@ void WindowReceiver::frameSwitch(const int &frame_index_a,
 void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
 
 	if (state == 2
-			&& qnode_recv->getFrameAddress(frame_index)
-					== qnode_recv->getIgnoreAddress()) {
-		qnode_recv->setFrameAddress(frame_index,
-				qnode_recv->getAssignAddress());
+			&& qnodeRecv->getFrameAddress(frame_index)
+					== qnodeRecv->getIgnoreAddress()) {
+		qnodeRecv->setFrameAddress(frame_index,
+				qnodeRecv->getAssignAddress());
 	} else if (state == 0) {
-		qnode_recv->setFrameAddress(frame_index,
-				qnode_recv->getIgnoreAddress());
+		qnodeRecv->setFrameAddress(frame_index,
+				qnodeRecv->getIgnoreAddress());
 	}
 	updateFrameAddressView(frame_index);
 }
@@ -541,7 +609,7 @@ void WindowReceiver::frameSelectChanged(const int &frame_index, int state) {
  */
 void WindowReceiver::updateFrameAddressView(const int &frame_index) {
 	frameAddressLineEdit[frame_index]->setText(
-			qnode_recv->getFrameAddress(frame_index));
+			qnodeRecv->getFrameAddress(frame_index));
 }
 
 /**
@@ -550,12 +618,8 @@ void WindowReceiver::updateFrameAddressView(const int &frame_index) {
  */
 void WindowReceiver::updateFrameHertzView(const int &frame_index) {
 	frameHertzLineEdit[frame_index]->setText(
-			QString::number(qnode_recv->getFrameHertzToDisplay(frame_index)));
+			QString::number(qnodeRecv->getFrameHertzToDisplay(frame_index)));
 }
-
-/***********************************************
- GUI SETTINGS
- ***********************************************/
 
 /**
  *
@@ -573,22 +637,22 @@ void WindowReceiver::readSettings() {
 	//initialize standard frames list for comboBoxes
 	QStringList comboBoxFrames;
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		comboBoxFrames.append(qnode_recv->getFrameString(i));
+		comboBoxFrames.append(qnodeRecv->getFrameString(i));
 	}
 
 	//restore settings values
-	ui_recv.checkBoxPerformance->setChecked(
+	uiRecv.checkBoxPerformance->setChecked(
 			settings.value(QString("key_signal_performance"), true).toBool());
-	ui_recv.checkBoxEuler->setChecked(
+	uiRecv.checkBoxEuler->setChecked(
 			settings.value(QString("key_signal_euler"), false).toBool());
-	ui_recv.comboBoxEuler->addItems(comboBoxFrames);
-	ui_recv.comboBoxEuler->setCurrentIndex(
+	uiRecv.comboBoxEuler->addItems(comboBoxFrames);
+	uiRecv.comboBoxEuler->setCurrentIndex(
 			settings.value(QString("key_frame_euler"), 0).toInt());
-	ui_recv.checkBoxInactivity->setChecked(
+	uiRecv.checkBoxInactivity->setChecked(
 					settings.value(QString("key_signal_inactivity"), false).toBool());
-	ui_recv.checkBoxAsync->setChecked(
+	uiRecv.checkBoxAsync->setChecked(
 				settings.value(QString("key_signal_async"), false).toBool());
-	ui_recv.spinBoxAsync->setValue(
+	uiRecv.spinBoxAsync->setValue(
 			settings.value(QString("key_value_async"), 30).toInt());
 
 	//start reading address list
@@ -598,9 +662,9 @@ void WindowReceiver::readSettings() {
 	if (addressListSize == NUMBER_OF_FRAMES) {
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 			settings.setArrayIndex(i);
-			qnode_recv->addFrameAddress(
+			qnodeRecv->addFrameAddress(
 					settings.value(QString("key_address"),
-							qnode_recv->getAssignAddress()).toString());
+							qnodeRecv->getAssignAddress()).toString());
 		}
 	}
 
@@ -610,13 +674,13 @@ void WindowReceiver::readSettings() {
 	//initialize address list if list size isn't correct
 	if (addressListSize != NUMBER_OF_FRAMES) {
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-			qnode_recv->addFrameAddress(qnode_recv->getAssignAddress());
+			qnodeRecv->addFrameAddress(qnodeRecv->getAssignAddress());
 		}
 	}
 
 	//set values of GUI elements
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-		if (qnode_recv->getFrameAddress(i) == qnode_recv->getIgnoreAddress()) {
+		if (qnodeRecv->getFrameAddress(i) == qnodeRecv->getIgnoreAddress()) {
 			frameSelectCheckBox[i]->setChecked(false);
 		} else {
 			frameSelectCheckBox[i]->setChecked(true);
@@ -628,17 +692,17 @@ void WindowReceiver::readSettings() {
 	}
 
 	//disable following GUI elements
-	ui_recv.checkBoxPerformance->setEnabled(false);
-	ui_recv.checkBoxEuler->setEnabled(false);
-	ui_recv.comboBoxEuler->setEnabled(false);
-	ui_recv.checkBoxInactivity->setEnabled(false);
-	ui_recv.checkBoxAsync->setEnabled(false);
-	ui_recv.spinBoxAsync->setEnabled(false);
-	ui_recv.pushButtonReceiverStart->setEnabled(false);
-	ui_recv.pushButtonReceiverStop->setEnabled(false);
-	ui_recv.pushButtonSwitch->setEnabled(false);
-	ui_recv.pushButtonResetModel->setEnabled(false);
-	ui_recv.pushButtonResetFrames->setEnabled(false);
+	uiRecv.checkBoxPerformance->setEnabled(false);
+	uiRecv.checkBoxEuler->setEnabled(false);
+	uiRecv.comboBoxEuler->setEnabled(false);
+	uiRecv.checkBoxInactivity->setEnabled(false);
+	uiRecv.checkBoxAsync->setEnabled(false);
+	uiRecv.spinBoxAsync->setEnabled(false);
+	uiRecv.pushButtonReceiverStart->setEnabled(false);
+	uiRecv.pushButtonReceiverStop->setEnabled(false);
+	uiRecv.pushButtonSwitch->setEnabled(false);
+	uiRecv.pushButtonResetModel->setEnabled(false);
+	uiRecv.pushButtonResetFrames->setEnabled(false);
 }
 
 /**
@@ -656,17 +720,17 @@ void WindowReceiver::writeSettings() {
 
 	//save settings values
 	settings.setValue(QString("key_signal_performance"),
-			ui_recv.checkBoxPerformance->isChecked());
+			uiRecv.checkBoxPerformance->isChecked());
 	settings.setValue(QString("key_signal_euler"),
-			ui_recv.checkBoxEuler->isChecked());
+			uiRecv.checkBoxEuler->isChecked());
 	settings.setValue(QString("key_frame_euler"),
-			ui_recv.comboBoxEuler->currentIndex());
+			uiRecv.comboBoxEuler->currentIndex());
 	settings.setValue(QString("key_signal_inactivity"),
-					ui_recv.checkBoxInactivity->isChecked());
+					uiRecv.checkBoxInactivity->isChecked());
 	settings.setValue(QString("key_signal_async"),
-				ui_recv.checkBoxAsync->isChecked());
+				uiRecv.checkBoxAsync->isChecked());
 	settings.setValue(QString("key_value_async"),
-			ui_recv.spinBoxAsync->value());
+			uiRecv.spinBoxAsync->value());
 
 	//start writing address list
 	settings.beginWriteArray(QString("key_address_list"));
@@ -675,7 +739,7 @@ void WindowReceiver::writeSettings() {
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		settings.setArrayIndex(i);
 		settings.setValue(QString("key_address"),
-				qnode_recv->getFrameAddress(i));
+				qnodeRecv->getFrameAddress(i));
 	}
 
 	//stop writing address list

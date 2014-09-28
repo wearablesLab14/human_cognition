@@ -1,6 +1,7 @@
 #ifndef human_cognition_WINDOW_RECEIVER_H
 #define human_cognition_WINDOW_RECEIVER_H
 
+//QT includes
 #include <QtGui>
 #include <QtGui/QDialog>
 #include <QtGui/QMainWindow>
@@ -13,8 +14,11 @@
 #include "../node_receiver/qnode_receiver.hpp"
 #endif
 
-/**
- *
+/*! \brief GUI class for receiver node
+ * @author Christian Benz <zneb_naitsirhc@web.de>
+ * @author Christoph Döringer <christoph.doeringer@gmail.com>
+ * @author Hendrik Pfeifer <hendrikpfeifer@gmail.com>
+ * @author Heiko Reinemuth <heiko.reinemuth@gmail.com>
  */
 class WindowReceiver: public QMainWindow {
 Q_OBJECT
@@ -69,19 +73,21 @@ private:
 	void frameSelectChanged(const int &frame_index, int state);
 	void updateFrameAddressView(const int &frame_index);
 	void updateFrameHertzView(const int &frame_index);
-
-	/***********************************************
-	 GUI SETTINGS
-	 ***********************************************/
 	void readSettings();
 	void writeSettings();
 
-	Ui::WindowReceiverDesign ui_recv;
-	QNodeReceiver *qnode_recv;
+	//contains window design and GUI elements of receiver window
+	Ui::WindowReceiverDesign uiRecv;
+
+	//receiver node
+	QNodeReceiver *qnodeRecv;
+
+	//dialog windows
 	DialogAbout dialogAbout;
 	DialogHelp dialogHelp;
 	DialogFrames dialogFrames;
 
+	//GUI elements for frames
 	QCheckBox* frameSelectCheckBox[NUMBER_OF_FRAMES];
 	QComboBox* frameSwitchComboBox[NUMBER_OF_FRAMES];
 	QLineEdit* frameAddressLineEdit[NUMBER_OF_FRAMES];

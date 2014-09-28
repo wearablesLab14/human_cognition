@@ -375,7 +375,7 @@ void QNodeReceiver::run() {
 									- lastStamp.nsec;
 						} else {
 							frameAsynchSpanNsec[currFrame] = currStamp.nsec
-									+ (ONE_SEC - lastStamp.nsec);
+									+ (ONE_SEC_IN_NSEC - lastStamp.nsec);
 						}
 
 						//update last stamp of frame
