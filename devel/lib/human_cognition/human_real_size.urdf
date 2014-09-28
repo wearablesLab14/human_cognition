@@ -165,8 +165,7 @@
 </joint>
 <joint name="joint_05_l_hip" type="continuous">
 	<origin xyz="0 0.1 0"/>
-	<parent link="base_link_connector"/>
-	<!--parent link="link_00_b_body"/-->
+	<parent link="link_00_b_body"/>
 	<child link="link_05_l_upper_leg"/>	
 </joint>
 <joint name="joint_06_l_knee" type="continuous">
@@ -197,9 +196,8 @@
 	<child link="link_10_r_hand"/>	
 </joint>
 <joint name="joint_11_r_hip" type="continuous">
-	<origin xyz="0 -0.1 0"/>
-	<parent link="base_link_connector"/>
-	<!--parent link="link_00_b_body"/-->
+	<origin xyz="0 -0.1 0"/>	
+	<parent link="link_00_b_body"/>
 	<child link="link_11_r_upper_leg"/>	
 </joint>
 <joint name="joint_12_r_knee" type="continuous">

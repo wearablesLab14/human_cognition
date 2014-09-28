@@ -276,7 +276,8 @@ void WindowReceiver::on_pushButtonAbout_clicked() {
  */
 void WindowReceiver::on_pushButtonHelp_clicked() {
 
-
+	dialogHelp.setModal(true);
+	dialogHelp.exec();
 }
 
 /**

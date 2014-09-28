@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DialogFrames</class>
- <widget class="QDialog" name="DialogFrames">
+ <class>DialogHelp</class>
+ <widget class="QDialog" name="DialogHelp">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,20 +23,20 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Frames</string>
+   <string>Help</string>
   </property>
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
+     <x>9</x>
+     <y>9</y>
      <width>671</width>
      <height>621</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QGraphicsView" name="graphicsView"/>
+     <widget class="QTextBrowser" name="textBrowser"/>
     </item>
    </layout>
   </widget>

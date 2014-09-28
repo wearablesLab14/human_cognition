@@ -608,13 +608,6 @@ bool QNodeReceiver::socketCreation() {
 	//create socket
 	udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
 
-	//TODO
-	/*
-	 int flags = fcntl(udpSocket, F_GETFL);
-	 flags |= O_NONBLOCK;
-	 fcntl(udpSocket, F_SETFL, flags);
-	 */
-
 	//return early if socket creation failed
 	if (udpSocket < 0) {
 		return false;

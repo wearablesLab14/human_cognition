@@ -134,10 +134,10 @@ void QNode::shutdownNode() {
 	wait();
 }
 
-/*! \brief Returns a QString representation for a frame
+/*! \brief Returns QString representation of a frame index
  *
  * @param frame_index The index of a frame
- * @return QString representation of a frame index
+ * @return QString representation of given frame index
  */
 QString QNode::getFrameString(const int &frame_index) {
 
@@ -147,10 +147,10 @@ QString QNode::getFrameString(const int &frame_index) {
 	return QString::number(frame_index);
 }
 
-/*! \brief Returns a Display type for a frame
+/*! \brief Returns Display type of a frame index
  *
  * @param frame_index The index of a frame
- * @return
+ * @return Display type of given frame index
  */
 DisplayType QNode::getFrameDisplayType(const int &frame_index) {
 
@@ -172,7 +172,7 @@ DisplayType QNode::getFrameDisplayType(const int &frame_index) {
 
 /*! \brief Appends a row to a listView model
  *
- *		Appends a row in a given style with a given message to a listView model
+ *		Appends a new row with given style and message to a listView model
  * @param display_type Determines the style of the row
  * @param message The message to be displayed
  */
@@ -255,8 +255,9 @@ void QNode::display(const DisplayType &display_type, const QString &message) {
 	Q_EMIT listViewModelUpdated();
 }
 
-/*! \brief Returns string representation of a ROS timestamp for a desired timezone
+/*! \brief Returns readable ROS timestamp for a desired timezone
  *
+ *		Converts a ROS timestamp to a desired timezone and returns a readable string representation
  * @param stamp A given ROS timestamp
  * @param time_zone Offset for the desired timezone
  * @return String representation of ROS time

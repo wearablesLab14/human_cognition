@@ -8,6 +8,7 @@
 #ifndef Q_MOC_RUN
 #include "ui_window_receiver.h"
 #include "dialog_about.hpp"
+#include "dialog_help.hpp"
 #include "dialog_frames.hpp"
 #include "../node_receiver/qnode_receiver.hpp"
 #endif
@@ -78,6 +79,7 @@ private:
 	Ui::WindowReceiverDesign ui_recv;
 	QNodeReceiver *qnode_recv;
 	DialogAbout dialogAbout;
+	DialogHelp dialogHelp;
 	DialogFrames dialogFrames;
 
 	QCheckBox* frameSelectCheckBox[NUMBER_OF_FRAMES];
