@@ -31,6 +31,7 @@ QNode::QNode(int argc, char** argv, const std::string &name) :
 		init_argc(argc), init_argv(argv), node_name(name) {
 
 	//initialize urdf link names
+	baseLinkName = "base_link_connector";
 	frameLinkName[0] = "link_00_b_body";
 	frameLinkName[1] = "link_01_b_head";
 	frameLinkName[2] = "link_02_l_upper_arm";

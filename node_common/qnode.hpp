@@ -121,6 +121,7 @@ protected:
 	QStandardItemModel listViewModel;
 
 	//urdf link names
+	std::string baseLinkName;
 	std::string frameLinkName[NUMBER_OF_FRAMES];
 
 	//urdf joint names

@@ -33,10 +33,10 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 		QNode(argc, argv, "receiver") {
 
 	display(TIP, "1. Connect to mocap");
-	display(TIP, "2. 'roscore'");
-	display(TIP, "3. 'roslaunch human_cognition rviz.launch'");
-	display(TIP, "'roslaunch human_cognition record.launch title:=myTitle'");
-	display(TIP, "'roslaunch human_cognition play.launch title:=myTitle'");
+	display(TIP, "2. Start ROS master process with 'roscore'");
+	display(TIP, "Start RVIZ and load human model with 'roslaunch human_cognition rviz.launch'");
+	display(TIP, "Record tf messages with 'roslaunch human_cognition record.launch title:=myTitle'");
+	display(TIP, "Play tf messages 'roslaunch human_cognition play.launch title:=myTitle'");
 
 	/***********************************************************/
 
@@ -657,49 +657,118 @@ bool QNodeReceiver::socketBinding() {
  */
 void QNodeReceiver::initMessages() {
 
+	//links for base message
+	std::string baseParentLink;
+	std::string baseChildLink;
+
+	//relative joint origin for base message
+	tf::Vector3 baseJointRelative;
+
+	//links for frame messages
+	std::string frameParentLink[NUMBER_OF_FRAMES];
+	std::string frameChildLink[NUMBER_OF_FRAMES];
+
+	//relative joint origin for frame messages
+	tf::Vector3 frameJointRelative[NUMBER_OF_FRAMES];
+
+	//read from urdf if parsing of urdf file is successful
 	if (model.initFile("human_real_size.urdf")) {
 
+		//display message
 		display(INFO, QString("URDF parsing successful"));
 
-		double x, y, z;
+		//get parent and child links from urdf model for base
+		baseParentLink = model.getJoint(baseJointName)->parent_link_name;
+		baseChildLink = model.getJoint(baseJointName)->child_link_name;
 
-		tfBaseMsg.frame_id_ = model.getJoint(baseJointName)->parent_link_name;
-		tfBaseMsg.child_frame_id_ =
-				model.getJoint(baseJointName)->child_link_name;
-
-		x =
-				model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.x;
-		y =
-				model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.y;
-		z =
-				model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.z;
-		tfBaseMsg.setOrigin(tf::Vector3(x, y, z));
-
-		tfBaseRot = tf::Quaternion(0, 0, 0, sqrt(1.0));
-		tfBaseRot.normalize();
-		tfBaseMsg.setRotation(tfBaseRot);
-
-		initFrameRotation();
+		//get relative joint origin from urdf model for base
+		baseJointRelative.setX(model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.x);
+		baseJointRelative.setY(model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.y);
+		baseJointRelative.setZ(model.getJoint(baseJointName)->parent_to_joint_origin_transform.position.z);
 
 		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
-			tfFrameMsg[i].frame_id_ =
-					model.getJoint(frameJointName[i])->parent_link_name;
-			tfFrameMsg[i].child_frame_id_ =
-					model.getJoint(frameJointName[i])->child_link_name;
+			//get parent and child links from urdf model for frames
+			frameParentLink[i] = model.getJoint(frameJointName[i])->parent_link_name;
+			frameChildLink[i] = model.getJoint(frameJointName[i])->child_link_name;
 
-			x =
-					model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.x;
-			y =
-					model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.y;
-			z =
-					model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.z;
-			tfFrameMsg[i].setOrigin(tf::Vector3(x, y, z));
-			tfFrameMsg[i].setRotation(tfFrameRot[i]);
+			//get relative joint origin from urdf model for frames
+			frameJointRelative[i].setX(model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.x);
+			frameJointRelative[i].setY(model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.y);
+			frameJointRelative[i].setZ(model.getJoint(frameJointName[i])->parent_to_joint_origin_transform.position.z);
 		}
-	} else {
-		display(INFO, QString("URDF parsing failed"));
 
+	}
+
+	//use standard links and joints if urdf parsing failed
+	else {
+
+		//display message
+		display(INFO, QString("URDF parsing failed - using standard links and joints"));
+
+		//set parent and child for base
+		baseParentLink = "base_link";
+		baseChildLink = baseLinkName;
+
+		//set relative joint origin for base
+		baseJointRelative = tf::Vector3(0, 0, 1);
+
+		//set parent and child for frames
+		for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+			if(i == 0) {
+				frameParentLink[i] = baseLinkName;
+			} else if (i == 2) {
+				frameParentLink[i] = frameLinkName[0];
+			} else if (i == 5) {
+				frameParentLink[i] = frameLinkName[0];
+			} else if (i == 8) {
+				frameParentLink[i] = frameLinkName[0];
+			} else if (i == 11) {
+				frameParentLink[i] = frameLinkName[0];
+			} else {
+				frameParentLink[i] = frameLinkName[i - 1];
+			}
+			frameChildLink[i] = frameLinkName[i];
+		}
+
+		//set relative joint origin for frames
+		frameJointRelative[0] = tf::Vector3(0, 0, 0);
+		frameJointRelative[1] = tf::Vector3(0, 0, 0.53);
+		frameJointRelative[2] = tf::Vector3(0, 0.3, 0.52);
+		frameJointRelative[3] = tf::Vector3(0, 0, -0.25);
+		frameJointRelative[4] = tf::Vector3(0, 0, -0.27);
+		frameJointRelative[5] = tf::Vector3(0, 0.1, 0);
+		frameJointRelative[6] = tf::Vector3(0, 0, -0.55);
+		frameJointRelative[7] = tf::Vector3(0, 0, -0.45);
+		frameJointRelative[8] = tf::Vector3(0, -0.3, 0.52);
+		frameJointRelative[9] = tf::Vector3(0, 0, -0.25);
+		frameJointRelative[10] = tf::Vector3(0, 0, -0.27);
+		frameJointRelative[11] = tf::Vector3(0, -0.1, 0);
+		frameJointRelative[12] = tf::Vector3(0, 0, -0.55);
+		frameJointRelative[13] = tf::Vector3(0, 0, -0.45);
+	}
+
+	//standard base rotation
+	tfBaseRot = tf::Quaternion(0, 0, 0, sqrt(1.0));
+	tfBaseRot.normalize();
+
+	//init base tf message
+	tfBaseMsg.frame_id_ = baseParentLink;
+	tfBaseMsg.child_frame_id_ = baseChildLink;
+	tfBaseMsg.setOrigin(baseJointRelative);
+	tfBaseMsg.setRotation(tfBaseRot);
+
+	//init frame rotations
+	initFrameRotation();
+
+	//init frame tf messages
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+
+		tfFrameMsg[i].frame_id_ = frameParentLink[i];
+		tfFrameMsg[i].child_frame_id_ = frameChildLink[i];
+		tfFrameMsg[i].setOrigin(frameJointRelative[i]);
+		tfFrameMsg[i].setRotation(tfFrameRot[i]);
 	}
 }
 
