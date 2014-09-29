@@ -99,6 +99,7 @@ void QNodeListener::stopAction() {
 
 /*! \brief Run method of QThread
  *
+ * @throws TransformException
  */
 void QNodeListener::run() {
 
