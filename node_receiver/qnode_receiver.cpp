@@ -198,7 +198,7 @@ void QNodeReceiver::run() {
 	QString currAddress;
 
 	//frame y-axis rotation correction
-	tf::Quaternion yRotCorr(0, sqrt(0.5), 0, -sqrt(0.5));
+	tf::Quaternion yRotCorr(0, sqrt(0.5), 0, -sqrt(0.5));;
 	yRotCorr.normalize();
 
 	/***********************************************************/
@@ -206,12 +206,21 @@ void QNodeReceiver::run() {
 	//duration of one second for Hertz calculation and GUI updates
 	ros::Duration oneSecInterval(1.0);
 
-	//start time of receive loop
+	//start time of receive loop(
 	ros::Time receiveStartTime = ros::Time::now();
 
 	/***********************************************************/
 
 	display(INFO, QString("Receiving has started"));
+
+	int printtimer = 0;
+	int iterations[14] = {};
+  tf::Quaternion offsetQuat[14] = {};
+  for (int i = 0; i < 14; i++) {
+	  iterations[i] = 0;
+    offsetQuat[i] = tf::Quaternion(0, 0, 0, 0);
+  }
+  tf::Quaternion baseQuat = tf::Quaternion(0, 0, 0, 1);
 
 	//receive sensor data packets while ROS is okay
 	while (ros::ok()) {
@@ -257,8 +266,38 @@ void QNodeReceiver::run() {
 				tf::Quaternion quat(sensorPacketData.q1, sensorPacketData.q2,
 						sensorPacketData.q3, sensorPacketData.q0);
 
+				
 				//normalize rotation data (quaternion)
-				quat.normalize();
+				printtimer++;
+				if(printtimer > 100) {
+				  std::cout << "Frame: " << currFrame << "  Quat: " << quat.getX() << "," << quat.getY() << "," << quat.getZ() << "," << quat.getW() << std::endl;
+				  printtimer = 0;
+				}
+
+				if(iterations[currFrame] > 100) {
+					quat = quat * offsetQuat[currFrame];
+					quat.normalize();
+				}
+
+				//the first iterations[currFrame] are used for the correction
+				if(iterations[currFrame] <= 100) {
+					offsetQuat[currFrame] = tf::Quaternion(	
+									offsetQuat[currFrame].getX() + quat.getX(),
+									offsetQuat[currFrame].getY() + quat.getY(),
+									offsetQuat[currFrame].getZ() + quat.getZ(),
+									offsetQuat[currFrame].getW() + quat.getW());
+					
+					if(iterations[currFrame] == 100) {
+						offsetQuat[currFrame] = tf::Quaternion(
+									offsetQuat[currFrame].getX() / iterations[currFrame], 
+									offsetQuat[currFrame].getY() / iterations[currFrame], 
+									offsetQuat[currFrame].getZ() / iterations[currFrame], 
+									offsetQuat[currFrame].getW() / iterations[currFrame]);
+						offsetQuat[currFrame] = inverse(offsetQuat[currFrame]) * baseQuat;
+					}
+					iterations[currFrame]++;
+					continue;
+				}
 
 				/***********************************************************/
 
@@ -266,7 +305,7 @@ void QNodeReceiver::run() {
 				if (currFrame != 7 && currFrame != 13) {
 
 					//multiply rotation data with rotation correction
-					quat = quat * yRotCorr;
+					//quat = quat * yRotCorr;
 
 					//normalize rotation data
 					quat.normalize();
@@ -895,3 +934,4 @@ void QNodeReceiver::displayFrameAsync() {
 		}
 	}
 }
+
