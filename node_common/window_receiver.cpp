@@ -108,6 +108,8 @@ WindowReceiver::WindowReceiver(QNodeReceiver *node, QWidget *parent) :
 			SLOT(updateListView()));
 	QObject::connect(qnodeRecv, SIGNAL(frameDataUpdated()), this,
 			SLOT(updateFrameViews()));
+	QObject::connect(qnodeRecv, SIGNAL(calibrationSwitchUpdated()), this,
+			SLOT(updateCalibrationSwitch()));
 }
 
 /*! \brief Destructor of WindowReceiver class
@@ -147,9 +149,12 @@ void WindowReceiver::on_pushButtonReceiverSetup_clicked() {
 		//enable following GUI elements
 		uiRecv.pushButtonReceiverStart->setEnabled(true);
 		uiRecv.checkBoxPerformance->setEnabled(true);
+		uiRecv.checkBoxEdison->setEnabled(true);
 		uiRecv.pushButtonSwitch->setEnabled(true);
 		uiRecv.pushButtonResetModel->setEnabled(true);
 		uiRecv.pushButtonResetFrames->setEnabled(true);
+		uiRecv.pushButtonCalibration->setEnabled(true);
+		uiRecv.pushButtonOffset->setEnabled(true);
 
 		//enable following GUI elements only when performance is unchecked
 		if (!uiRecv.checkBoxPerformance->isChecked()) {
@@ -169,11 +174,13 @@ void WindowReceiver::on_pushButtonReceiverStart_clicked() {
 
 	//set node data
 	qnodeRecv->setSignalPerformance(uiRecv.checkBoxPerformance->isChecked());
+	qnodeRecv->setSignalEdison(uiRecv.checkBoxEdison->isChecked());
 	qnodeRecv->setSignalEuler(uiRecv.checkBoxEuler->isChecked());
 	qnodeRecv->setFrameEuler(uiRecv.comboBoxEuler->currentIndex());
 	qnodeRecv->setSignalInactivity(uiRecv.checkBoxInactivity->isChecked());
 	qnodeRecv->setSignalAsync(uiRecv.checkBoxAsync->isChecked());
 	qnodeRecv->setValueAsync(uiRecv.spinBoxAsync->value());
+
 
 	//start node thread
 	qnodeRecv->startAction();
@@ -181,6 +188,7 @@ void WindowReceiver::on_pushButtonReceiverStart_clicked() {
 	//disable following GUI elements
 	uiRecv.pushButtonReceiverStart->setEnabled(false);
 	uiRecv.checkBoxPerformance->setEnabled(false);
+	uiRecv.checkBoxEdison->setEnabled(false);
 	uiRecv.checkBoxEuler->setEnabled(false);
 	uiRecv.comboBoxEuler->setEnabled(false);
 	uiRecv.checkBoxInactivity->setEnabled(false);
@@ -204,6 +212,8 @@ void WindowReceiver::on_pushButtonReceiverStop_clicked() {
 	uiRecv.pushButtonSwitch->setEnabled(false);
 	uiRecv.pushButtonResetModel->setEnabled(false);
 	uiRecv.pushButtonResetFrames->setEnabled(false);
+	uiRecv.pushButtonCalibration->setEnabled(false);
+	uiRecv.pushButtonOffset->setEnabled(false);
 
 	//enable following GUI elements
 	uiRecv.pushButtonReceiverSetup->setEnabled(true);
@@ -247,6 +257,14 @@ void WindowReceiver::on_checkBoxPerformance_stateChanged(int state) {
 			uiRecv.spinBoxAsync->setEnabled(true);
 		}
 	}
+}
+
+/*! \brief Enables and disables the euler comboBox depending on the changed state
+ *
+ * @param state The new state of the checkBox
+ */
+void WindowReceiver::on_checkBoxEdison_stateChanged(int state) {
+	qnodeRecv->setSignalEdison(uiRecv.checkBoxEdison->isChecked());
 }
 
 /*! \brief Enables and disables the euler comboBox depending on the changed state
@@ -320,7 +338,9 @@ void WindowReceiver::on_pushButtonSwitch_clicked() {
 
 	//loop over all frames
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
-
+ 		manual_frame_switch(i, frameSwitchComboBox[i]->currentIndex());
+	
+ 	/*	
 		//switch frames if a frame has not his own index as its selected switch frame
 		if (i != frameSwitchComboBox[i]->currentIndex()) {
 			frameSwitch(i, frameSwitchComboBox[i]->currentIndex());
@@ -328,7 +348,23 @@ void WindowReceiver::on_pushButtonSwitch_clicked() {
 			//reset current index of frame's switch comboBox
 			frameSwitchComboBox[i]->setCurrentIndex(i);
 		}
+	*/
 	}
+}
+
+/*! \change two frames
+ *
+ *
+ */
+void WindowReceiver::manual_frame_switch(int source, int target) {
+
+		//switch frames if a frame has not his own index as its selected switch frame
+		if (source != target) {
+			frameSwitch(source, target);
+
+			//reset current index of frame's switch comboBox
+			frameSwitchComboBox[source]->setCurrentIndex(source);
+		}
 }
 
 /*! \brief Changes frame selection and address depending on the changed state
@@ -531,6 +567,30 @@ void WindowReceiver::on_pushButtonResetFrames_clicked() {
 	}
 }
 
+/*! \brief activates Calibration
+ *
+ *
+ *
+ */
+void WindowReceiver::on_pushButtonCalibration_clicked() {
+
+	//Activates the Calibration Function and resets all its initial values
+	qnodeRecv->activateCalibration();
+
+}
+
+/*! \brief calculates the Offset
+ *
+ *
+ *
+ */
+void WindowReceiver::on_pushButtonOffset_clicked() {
+
+	//Activates the Offset Calculation and resets all its initial values
+	qnodeRecv->calculateOffset();
+
+}
+
 /***********************************************
  MODEL SIGNAL METHODS
  ***********************************************/
@@ -539,6 +599,7 @@ void WindowReceiver::on_pushButtonResetFrames_clicked() {
  *
  */
 void WindowReceiver::updateListView() {
+
 	uiRecv.listViewInfo->scrollToBottom();
 }
 
@@ -556,6 +617,14 @@ void WindowReceiver::updateFrameViews() {
 		//update frame hertz
 		updateFrameHertzView(i);
 	}
+}
+
+/*! \brief switch items for calibration
+ *
+ */
+void WindowReceiver::updateCalibrationSwitch() {
+	int *framesToBeSwitched = qnodeRecv->getFramesToSwitch();
+	manual_frame_switch(framesToBeSwitched[0], framesToBeSwitched[1]);
 }
 
 /***********************************************
@@ -585,6 +654,9 @@ void WindowReceiver::frameSwitch(const int &frame_index_a,
 	//switch frame selections
 	frameSelectCheckBox[frame_index_a]->setChecked(boolean_b);
 	frameSelectCheckBox[frame_index_b]->setChecked(boolean_a);
+
+	//switch calculated offsets
+	qnodeRecv->switchOffset(frame_index_a, frame_index_b);
 
 	//update all frame views
 	updateFrameViews();
@@ -653,6 +725,8 @@ void WindowReceiver::readSettings() {
 	//restore settings values
 	uiRecv.checkBoxPerformance->setChecked(
 			settings.value(QString("key_signal_performance"), true).toBool());
+	uiRecv.checkBoxEdison->setChecked(
+			settings.value(QString("key_signal_edison"), true).toBool());
 	uiRecv.checkBoxEuler->setChecked(
 			settings.value(QString("key_signal_euler"), false).toBool());
 	uiRecv.comboBoxEuler->addItems(comboBoxFrames);
@@ -703,6 +777,7 @@ void WindowReceiver::readSettings() {
 
 	//disable following GUI elements
 	uiRecv.checkBoxPerformance->setEnabled(false);
+	uiRecv.checkBoxEdison->setEnabled(false);
 	uiRecv.checkBoxEuler->setEnabled(false);
 	uiRecv.comboBoxEuler->setEnabled(false);
 	uiRecv.checkBoxInactivity->setEnabled(false);
@@ -713,6 +788,8 @@ void WindowReceiver::readSettings() {
 	uiRecv.pushButtonSwitch->setEnabled(false);
 	uiRecv.pushButtonResetModel->setEnabled(false);
 	uiRecv.pushButtonResetFrames->setEnabled(false);
+	uiRecv.pushButtonCalibration->setEnabled(false);
+	uiRecv.pushButtonOffset->setEnabled(false);
 }
 
 /*! \brief Saves GUI state, values and lists in QSettings
@@ -731,6 +808,8 @@ void WindowReceiver::writeSettings() {
 	//save settings values
 	settings.setValue(QString("key_signal_performance"),
 			uiRecv.checkBoxPerformance->isChecked());
+	settings.setValue(QString("key_signal_edison"),
+			uiRecv.checkBoxEdison->isChecked());
 	settings.setValue(QString("key_signal_euler"),
 			uiRecv.checkBoxEuler->isChecked());
 	settings.setValue(QString("key_frame_euler"),

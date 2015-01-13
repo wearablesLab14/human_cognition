@@ -3,8 +3,30 @@
 
 #ifndef Q_MOC_RUN
 #include <ros/ros.h>
+#include <boost/thread.hpp>
 #include "../node_common/qnode.hpp"
+#include "./cmotionHelper.h"
 #endif
+
+/*
+ * define which frameIndex belongs to the binded limb
+ */
+enum LimbFrameOrder {
+ BASE_BODY = 0,
+ BASE_HEAD = 1,
+ LEFT_UPPER_ARM = 2,
+ LEFT_LOWER_ARM = 3,
+ LEFT_HAND = 4,
+ LEFT_UPPER_LEG = 5,
+ LEFT_LOWER_LEG = 6,
+ LEFT_FOOT = 7,
+ RIGHT_UPPER_ARM = 8,
+ RIGHT_LOWER_ARM = 9,
+ RIGHT_HAND = 10,
+ RIGHT_UPPER_LEG = 11,
+ RIGHT_LOWER_LEG = 12,
+ RIGHT_FOOT = 13
+};
 
 /*! \brief Specialized node class for receiving UDP packets
  * @author Christian Benz <zneb_naitsirhc@web.de>
@@ -26,6 +48,9 @@ public:
 	void startAction();
 	void stopAction();
 	void run();
+	virtual void switchOffset(const int &frame_index_a, const int &frame_index_b);
+	virtual void activateCalibration();
+	virtual void calculateOffset();
 
 	/***********************************************
 	 GETTER
@@ -34,6 +59,7 @@ public:
 	virtual QString getIgnoreAddress();
 	virtual QString getFrameAddress(const int &frame_index);
 	virtual int getFrameHertzToDisplay(const int &frame_index);
+	virtual int* getFramesToSwitch();
 
 	/***********************************************
 	 SETTER
@@ -42,11 +68,18 @@ public:
 	virtual void setFrameAddress(const int &frame_index, QString address);
 	virtual void setSignalResetModel(const bool &boolean);
 	virtual void setSignalPerformance(const bool &boolean);
+	virtual void setSignalEdison(const bool &boolean);
 	virtual void setSignalEuler(const bool &boolean);
 	virtual void setFrameEuler(const int &frame_index);
 	virtual void setSignalInactivity(const bool &boolean);
 	virtual void setSignalAsync(const bool &boolean);
 	virtual void setValueAsync(const int &value);
+
+	/***********************************************
+	 STATIC
+	 ***********************************************/
+	static tf::Quaternion* offsetQuat ;
+	static bool* offsetCalculated;
 
 private:
 	/***********************************************
@@ -80,6 +113,7 @@ private:
 
 	//settings variables
 	bool signalPerformance;
+	bool signalEdison;
 	bool signalEuler;
 	int frameEuler;
 	bool signalInactivity;
@@ -124,6 +158,35 @@ private:
 
 	//frame message
 	tf::StampedTransform tfFrameMsg[NUMBER_OF_FRAMES];
+
+	//offset
+	bool doOffsetCalc;
+	int iterations[14];
+	tf::Quaternion baseQuat;
+
+	//counts frames for calibration calculation
+	int calibrationCounter;
+	//which frame is searched to calibrate
+	// int calibrateLimb;
+	//which frames to switch
+	int framesToSwitch[2];
+	bool doCalibration;
+	bool firstTime;
+
+	int limbOrder[NUMBER_OF_FRAMES];
+	int limbOrderLength;
+	double diffCords[NUMBER_OF_FRAMES + 1];
+	double lastStateCords[NUMBER_OF_FRAMES][3];
+	int maxIndex;
+	int nextChangeIndex;
+	//base connector rotation
+	tf::Quaternion offsetHelper;
+	//euler angle array for calibration
+	double initEulerXYZ[NUMBER_OF_FRAMES][3];
+	double eulerXYZ[NUMBER_OF_FRAMES][3];
+	//void switchOffsets(int s, int t);
+
+
 };
 
 #endif

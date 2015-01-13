@@ -23,6 +23,10 @@
 
 #include "qnode_receiver.hpp"
 
+//tf::Quaternion offsetQuat[] = {};
+tf::Quaternion* QNodeReceiver::offsetQuat = new tf::Quaternion[NUMBER_OF_FRAMES];
+bool* QNodeReceiver::offsetCalculated = new bool[NUMBER_OF_FRAMES];
+
 /*! \brief Constructor of QNodeReceiver class
  *
  *		Displays messages and initializes variables
@@ -43,6 +47,9 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 			"Play tf messages with 'roslaunch human_cognition play.launch title:=myTitle'");
 
 	/***********************************************************/
+	//the calibration is not working initially
+	doCalibration = false;
+	doOffsetCalc = false;
 
 	//initialize socket and address variables
 	udpSocket = -1;
@@ -75,6 +82,7 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 
 	//initialize settings variables
 	signalPerformance = false;
+ 	signalEdison = false;
 	signalEuler = false;
 	frameEuler = 0;
 	signalInactivity = false;
@@ -203,7 +211,7 @@ void QNodeReceiver::run() {
 
 	/***********************************************************/
 
-	//duration of one second for Hertz calculation and GUI updates
+	//duration of a defined interval for Hertz calculation and GUI updates
 	ros::Duration oneSecInterval(1.0);
 
 	//start time of receive loop(
@@ -213,14 +221,7 @@ void QNodeReceiver::run() {
 
 	display(INFO, QString("Receiving has started"));
 
-	int printtimer = 0;
-	int iterations[14] = {};
-  tf::Quaternion offsetQuat[14] = {};
-  for (int i = 0; i < 14; i++) {
-	  iterations[i] = 0;
-    offsetQuat[i] = tf::Quaternion(0, 0, 0, 0);
-  }
-  tf::Quaternion baseQuat = tf::Quaternion(0, 0, 0, 1);
+	tf::Quaternion baseQuat = tf::Quaternion(0, 0, 0, 1);
 
 	//receive sensor data packets while ROS is okay
 	while (ros::ok()) {
@@ -268,48 +269,197 @@ void QNodeReceiver::run() {
 
 				
 				//normalize rotation data (quaternion)
-				printtimer++;
-				if(printtimer > 100) {
-				  std::cout << "Frame: " << currFrame << "  Quat: " << quat.getX() << "," << quat.getY() << "," << quat.getZ() << "," << quat.getW() << std::endl;
-				  printtimer = 0;
-				}
+				if (doOffsetCalc) {
+					if(QNodeReceiver::offsetCalculated [currFrame]) {
+						quat = quat * QNodeReceiver::offsetQuat [currFrame];
+						quat.normalize();
+					} else {
+						//the first iterations[currFrame] are used for the correction
+						QNodeReceiver::offsetQuat [currFrame] = tf::Quaternion(
+										QNodeReceiver::offsetQuat [currFrame].getX() + quat.getX(),
+										QNodeReceiver::offsetQuat [currFrame].getY() + quat.getY(),
+										QNodeReceiver::offsetQuat [currFrame].getZ() + quat.getZ(),
+										QNodeReceiver::offsetQuat [currFrame].getW() + quat.getW());
 
-				if(iterations[currFrame] > 100) {
-					quat = quat * offsetQuat[currFrame];
-					quat.normalize();
-				}
-
-				//the first iterations[currFrame] are used for the correction
-				if(iterations[currFrame] <= 100) {
-					offsetQuat[currFrame] = tf::Quaternion(	
-									offsetQuat[currFrame].getX() + quat.getX(),
-									offsetQuat[currFrame].getY() + quat.getY(),
-									offsetQuat[currFrame].getZ() + quat.getZ(),
-									offsetQuat[currFrame].getW() + quat.getW());
-					
-					if(iterations[currFrame] == 100) {
-						offsetQuat[currFrame] = tf::Quaternion(
-									offsetQuat[currFrame].getX() / iterations[currFrame], 
-									offsetQuat[currFrame].getY() / iterations[currFrame], 
-									offsetQuat[currFrame].getZ() / iterations[currFrame], 
-									offsetQuat[currFrame].getW() / iterations[currFrame]);
-						offsetQuat[currFrame] = inverse(offsetQuat[currFrame]) * baseQuat;
+						if(iterations[currFrame] == 100) {
+							QNodeReceiver::offsetQuat [currFrame] = tf::Quaternion(
+										QNodeReceiver::offsetQuat [currFrame].getX() / iterations[currFrame],
+										QNodeReceiver::offsetQuat [currFrame].getY() / iterations[currFrame],
+										QNodeReceiver::offsetQuat [currFrame].getZ() / iterations[currFrame],
+										QNodeReceiver::offsetQuat [currFrame].getW() / iterations[currFrame]);
+							QNodeReceiver::offsetQuat [currFrame] = inverse(QNodeReceiver::offsetQuat [currFrame]) * baseQuat;
+							QNodeReceiver::offsetCalculated [currFrame] = true;
+							display(INFO, QString("Offset calculated!"));
+							//WindowReceiver::SingleTon::manual_frame_switch(0, 6);
+						}
+						iterations[currFrame]++;
+						//continue;
 					}
-					iterations[currFrame]++;
-					continue;
+				} else {
+					/***********************************************************/
+					//correct original rotation for all frames except the feet frames
+					if (currFrame != 7 && currFrame != 13) {
+
+						//multiply rotation data with rotation correction
+						quat = quat * yRotCorr;
+
+						//normalize rotation data
+						quat.normalize();
+					}
 				}
 
-				/***********************************************************/
 
-				//correct original rotation for all frames except the feet frames
-				if (currFrame != 7 && currFrame != 13) {
+				//do calibration
+				if (doCalibration) {
+					if(firstTime) {
+						if (nextChangeIndex == 0)
+							display(CALIBRATION, QString("Move your right arm."));
+						if (nextChangeIndex == 3)
+							display(CALIBRATION, QString("Move your head."));
+						if (nextChangeIndex == 4)
+							display(CALIBRATION, QString("Move your body."));
 
-					//multiply rotation data with rotation correction
-					//quat = quat * yRotCorr;
+						firstTime = false;
+					}
+					//calculate roll, pitch and yaw from rotation data of sensor data packet
+					int limbOrderindex	= cmotionHelper::getIndex(limbOrder, currFrame, limbOrderLength);
 
-					//normalize rotation data
-					quat.normalize();
+					//display(CALIBRATION, QString::number(limbOrderindex));
+					if( limbOrderindex  >= 0)
+					{
+						//std::cout << limbOrderindex << std::endl;
+					// caculate currentEulerValues
+					tf::Matrix3x3(quat).getRPY(
+							eulerXYZ[currFrame][0],
+							eulerXYZ[currFrame][1],
+							eulerXYZ[currFrame][2]);
+
+					// caculateCurrentChange
+					diffCords[limbOrderindex] += sqrt(
+							pow ((eulerXYZ[currFrame][0] - lastStateCords[limbOrderindex][0]), 2) +
+							pow ((eulerXYZ[currFrame][1] - lastStateCords[limbOrderindex][1]), 2) +
+							pow ((eulerXYZ[currFrame][2] - lastStateCords[limbOrderindex][2]), 2)
+							);
+
+					// saveToTheLast
+					for(int i = 0 ; i < 3; i++) {
+						lastStateCords[limbOrderindex][i] = eulerXYZ[currFrame][i];
+					}
+
+					//calculate max value
+					if (diffCords[limbOrderindex] > diffCords[maxIndex])
+						maxIndex = limbOrderindex;
+
+					//if max value is bigger than a given value, switch frames
+					if (diffCords[limbOrderindex] > 10) {
+						//which frames to switch
+						framesToSwitch[0] = limbOrder[nextChangeIndex];
+						framesToSwitch[1] = limbOrder[limbOrderindex];
+						std::cout << "framesToSwitch[0]: " << framesToSwitch[0] << "   framesToSwitch[1]: " << framesToSwitch[1] << std::endl;
+						//tell GUI to updated switch info
+						Q_EMIT calibrationSwitchUpdated();
+						//limbOrder isn't used anymore
+						diffCords[limbOrderindex] = 0;
+						limbOrder[nextChangeIndex] = limbOrder[nextChangeIndex] - 20;
+						//diffCords[14]=0;
+						maxIndex = 14;
+						nextChangeIndex++;
+						firstTime=true;
+						//set the actual limb to standard position!
+						quat = baseQuat;
+					}
+
+					// slia
+					if ((ros::Time::now() - receiveStartTime) >= oneSecInterval) {
+
+						display(CALIBRATION,
+								QString("MaxValue %1, Frame %2").arg(
+										QString::number(diffCords[maxIndex], 'f', 3)).arg(
+										QString::number(maxIndex, 'f', 1)));
+					}
+
+
+					}
 				}
+
+						/*
+						if (firstTime) {
+							initEulerXYZ[currFrame][0] = eulerXYZ[currFrame][0];
+							initEulerXYZ[currFrame][1] = eulerXYZ[currFrame][1];
+							initEulerXYZ[currFrame][2] = eulerXYZ[currFrame][2];
+						}
+
+
+						calibrationCounter = 0;
+						//which limb to calibrate
+							switch (calibrateLimb) {
+								case (BASE_BODY): {
+									break;
+								}
+								case (BASE_HEAD): {
+									break;
+								}
+								case (LEFT_UPPER_ARM): {
+									break;
+								}
+								case (LEFT_LOWER_ARM): {
+									break;
+								}
+								case (LEFT_HAND): {
+									break;
+								}
+								case (LEFT_UPPER_LEG): {
+									break;
+								}
+								case (LEFT_LOWER_LEG): {
+									break;
+								}
+								case (LEFT_FOOT): {
+									break;
+								}
+								case (RIGHT_UPPER_ARM): {
+									break;
+								}
+								case (RIGHT_LOWER_ARM): {
+									break;
+								}
+								case (RIGHT_HAND): {
+									if(firstTime) {
+										display(CALIBRATION, QString("Turn your RIGHT_HAND 180 degrees (yaw)"));
+										firstTime = false;
+									}
+
+									if (eulerXYZ[currFrame][2] - initEulerXYZ[currFrame][2] > 1) {
+										//change_frames
+										if (currFrame != RIGHT_HAND) {
+											framesToSwitch[0] = currFrame;
+											framesToSwitch[1] = RIGHT_HAND;
+											//tell GUI to updated switch info
+											Q_EMIT calibrationSwitchUpdated();
+										}
+										display(CALIBRATION, QString("RIGHT_HAND is calibrated!"));
+										doCalibration = false;
+										firstTime = true;
+										//next limb
+										calibrateLimb = RIGHT_HAND;
+									}
+									break;
+								}
+								case (RIGHT_UPPER_LEG): {
+									break;
+								}
+								case (RIGHT_LOWER_LEG): {
+									break;
+								}
+								case (RIGHT_FOOT): {
+									break;
+								}
+								default: {
+									break;
+								}
+							}
+							*/
+				//}
 
 				/***********************************************************/
 
@@ -475,6 +625,75 @@ void QNodeReceiver::run() {
 	display(INFO, QString("Receiving has stopped"));
 }
 
+
+/*! \brief changes the calculated offset of a and b
+ *
+ *
+ */
+void QNodeReceiver::switchOffset(const int &frame_index_a, const int &frame_index_b) {
+	offsetHelper = QNodeReceiver::offsetQuat[frame_index_a];
+	QNodeReceiver::offsetQuat[frame_index_a] = QNodeReceiver::offsetQuat[frame_index_b];
+	QNodeReceiver::offsetQuat[frame_index_b] = offsetHelper;
+	bool offsetHelper = QNodeReceiver::offsetCalculated[frame_index_a];
+	QNodeReceiver::offsetCalculated[frame_index_a] = QNodeReceiver::offsetCalculated[frame_index_b];
+	QNodeReceiver::offsetCalculated[frame_index_b] = offsetHelper;
+	display(INFO, QString("Offset switched!"));
+}
+
+/*! \activates the calibration and resets its values
+ *
+ *
+ */
+void QNodeReceiver::activateCalibration() {
+	display(CALIBRATION, QString("Calibration activated!"));
+	//initialize calibration variables
+	calibrationCounter = 1;
+	limbOrderLength = 14;
+
+	// which order the calibration is done
+	limbOrder [0] = RIGHT_HAND;
+	limbOrder [1] = RIGHT_LOWER_ARM;
+	limbOrder [2] = RIGHT_UPPER_ARM;
+	limbOrder [12] = LEFT_HAND;
+	limbOrder [13] = LEFT_LOWER_ARM;
+	limbOrder [5] = LEFT_UPPER_ARM;
+	limbOrder [6] = RIGHT_FOOT;
+	limbOrder [7] = RIGHT_LOWER_LEG;
+	limbOrder [8] = RIGHT_UPPER_LEG;
+	limbOrder [9] = LEFT_FOOT;
+	limbOrder [10] = LEFT_LOWER_LEG;
+	limbOrder [11] = LEFT_UPPER_LEG;
+	limbOrder [3] = BASE_HEAD;
+	limbOrder [4] = BASE_BODY;
+
+	for (int i=0; i <= limbOrderLength; i++)
+		diffCords [i] = 0;
+
+	//start calibration
+	doCalibration = true;
+	//the index with the maximum value initially is 14
+	maxIndex = 14;
+	//to initialize a text message
+	firstTime = true;
+	//next limborder to be changed, initially 0
+	nextChangeIndex = 0;
+}
+
+/*! \calculates the offset and resets its values
+ *
+ *
+ */
+void QNodeReceiver::calculateOffset() {
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+		//if(!offsetCalculated[currFrame])
+		QNodeReceiver::offsetQuat [i] = tf::Quaternion(0, 0, 0, 0);
+		iterations[i] = 0;
+		QNodeReceiver::offsetCalculated [i] = false;
+	}
+	baseQuat = tf::Quaternion(0, 0, 0, 1);
+	doOffsetCalc = true;
+}
+
 /***********************************************
  GETTER
  ***********************************************/
@@ -511,6 +730,14 @@ QString QNodeReceiver::getFrameAddress(const int &frame_index) {
  */
 int QNodeReceiver::getFrameHertzToDisplay(const int &frame_index) {
 	return frameHertzToDisplay[frame_index];
+}
+
+/*! \brief returns a array of two integer values to be switched
+ *
+ * @return the frames to be switched because of calibration
+ */
+int* QNodeReceiver::getFramesToSwitch() {
+	return framesToSwitch;
 }
 
 /***********************************************
@@ -560,6 +787,30 @@ void QNodeReceiver::setSignalResetModel(const bool &boolean) {
  */
 void QNodeReceiver::setSignalPerformance(const bool &boolean) {
 	signalEuler = boolean;
+}
+
+/*! \spam Edison - executed as thread
+ *
+ *
+ */
+void spamEdison() 
+{
+	while(true) {
+		boost::this_thread::sleep(boost::posix_time::milliseconds(8));
+		system("/bin/bash -c \"/bin/echo -n spam >/dev/udp/192.168.0.100/6060\"");
+	} 
+}
+
+/*! \brief Sets edison signal & starts spam thread
+ *
+ * @param boolean Boolean value to be set
+ */
+void QNodeReceiver::setSignalEdison(const bool &boolean) {
+	signalEdison = boolean;
+	if(signalEdison)
+		boost::thread thread_Edison(spamEdison);
+	//if(!signalEdison)
+	//	thread_Edison.interrupt();
 }
 
 /*! \brief Sets euler signal
@@ -856,6 +1107,7 @@ void QNodeReceiver::initFrameData() {
 		frameAsynchSpanNsec[i] = 0;
 	}
 }
+
 /*! \brief Display latest euler angles for the desired euler frame
  *
  */

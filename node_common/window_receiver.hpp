@@ -27,6 +27,7 @@ public:
 	WindowReceiver(QNodeReceiver *node, QWidget *parent = 0);
 	~WindowReceiver();
 	void closeEvent(QCloseEvent *event);
+	void manual_frame_switch(int source, int target);
 
 public Q_SLOTS:
 	/***********************************************
@@ -34,6 +35,7 @@ public Q_SLOTS:
 	 ***********************************************/
 	void updateListView();
 	void updateFrameViews();
+	void updateCalibrationSwitch();
 
 	/***********************************************
 	 GUI ACTION METHODS
@@ -45,6 +47,7 @@ public Q_SLOTS:
 	void on_pushButtonHelp_clicked();
 	void on_pushButtonFrames_clicked();
 	void on_checkBoxPerformance_stateChanged(int state);
+	void on_checkBoxEdison_stateChanged(int state);
 	void on_checkBoxEuler_stateChanged(int state);
 	void on_checkBoxAsync_stateChanged(int state);
 	void on_pushButtonSwitch_clicked();
@@ -64,6 +67,8 @@ public Q_SLOTS:
 	void on_checkBox_13_stateChanged(int state);
 	void on_pushButtonResetModel_clicked();
 	void on_pushButtonResetFrames_clicked();
+	void on_pushButtonCalibration_clicked();
+	void on_pushButtonOffset_clicked();
 
 private:
 	/***********************************************

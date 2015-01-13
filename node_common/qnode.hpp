@@ -56,7 +56,8 @@ enum DisplayType {
 	FRAME234,
 	FRAME567,
 	FRAME8910,
-	FRAME111213
+	FRAME111213,
+	CALIBRATION
 };
 
 //struct for sensor packet data
@@ -107,6 +108,7 @@ Q_SIGNALS:
 	 ***********************************************/
 	void listViewModelUpdated();
 	void frameDataUpdated();
+	void calibrationSwitchUpdated();
 
 private:
 	/***********************************************
