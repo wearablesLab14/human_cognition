@@ -36,7 +36,7 @@ public Q_SLOTS:
 	void updateListView();
 	void updateFrameViews();
 	void updateCalibrationSwitch();
-
+	
 	/***********************************************
 	 GUI ACTION METHODS
 	 ***********************************************/

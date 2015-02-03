@@ -573,10 +573,29 @@ void WindowReceiver::on_pushButtonResetFrames_clicked() {
  *
  */
 void WindowReceiver::on_pushButtonCalibration_clicked() {
-
+	bool boxes[NUMBER_OF_FRAMES];
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+		if (frameSelectCheckBox[i]->isChecked()) {
+			boxes[i] = true;
+		} else {
+			boxes[i] = false;
+		}
+	}
 	//Activates the Calibration Function and resets all its initial values
-	qnodeRecv->activateCalibration();
-
+	qnodeRecv->activateCalibration(	boxes[0],
+									boxes[1], 
+									boxes[2], 
+									boxes[3], 
+									boxes[4], 
+									boxes[5], 
+									boxes[6], 
+									boxes[7], 
+									boxes[8], 
+									boxes[9], 
+									boxes[10], 
+									boxes[11], 
+									boxes[12], 
+									boxes[13]);
 }
 
 /*! \brief calculates the Offset

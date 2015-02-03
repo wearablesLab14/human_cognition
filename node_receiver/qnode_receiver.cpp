@@ -30,7 +30,7 @@ tf::Quaternion* QNodeReceiver::offsetQuat = new tf::Quaternion[NUMBER_OF_FRAMES]
 int** offsetDirection = new int*[NUMBER_OF_FRAMES];
 
 bool* QNodeReceiver::offsetCalculated = new bool[NUMBER_OF_FRAMES];
-	
+
 /*! \brief Constructor of QNodeReceiver class
  *
  *		Displays messages and initializes variables
@@ -45,7 +45,7 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 		// contains the achses-Order X Y Z
 		offsetDirection[i] = new int[3];
 	}
-	
+
 	display(TIP, "1. Connect to mocap");
 	display(TIP, "2. Start ROS master process with 'roscore'");
 	display(TIP,
@@ -60,8 +60,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	//important to initialize with WHOLE PATH!!
 	urdfFile =
 			"/home/cognition/catkin_ws/src/human_cognition/devel/lib/human_cognition/human_real_size.urdf";
-	
-	//init for base transformation	
+
+	//init for base transformation
 	frameYaw = 0;
 	framePitch = 0;
 	frameRoll = 0;
@@ -71,14 +71,14 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	// count !doCalibration
 	countNotCalibration = 0;
 	doOffsetCalc = false;
-	
+
 	//enum not mappable to string... grrr :-)
-	limbStrings[0] = "BASE_BODY"; 
-	limbStrings[1] = "BASE_HEAD"; 
-	limbStrings[2] = "LEFT_UPPER_ARM"; 
-	limbStrings[3] = "LEFT_LOWER_ARM"; 
-	limbStrings[4] = "LEFT_HAND"; 
-	limbStrings[5] = "LEFT_UPPER_LEG"; 
+	limbStrings[0] = "BASE_BODY";
+	limbStrings[1] = "BASE_HEAD";
+	limbStrings[2] = "LEFT_UPPER_ARM";
+	limbStrings[3] = "LEFT_LOWER_ARM";
+	limbStrings[4] = "LEFT_HAND";
+	limbStrings[5] = "LEFT_UPPER_LEG";
 	limbStrings[6] = "LEFT_LOWER_LEG";
 	limbStrings[7] = "LEFT_FOOT";
 	limbStrings[8] = "RIGHT_UPPER_ARM";
@@ -275,36 +275,36 @@ void QNodeReceiver::run() {
 
 			//update current address with address of sensor data packet
 			currAddress = QString(inet_ntoa(sensorAddress.sin_addr));
-			
-			
-			// TODO Nghia, timeStampe 
+
+
+			// TODO Nghia, timeStampe
 			//receive bytes to fill struct
-				
-				
-					// timeStampToString						
-					std::ostringstream ss;					
+
+
+					// timeStampToString
+					std::ostringstream ss;
 					ss << sensorPacketData.timestamp;
-					
+
 					std::string  tmpCurrAddress =  currAddress.toUtf8().constData() ;
-					tmpCurrAddress = tmpCurrAddress.replace(0,10,"") + "."  + ss.str();		
+					tmpCurrAddress = tmpCurrAddress.replace(0,10,"") + "."  + ss.str();
 					currAddress.clear();
 					currAddress.append(tmpCurrAddress.c_str());
-						
-						
-					/*				
+
+
+					/*
 					//sensorPacketData.timestamp.str
 					std::cout << "currAddressto  " << currAddress.toUtf8().constData() <<
 					"sensorPacketData.stamp_  " << sensorPacketData.timestamp <<
 					"tmpCurrAddress  " << tmpCurrAddress <<
-					std::endl; 
+					std::endl;
 					*/
-				 
-					 
-					 
-			
+
+
+
+
 			//search address list for current address and return index if found
 			currFrame = frameAddressList.indexOf(currAddress, 0);
-			
+
 
 
 			/***********************************************************/
@@ -336,7 +336,7 @@ void QNodeReceiver::run() {
 				if (doOffsetCalc) {
 					if (QNodeReceiver::offsetCalculated[currFrame]) {
 						quat = quat * QNodeReceiver::offsetQuat[currFrame];
-						quat.normalize();	
+						quat.normalize();
 					} else {
 						//the first iterations[currFrame] are used for the correction
 						QNodeReceiver::offsetQuat[currFrame] = tf::Quaternion(
@@ -354,28 +354,28 @@ void QNodeReceiver::run() {
 									QNodeReceiver::offsetQuat[currFrame].getZ()
 											/ iterations[currFrame],
 									QNodeReceiver::offsetQuat[currFrame].getW()
-											/ iterations[currFrame]);							
-							
+											/ iterations[currFrame]);
+
 							if(currFrame == 0)
 								offsetHelper = offsetQuat[0];
-							
+
 							QNodeReceiver::offsetQuat[currFrame] = baseQuat * inverse(
 									QNodeReceiver::offsetQuat[currFrame]);
 
 							QNodeReceiver::offsetCalculated[currFrame] = true;
 							display(INFO, QString("Offset calculated!"));
-							
-							
+
+
 							//corrects the base body rotation to its original angle
 							if (currFrame == 0) {
 								tf::Matrix3x3(offsetHelper).getRPY(frameRoll, framePitch, frameYaw);
 								offsetHelper.setRPY(0,0,-frameYaw);
-								
+
 								offsetQuat[currFrame]=
 									offsetQuat[currFrame] *
 									inverse(offsetHelper);
 								}
-							
+
 						}
 						iterations[currFrame]++;
 					}
@@ -394,22 +394,22 @@ void QNodeReceiver::run() {
 				//do calibration
 				if (doCalibration) {
 					if (firstTime) {
-						display(CALIBRATION, 
+						display(CALIBRATION,
 							QString("Move your " + limbStrings[limbOrder[nextChangeIndex]]));
 
 						firstTime = false;
 					}
-					
+
 					//calculate roll, pitch and yaw from rotation data of sensor data packet
 					int limbOrderindex = cmotionHelper::getIndex(limbOrder, currFrame,
 							limbOrderLength);
 
 					//display(CALIBRATION, QString::number(limbOrderindex));
 					if (limbOrderindex >= 0) {
-						
+
 						// just continue to count, if no frame to calibration
 						countNotCalibration = 0;
-						
+
 						// caculateCurrentChange to get the max chaged Coordinates
 						diffCords[limbOrderindex] +=
 								sqrt(
@@ -432,14 +432,14 @@ void QNodeReceiver::run() {
 						lastStateCords[limbOrderindex][2] = quat.getZ();
 						lastStateCords[limbOrderindex][3] = quat.getW();
 
-						
+
 						//save if the new value > max value
 						if (diffCords[limbOrderindex] > diffCords[maxIndex])
 							maxIndex = limbOrderindex;
-						
+
 						if (diffCords[limbOrderindex] < diffCords[minIndex])
 							minIndex = limbOrderindex;
-						
+
 
 						//if max value is bigger than 10, switch frames
 						if (diffCords[limbOrderindex] > 3) {
@@ -448,13 +448,13 @@ void QNodeReceiver::run() {
 							framesToSwitch[1] = limbOrder[limbOrderindex];
 							// limbOrder[limbOrderindex] == currFrame, müsste
 							assert(limbOrder[limbOrderindex] == currFrame);
-							
-					
+
+
 							std::cout << "framesToSwitch[0]: " << framesToSwitch[0]
 									<< "   framesToSwitch[1]: " << framesToSwitch[1] << std::endl;
 							//tell GUI to updated switch info
 							Q_EMIT calibrationSwitchUpdated();
-							
+
 							/**** RESET VALUES ****/
 							//limbOrder isn't used anymore
 							diffCords[limbOrderindex] = 0;
@@ -465,7 +465,7 @@ void QNodeReceiver::run() {
 							nextChangeIndex++;
 							firstTime = true;
 							//set the actual limb to standard position!
-					
+
 							quat = baseQuat;
 						}
 
@@ -492,7 +492,7 @@ void QNodeReceiver::run() {
 
 				tfFrameRot[currFrame] = tf::Quaternion(quat.getX(), quat.getY(),
 							quat.getZ(), quat.getW());
-							
+
 
 				tfFrameRot[currFrame].normalize();
 				tfOrigFrameRot[currFrame] = tfFrameRot[currFrame];
@@ -511,19 +511,19 @@ void QNodeReceiver::run() {
 							* tfFrameRot[currFrame];
 				}
 
-						
+
 				//normalize rotation data
 				tfFrameRot[currFrame].normalize();
 
 				/***********************************************************/
 
 
-						
+
 				//assign message of current frame with updated rotation data
 				tfFrameMsg[currFrame].setRotation(tfFrameRot[currFrame]);
-				
-	
-			
+
+
+
 
 				/***********************************************************/
 
@@ -537,7 +537,7 @@ void QNodeReceiver::run() {
 
 					//calculate roll, pitch and yaw from rotation data of sensor data packet
 					tf::Matrix3x3(quat).getRPY(frameEulerY, frameEulerX, frameEulerZ);
-					
+
 				}
 
 				/***********************************************************/
@@ -559,27 +559,27 @@ void QNodeReceiver::run() {
 				for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 
 					// Nghia print Information to Terminal
-					if ( i== 0 && (ros::Time::now() - receiveStartTime) >= oneSecInterval) 					
-					{	
+					if ( i== 0 && (ros::Time::now() - receiveStartTime) >= oneSecInterval)
+					{
 						double x,y,z;
 						tf::Matrix3x3(tfFrameRot[0]).getRPY(x,y,z);
-						
-						std::cout 	//<< tfFrameRot[0].getX() << "   " 
-									//<< tfFrameRot[0].getY() << "   " 
-									//<< tfFrameRot[0].getZ() << "   \n" 
-									//<< "X Offset " <<offsetQuat[0].getX() << "   " 
-									//<< "Y Offset " <<offsetQuat[0].getY() << "   " 
+
+						std::cout 	//<< tfFrameRot[0].getX() << "   "
+									//<< tfFrameRot[0].getY() << "   "
+									//<< tfFrameRot[0].getZ() << "   \n"
+									//<< "X Offset " <<offsetQuat[0].getX() << "   "
+									//<< "Y Offset " <<offsetQuat[0].getY() << "   "
 									//<< "Z Offset " <<offsetQuat[0].getZ() << "   \n"
-									<< "X angle " <<x / 3.14 * 180<< "   " 
-									<< "Y angle " <<y / 3.14 * 180<< "   " 
-									<< "Z angle " <<z / 3.14 * 180<< "  \n " 
-									<< "currAddress: " << currAddress.toUtf8().constData() 
-									<< " " << frameAddressList.at(currFrame).toUtf8().constData() 
-									<< "   currFrame: " << currFrame 
-									<< "   sensorPacketData.timestamp: " << sensorPacketData.timestamp 
+									<< "X angle " <<x / 3.14 * 180<< "   "
+									<< "Y angle " <<y / 3.14 * 180<< "   "
+									<< "Z angle " <<z / 3.14 * 180<< "  \n "
+									<< "currAddress: " << currAddress.toUtf8().constData()
+									<< " " << frameAddressList.at(currFrame).toUtf8().constData()
+									<< "   currFrame: " << currFrame
+									<< "   sensorPacketData.timestamp: " << sensorPacketData.timestamp
 									<< std::endl;
-					}					
-					
+					}
+
 					//update timestamp of base tf message
 					tfBaseMsg.stamp_ = ros::Time::now();
 
@@ -693,16 +693,45 @@ void QNodeReceiver::switchOffset(const int &frame_index_a,
 }
 
 /*! \activates the calibration and resets its values
+ *  \only signals can be passed, bools are signals, arrays not! GRRR :) hmpf
  *
  *
  */
-void QNodeReceiver::activateCalibration() {
+void QNodeReceiver::activateCalibration(const bool check_box0,
+										const bool check_box1,
+										const bool check_box2,
+										const bool check_box3,
+										const bool check_box4,
+										const bool check_box5,
+										const bool check_box6,
+										const bool check_box7,
+										const bool check_box8,
+										const bool check_box9,
+										const bool check_box10,
+										const bool check_box11,
+										const bool check_box12,
+										const bool check_box13) {
 	display(CALIBRATION, QString("Calibration activated!"));
 	//initialize calibration variables
 	calibrationCounter = 1;
 	limbOrderLength = 14;
+	bool check_boxes[NUMBER_OF_FRAMES];
+	check_boxes[0]=check_box0;
+	check_boxes[1]=check_box1;
+	check_boxes[2]=check_box2;
+	check_boxes[3]=check_box3;
+	check_boxes[4]=check_box4;
+	check_boxes[5]=check_box5;
+	check_boxes[6]=check_box6;
+	check_boxes[7]=check_box7;
+	check_boxes[8]=check_box8;
+	check_boxes[9]=check_box9;
+	check_boxes[10]=check_box10;
+	check_boxes[11]=check_box11;
+	check_boxes[12]=check_box12;
+	check_boxes[13]=check_box13;
 
-	// which order the calibration is done
+	//which order the calibration is done if all are activated
 	limbOrder[0] = RIGHT_HAND;
 	limbOrder[1] = RIGHT_LOWER_ARM;
 	limbOrder[2] = RIGHT_UPPER_ARM;
@@ -717,7 +746,17 @@ void QNodeReceiver::activateCalibration() {
 	limbOrder[11] = LEFT_UPPER_LEG;
 	limbOrder[12] = BASE_HEAD;
 	limbOrder[13] = BASE_BODY;
-
+	
+	//order the limbOrder array such that only activated frames are used
+	int j = 0;
+	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
+		if (check_boxes[limbOrder[i]]) {
+			limbOrder[j] = limbOrder[i];
+			j++;
+		}
+	}
+	
+	//diffCords initially are 0
 	for (int i = 0; i <= limbOrderLength; i++)
 		diffCords[i] = 0;
 

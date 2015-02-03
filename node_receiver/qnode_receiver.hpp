@@ -49,7 +49,20 @@ public:
 	void stopAction();
 	void run();
 	virtual void switchOffset(const int &frame_index_a, const int &frame_index_b);
-	virtual void activateCalibration();
+	virtual void activateCalibration(const bool check_boxes0,
+									 const bool check_boxes1,
+									 const bool check_boxes2,
+									 const bool check_boxes3,
+									 const bool check_boxes4,
+									 const bool check_boxes5,
+									 const bool check_boxes6,
+									 const bool check_boxes7,
+									 const bool check_boxes8,
+									 const bool check_boxes9,
+									 const bool check_boxes10,
+									 const bool check_boxes11,
+									 const bool check_boxes12,
+									 const bool check_boxes13);
 	virtual void calculateOffset();
 
 	/***********************************************
