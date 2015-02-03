@@ -125,6 +125,9 @@ private:
 	double frameEulerX;
 	double frameEulerY;
 	double frameEulerZ;
+	double frameYaw;
+	double framePitch;
+	double frameRoll;
 
 	//list of frame ip addresses
 	QStringList frameAddressList;
@@ -146,6 +149,8 @@ private:
 
 	//urdf data model
 	urdf::Model model;
+	//init urdf File path
+	std::string urdfFile;
 
 	//base connector rotation
 	tf::Quaternion tfBaseRot;
@@ -155,6 +160,7 @@ private:
 
 	//frame rotation
 	tf::Quaternion tfFrameRot[NUMBER_OF_FRAMES];
+	tf::Quaternion tfOrigFrameRot[NUMBER_OF_FRAMES];
 
 	//frame message
 	tf::StampedTransform tfFrameMsg[NUMBER_OF_FRAMES];
@@ -163,6 +169,7 @@ private:
 	bool doOffsetCalc;
 	int iterations[14];
 	tf::Quaternion baseQuat;
+	tf::Quaternion baseQuatFoot;
 
 	//counts frames for calibration calculation
 	int calibrationCounter;
@@ -172,12 +179,14 @@ private:
 	int framesToSwitch[2];
 	bool doCalibration;
 	bool firstTime;
+	int countNotCalibration;
 
 	int limbOrder[NUMBER_OF_FRAMES];
 	int limbOrderLength;
 	double diffCords[NUMBER_OF_FRAMES + 1];
-	double lastStateCords[NUMBER_OF_FRAMES][3];
+	double lastStateCords[NUMBER_OF_FRAMES][4];
 	int maxIndex;
+	int minIndex;
 	int nextChangeIndex;
 	//base connector rotation
 	tf::Quaternion offsetHelper;
@@ -185,7 +194,7 @@ private:
 	double initEulerXYZ[NUMBER_OF_FRAMES][3];
 	double eulerXYZ[NUMBER_OF_FRAMES][3];
 	//void switchOffsets(int s, int t);
-
+	QString limbStrings[14];
 
 };
 
