@@ -277,19 +277,23 @@ void QNodeReceiver::run() {
 			currAddress = QString(inet_ntoa(sensorAddress.sin_addr));
 
 
-			// TODO Nghia, timeStampe
+			// TODO Nghia, timeStamp
 			//receive bytes to fill struct
-
-
+			if (sensorPacketData.timestamp >= 0 && sensorPacketData.timestamp < 10)
+				currAddress.append(QString("_%1").arg(sensorPacketData.timestamp));
+			
+					/*
 					// timeStampToString
 					std::ostringstream ss;
 					ss << sensorPacketData.timestamp;
 
-					std::string  tmpCurrAddress =  currAddress.toUtf8().constData() ;
+					std::string tmpCurrAddress =  currAddress.toUtf8().constData() ;
 					tmpCurrAddress = tmpCurrAddress.replace(0,10,"") + "."  + ss.str();
 					currAddress.clear();
 					currAddress.append(tmpCurrAddress.c_str());
+					*/
 
+					//currAddress.append(QString::number(sensorPacketDate.timestamp));
 
 					/*
 					//sensorPacketData.timestamp.str
@@ -299,13 +303,8 @@ void QNodeReceiver::run() {
 					std::endl;
 					*/
 
-
-
-
 			//search address list for current address and return index if found
 			currFrame = frameAddressList.indexOf(currAddress, 0);
-
-
 
 			/***********************************************************/
 

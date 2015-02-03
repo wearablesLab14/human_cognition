@@ -41,8 +41,8 @@
 #define PORT 5050
 #define ONE_SEC_IN_NSEC 1000000000
 #define NUMBER_OF_FRAMES 14
-#define TO_ASSIGN_ADDRESS "000.000.000.000"
-#define TO_IGNORE_ADDRESS "---.---.-.---"
+#define TO_ASSIGN_ADDRESS "000.000.0.000_0"
+#define TO_IGNORE_ADDRESS "---.---.-.---_-"
 
 //display type enums
 enum DisplayType {
