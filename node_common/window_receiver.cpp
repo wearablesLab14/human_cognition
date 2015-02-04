@@ -582,7 +582,8 @@ void WindowReceiver::on_pushButtonCalibration_clicked() {
 		}
 	}
 	//Activates the Calibration Function and resets all its initial values
-	qnodeRecv->activateCalibration(	boxes[0],
+		qnodeRecv->activateCalibration(	
+									boxes[0],
 									boxes[1], 
 									boxes[2], 
 									boxes[3], 
@@ -590,10 +591,10 @@ void WindowReceiver::on_pushButtonCalibration_clicked() {
 									boxes[5], 
 									boxes[6], 
 									boxes[7], 
-									boxes[8], 
-									boxes[9], 
-									boxes[10], 
-									boxes[11], 
+									boxes[8],
+									boxes[9],
+									boxes[10],
+									boxes[11],
 									boxes[12], 
 									boxes[13]);
 }

@@ -276,32 +276,9 @@ void QNodeReceiver::run() {
 			//update current address with address of sensor data packet
 			currAddress = QString(inet_ntoa(sensorAddress.sin_addr));
 
-
-			// TODO Nghia, timeStamp
-			//receive bytes to fill struct
-			if (sensorPacketData.timestamp >= 0 && sensorPacketData.timestamp < 10)
+			//use timestamp to generate more than one ID from an ip-address
+			if (sensorPacketData.timestamp >= 1 && sensorPacketData.timestamp < 100)
 				currAddress.append(QString("_%1").arg(sensorPacketData.timestamp));
-			
-					/*
-					// timeStampToString
-					std::ostringstream ss;
-					ss << sensorPacketData.timestamp;
-
-					std::string tmpCurrAddress =  currAddress.toUtf8().constData() ;
-					tmpCurrAddress = tmpCurrAddress.replace(0,10,"") + "."  + ss.str();
-					currAddress.clear();
-					currAddress.append(tmpCurrAddress.c_str());
-					*/
-
-					//currAddress.append(QString::number(sensorPacketDate.timestamp));
-
-					/*
-					//sensorPacketData.timestamp.str
-					std::cout << "currAddressto  " << currAddress.toUtf8().constData() <<
-					"sensorPacketData.stamp_  " << sensorPacketData.timestamp <<
-					"tmpCurrAddress  " << tmpCurrAddress <<
-					std::endl;
-					*/
 
 			//search address list for current address and return index if found
 			currFrame = frameAddressList.indexOf(currAddress, 0);
@@ -405,15 +382,27 @@ void QNodeReceiver::run() {
 
 					//display(CALIBRATION, QString::number(limbOrderindex));
 					if (limbOrderindex >= 0) {
-
+						// Set lastStateCords initially
+						if(lastStateCords[limbOrderindex][0] == 0 &&
+							lastStateCords[limbOrderindex][1] == 0 &&
+							lastStateCords[limbOrderindex][2] == 0 &&
+							lastStateCords[limbOrderindex][3] == 0 )
+						{
+							lastStateCords[limbOrderindex][0] =  quat.getX();
+							lastStateCords[limbOrderindex][1] = quat.getY();
+							lastStateCords[limbOrderindex][2] = quat.getZ();
+							lastStateCords[limbOrderindex][3] =  quat.getW();
+						}
+						
 						// just continue to count, if no frame to calibration
 						countNotCalibration = 0;
 
-						// caculateCurrentChange to get the max chaged Coordinates
+						// caculateCurrentChange to get the max changed Coordinates
 						diffCords[limbOrderindex] +=
 								sqrt(
-									pow((quat.getX()
-											- lastStateCords[limbOrderindex][0]), 2)
+									  pow(
+											(quat.getX()
+													- lastStateCords[limbOrderindex][0]), 2)
 									+ pow(
 											(quat.getY()
 													- lastStateCords[limbOrderindex][1]), 2)
@@ -441,7 +430,7 @@ void QNodeReceiver::run() {
 
 
 						//if max value is bigger than 10, switch frames
-						if (diffCords[limbOrderindex] > 3) {
+						if (diffCords[limbOrderindex] > 2) {
 							//which frames to switch
 							framesToSwitch[0] = limbOrder[nextChangeIndex];
 							framesToSwitch[1] = limbOrder[limbOrderindex];
@@ -449,8 +438,8 @@ void QNodeReceiver::run() {
 							assert(limbOrder[limbOrderindex] == currFrame);
 
 
-							std::cout << "framesToSwitch[0]: " << framesToSwitch[0]
-									<< "   framesToSwitch[1]: " << framesToSwitch[1] << std::endl;
+							std::cout 	<< "framesToSwitch[0]: " << framesToSwitch[0]
+										<< "   framesToSwitch[1]: " << framesToSwitch[1] << std::endl;
 							//tell GUI to updated switch info
 							Q_EMIT calibrationSwitchUpdated();
 
@@ -561,11 +550,12 @@ void QNodeReceiver::run() {
 					if ( i== 0 && (ros::Time::now() - receiveStartTime) >= oneSecInterval)
 					{
 						double x,y,z;
-						tf::Matrix3x3(tfFrameRot[0]).getRPY(x,y,z);
-
-						std::cout 	//<< tfFrameRot[0].getX() << "   "
-									//<< tfFrameRot[0].getY() << "   "
-									//<< tfFrameRot[0].getZ() << "   \n"
+						tf::Matrix3x3(tfFrameRot[currFrame]).getRPY(x,y,z);
+						//system("clear");
+						std::cout 	<< quat.getX() << "   "
+									<< quat.getY() << "   "
+									<< quat.getZ() << "   "
+									<< quat.getW() << "   \n"
 									//<< "X Offset " <<offsetQuat[0].getX() << "   "
 									//<< "Y Offset " <<offsetQuat[0].getY() << "   "
 									//<< "Z Offset " <<offsetQuat[0].getZ() << "   \n"
@@ -576,7 +566,7 @@ void QNodeReceiver::run() {
 									<< " " << frameAddressList.at(currFrame).toUtf8().constData()
 									<< "   currFrame: " << currFrame
 									<< "   sensorPacketData.timestamp: " << sensorPacketData.timestamp
-									<< std::endl;
+									<< std::endl << std::endl;
 					}
 
 					//update timestamp of base tf message
@@ -748,11 +738,20 @@ void QNodeReceiver::activateCalibration(const bool check_box0,
 	
 	//order the limbOrder array such that only activated frames are used
 	int j = 0;
+	int helper;
 	for (int i = 0; i < NUMBER_OF_FRAMES; i++) {
 		if (check_boxes[limbOrder[i]]) {
+			helper = limbOrder[j];
 			limbOrder[j] = limbOrder[i];
+			limbOrder[i] = helper;
 			j++;
 		}
+		// set first standFigure movement to 0,0,0
+		lastStateCords[i][0] = 0;
+		lastStateCords[i][1] = 0;
+		lastStateCords[i][2] = 0;
+		lastStateCords[i][3] = 0;
+		
 	}
 	
 	//diffCords initially are 0
@@ -885,7 +884,7 @@ void QNodeReceiver::setSignalPerformance(const bool &boolean) {
  */
 void spamEdison() {
 	while (true) {
-		boost::this_thread::sleep(boost::posix_time::milliseconds(8));
+		boost::this_thread::sleep(boost::posix_time::milliseconds(12));
 		system("/bin/bash -c \"/bin/echo -n spam >/dev/udp/192.168.0.100/6060\"");
 	}
 }
