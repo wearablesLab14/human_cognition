@@ -9,17 +9,17 @@
 <link name="link_00_b_body">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/base_body.dae" scale="0.4 0.35 0.31"/>				
+			<mesh filename="package://human_cognition/meshes/base_body.dae" scale="1 1 1"/>				
 		</geometry>
-		<origin xyz="0 0 0.1"/>	
+		<origin xyz="0 0 0" rpy="0 0 1.57"/>	
 	</visual>		
 </link>
 <link name="link_01_b_head">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/base_head.dae" scale="0.035 0.03 0.035"/>			
+			<mesh filename="package://human_cognition/meshes/base_head.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0.03 0 0.06" rpy="0 0 1.57"/>	
+		<origin xyz="0 0 0" rpy="0 0 1.57"/>	
 	</visual>
 </link>
 
@@ -27,49 +27,49 @@
 <link name="link_02_l_upper_arm">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_upper_arm.dae" scale="0.3 0.3 0.25"/>			
+			<mesh filename="package://human_cognition/meshes/right_upper_arm.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0 -0.01 -0.30" rpy="0 0 0"/>		
+		<origin xyz="0 0 -0.3" rpy="0 0 1.57"/>		
 	</visual>	
 </link>
 <link name="link_03_l_lower_arm">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_lower_arm.dae" scale="0.3 0.3 0.3"/>			
+			<mesh filename="package://human_cognition/meshes/right_lower_arm.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0 -0.01 -0.3" rpy="0 0 0"/>	
+		<origin xyz="0 0 -0.3" rpy="0 0 1.57"/>	
 	</visual>
 </link>
 <link name="link_04_l_hand">
 	<visual>
 		<geometry>	
-			<mesh filename="package://human_cognition/meshes/left_hand.dae" scale="0.11 0.11 0.11"/>		
+			<mesh filename="package://human_cognition/meshes/right_hand.dae" scale="1 1 1"/>		
 		</geometry>
-		<origin xyz="0 0 -0.08" rpy="1.57 3.14 0"/>			
+		<origin xyz="0 0 0" rpy="0 0 1.57"/>			
 	</visual>	
 </link>
 <link name="link_05_l_upper_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_upper_leg.dae" scale="0.4 0.4 0.5"/>		
+			<mesh filename="package://human_cognition/meshes/right_upper_leg.dae" scale="1 1 1"/>		
 		</geometry>
-		<origin xyz="0 0 -0.58" rpy="0 0 0"/>	
+		<origin xyz="0 0 -0.5" rpy="0 0 1.57"/>	
 	</visual>	
 </link>
 <link name="link_06_l_lower_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_lower_leg.dae" scale="0.45 0.45 0.38"/>			
+			<mesh filename="package://human_cognition/meshes/right_lower_leg.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0 0 -0.375" rpy="0 0 0"/>			
+		<origin xyz="0 0 -0.3" rpy="0 0 1.57"/>			
 	</visual>
 </link>
 <link name="link_07_l_foot">
 	<visual>
 		<geometry>			
-			<mesh filename="package://human_cognition/meshes/left_foot.dae" scale="0.2 0.2 0.2"/>
+			<mesh filename="package://human_cognition/meshes/right_foot.dae" scale="1 1 1"/>
 		</geometry>     
-		<origin xyz="0.03 0 0" rpy="0 0 1.57"/>			
+		<origin xyz="0 0 0" rpy="0 0 1.57"/>			
 	</visual>
 </link>
 
@@ -77,49 +77,49 @@
 <link name="link_08_r_upper_arm">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_upper_arm.dae" scale="0.3 0.3 0.25"/>			
+			<mesh filename="package://human_cognition/meshes/left_upper_arm.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0 0.01 -0.30" rpy="0 0 -1.57"/>		
+		<origin xyz="0 0 -0.3" rpy="0 0 1.57"/>	
 	</visual>
 </link>
 <link name="link_09_r_lower_arm">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_lower_arm.dae" scale="0.3 0.3 0.3"/>			
+			<mesh filename="package://human_cognition/meshes/left_lower_arm.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0 0.01 -0.3" rpy="0 0 0"/>		
+		<origin xyz="0 0 -0.3" rpy="0 0 1.57"/>		
 	</visual>
 </link>
 <link name="link_10_r_hand">
 	<visual>
 		<geometry>			
-				<mesh filename="package://human_cognition/meshes/right_hand.dae" scale="0.11 0.11 0.11"/>		
+				<mesh filename="package://human_cognition/meshes/left_hand.dae" scale="1 1 1"/>		
 		</geometry>
-		<origin xyz="0 0 -0.08" rpy="-1.57 0 0"/>		
+		<origin xyz="0 0 0" rpy="0 0 1.57"/>		
 	</visual>
 </link>
 <link name="link_11_r_upper_leg">
 <visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_upper_leg.dae" scale="0.4 0.4 0.5"/>		
+			<mesh filename="package://human_cognition/meshes/left_upper_leg.dae" scale="1 1 1"/>		
 		</geometry>
-		<origin xyz="0 0 -0.58" rpy="0 0 -1.57"/>	
+		<origin xyz="0 0 -0.5" rpy="0 0 1.57"/>		
 	</visual>	
 </link>
 <link name="link_12_r_lower_leg">
 	<visual>
 		<geometry>
-			<mesh filename="package://human_cognition/meshes/left-right_lower_leg.dae" scale="0.45 0.45 0.38"/>			
+			<mesh filename="package://human_cognition/meshes/left_lower_leg.dae" scale="1 1 1"/>			
 		</geometry>
-		<origin xyz="0 0 -0.375" rpy="0 0 0"/>			
+		<origin xyz="0 0 -0.3" rpy="0 0 1.57"/>		
 	</visual>
 </link>
 <link name="link_13_r_foot">
 	<visual>
 		<geometry>			
-			<mesh filename="package://human_cognition/meshes/right_foot.dae" scale="0.2 0.2 0.2"/>
-		</geometry>     
-		<origin xyz="0.03 0 0" rpy="0 0 1.57"/>			
+			<mesh filename="package://human_cognition/meshes/left_foot.dae" scale="1 1 1"/>
+		</geometry>
+		<origin xyz="0 0 0" rpy="0 0 1.57"/>
 	</visual>
 </link>
 
@@ -127,7 +127,7 @@
 <<!--#############################################################-->
 <<!--#############################################################-->
 <joint name="joint_base_connector" type="fixed">
-	<origin xyz="0 0 1"/>
+	<origin xyz="0 0 0.9"/>
 	<parent link="base_link"/>
 	<child link="base_link_connector"/>
 </joint>
@@ -147,68 +147,67 @@
 
 <<!--#############################################################-->
 <joint name="joint_02_l_shoulder" type="continuous">
-	<origin xyz="0 0.3 .52"/>
+	<origin xyz="0 0.2 0.46"/>
 	<parent link="link_00_b_body"/>
 	<child link="link_02_l_upper_arm"/>	
 </joint>
 <joint name="joint_03_l_elbow" type="continuous">
-	<origin xyz="0 0 -0.25"/>
+	<origin xyz="0.03 0 -0.21"/>
 	<parent link="link_02_l_upper_arm"/>
 	<child link="link_03_l_lower_arm"/>
 </joint>
 <joint name="joint_04_l_wrist" type="continuous">
-	<origin xyz="0 0 -0.27"/>
+	<origin xyz="0 0 -0.32"/>
 	<parent link="link_03_l_lower_arm"/>
 	<child link="link_04_l_hand"/>	
 </joint>
 <joint name="joint_05_l_hip" type="continuous">
-	<origin xyz="0 0.1 0"/>
+	<origin xyz="0.055 0.13 0.06"/>
 	<parent link="link_00_b_body"/>
 	<!--parent link="base_link_connector"/-->
 	<child link="link_05_l_upper_leg"/>	
 </joint>
 <joint name="joint_06_l_knee" type="continuous">
-	<origin xyz="0 0 -0.55"/>
+	<origin xyz="0 0.01 -0.55"/>
 	<parent link="link_05_l_upper_leg"/>
 	<child link="link_06_l_lower_leg"/>	
 </joint>
 <joint name="joint_07_l_ankle" type="continuous">
-	<origin xyz="0 0 -0.45"/>
+	<origin xyz="0 0 -0.36"/>
 	<parent link="link_06_l_lower_leg"/>
 	<child link="link_07_l_foot"/>
 </joint>
 
 <<!--#############################################################-->
 <joint name="joint_08_r_shoulder" type="continuous">
-	<origin xyz="0 -0.3 0.52"/>
+	<origin xyz="0 -0.2 0.46"/>
 	<parent link="link_00_b_body"/>
 	<child link="link_08_r_upper_arm"/>	
 </joint>
 <joint name="joint_09_r_elbow" type="continuous">
-	<origin xyz="0 0 -0.25"/>
+	<origin xyz="0.03 0 -0.21"/>
 	<parent link="link_08_r_upper_arm"/>
 	<child link="link_09_r_lower_arm"/>	
 </joint>
 <joint name="joint_10_r_wrist" type="continuous">
-	<origin xyz="0 0 -0.27"/>
+	<origin xyz="0 0 -0.32"/>
 	<parent link="link_09_r_lower_arm"/>
 	<child link="link_10_r_hand"/>	
 </joint>
 <joint name="joint_11_r_hip" type="continuous">
-	<origin xyz="0 -0.1 0"/>	
+	<origin xyz="0.055 -0.13 0.06"/>	
 	<parent link="link_00_b_body"/>
 	<!--parent link="base_link_connector"/-->
 	<child link="link_11_r_upper_leg"/>	
 </joint>
 <joint name="joint_12_r_knee" type="continuous">
-	<origin xyz="0 0 -0.55"/>
+	<origin xyz="0 -0.01 -0.55"/>
 	<parent link="link_11_r_upper_leg"/>
 	<child link="link_12_r_lower_leg"/>	
 </joint>
 <joint name="joint_13_r_ankle" type="continuous">
-	<origin xyz="0 0 -0.45"/>
+	<origin xyz="0 0 -0.36"/>
 	<parent link="link_12_r_lower_leg"/>
 	<child link="link_13_r_foot"/>	
 </joint>
-
 </robot>

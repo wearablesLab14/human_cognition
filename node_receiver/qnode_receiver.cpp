@@ -66,7 +66,7 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	framePitch = 0;
 	frameRoll = 0;
 
-	//the calibration is not working initially
+	//not do the calibration initially
 	doCalibration = false;
 	// count !doCalibration
 	countNotCalibration = 0;
@@ -181,6 +181,8 @@ void QNodeReceiver::startAction() {
  */
 void QNodeReceiver::stopAction() {
 	shutdownNode();
+	//the calibration is not working initially
+	doCalibration = false;
 }
 
 /*! \brief Run method of QThread
@@ -539,6 +541,8 @@ void QNodeReceiver::run() {
 						tfFrameMsg[i].setRotation(tfFrameRot[i]);
 					}
 					signalResetModel = false;
+						//the calibration is not working initially
+					doCalibration = false;
 				}
 
 				/***********************************************************/
