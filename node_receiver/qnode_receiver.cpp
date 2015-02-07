@@ -310,12 +310,27 @@ void QNodeReceiver::run() {
 				tf::Quaternion quat(sensorPacketData.q1, sensorPacketData.q2,
 						sensorPacketData.q3, sensorPacketData.q0);
 
+				// if we have one of the small devices with wrong axes
+				if (sensorPacketData.timestamp > 100) {
+						quat = quat * yRotCorr;
+						quat.normalize();
+					}			
+
 				//normalize rotation data (quaternion)
 				if (doOffsetCalc) {
 					if (QNodeReceiver::offsetCalculated[currFrame]) {
-						quat = quat * QNodeReceiver::offsetQuat[currFrame];
+						quat = quat * QNodeReceiver::offsetQuat[currFrame] * inverse(offsetYawBack);	
+							
+							/*
+							 quat = tf::Quaternion(
+												quat.getX(),
+												quat.getY(),
+												quat.getZ(),
+												quat.getW());
+												*/
 						quat.normalize();
-					} else {
+						
+					} else {	
 						//the first iterations[currFrame] are used for the correction
 						QNodeReceiver::offsetQuat[currFrame] = tf::Quaternion(
 								QNodeReceiver::offsetQuat[currFrame].getX() + quat.getX(),
@@ -335,7 +350,7 @@ void QNodeReceiver::run() {
 											/ iterations[currFrame]);
 
 							if(currFrame == 0)
-								offsetHelper = offsetQuat[0];
+								offsetYawBack = QNodeReceiver::offsetQuat[0];
 
 							QNodeReceiver::offsetQuat[currFrame] = baseQuat * inverse(
 									QNodeReceiver::offsetQuat[currFrame]);
@@ -346,12 +361,17 @@ void QNodeReceiver::run() {
 
 							//corrects the base body rotation to its original angle
 							if (currFrame == 0) {
-								tf::Matrix3x3(offsetHelper).getRPY(frameRoll, framePitch, frameYaw);
-								offsetHelper.setRPY(0,0,-frameYaw);
+								//tf::Matrix3x3(offsetHelper).getEulerYPR(frameYaw, framePitch, frameRoll);
+								//tf::Matrix3x3(offsetHelper).setEulerYPR(frameYaw, 0, 0);
+								tf::Matrix3x3(offsetYawBack).getRPY(frameRoll, framePitch, frameYaw);
+								offsetYawBack.setRPY(0,0,-frameYaw);
 
-								offsetQuat[currFrame]=
-									offsetQuat[currFrame] *
-									inverse(offsetHelper);
+								/* has to be calculated for every frame, but after the 
+								 * base body offsetYawBack has been calculated
+								QNodeReceiver::offsetQuat[currFrame]=
+									QNodeReceiver::offsetQuat[currFrame] *
+									inverse(offsetYawBack);
+									*/
 								}
 
 						}
@@ -362,10 +382,10 @@ void QNodeReceiver::run() {
 					//correct original rotation for all frames except the feet frames
 					//if (currFrame != 7 && currFrame != 13) {
 					//multiply rotation data with rotation correction
-					quat = quat * yRotCorr;
+					//quat = quat * yRotCorr;
 
 					//normalize rotation data
-					quat.normalize();
+					//quat.normalize();
 					//}
 				}
 
@@ -674,14 +694,14 @@ void QNodeReceiver::run() {
  */
 void QNodeReceiver::switchOffset(const int &frame_index_a,
 		const int &frame_index_b) {
-	offsetHelper = QNodeReceiver::offsetQuat[frame_index_a];
+	offsetSwitchHelper = QNodeReceiver::offsetQuat[frame_index_a];
 	QNodeReceiver::offsetQuat[frame_index_a] =
 			QNodeReceiver::offsetQuat[frame_index_b];
-	QNodeReceiver::offsetQuat[frame_index_b] = offsetHelper;
-	bool offsetHelper = QNodeReceiver::offsetCalculated[frame_index_a];
+	QNodeReceiver::offsetQuat[frame_index_b] = offsetSwitchHelper;
+	bool offsetSwitchHelper = QNodeReceiver::offsetCalculated[frame_index_a];
 	QNodeReceiver::offsetCalculated[frame_index_a] =
 			QNodeReceiver::offsetCalculated[frame_index_b];
-	QNodeReceiver::offsetCalculated[frame_index_b] = offsetHelper;
+	QNodeReceiver::offsetCalculated[frame_index_b] = offsetSwitchHelper;
 	display(INFO, QString("Offset switched!"));
 }
 

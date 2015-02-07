@@ -141,6 +141,9 @@ private:
 	double frameYaw;
 	double framePitch;
 	double frameRoll;
+	double frameYaw2;
+	double framePitch2;
+	double frameRoll2;
 
 	//list of frame ip addresses
 	QStringList frameAddressList;
@@ -202,7 +205,9 @@ private:
 	int minIndex;
 	int nextChangeIndex;
 	//base connector rotation
-	tf::Quaternion offsetHelper;
+	tf::Quaternion offsetSwitchHelper;
+	tf::Quaternion offsetYawBack;
+	tf::Quaternion offsetLittleDevices;
 	//euler angle array for calibration
 	double initEulerXYZ[NUMBER_OF_FRAMES][3];
 	double eulerXYZ[NUMBER_OF_FRAMES][3];
