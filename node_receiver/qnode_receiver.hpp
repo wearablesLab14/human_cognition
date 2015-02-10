@@ -208,6 +208,7 @@ private:
 	tf::Quaternion offsetSwitchHelper;
 	tf::Quaternion offsetYawBack;
 	tf::Quaternion offsetLittleDevices;
+	bool offsetYawBackCalculated[NUMBER_OF_FRAMES];
 	//euler angle array for calibration
 	double initEulerXYZ[NUMBER_OF_FRAMES][3];
 	double eulerXYZ[NUMBER_OF_FRAMES][3];

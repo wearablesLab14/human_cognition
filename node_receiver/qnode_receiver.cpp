@@ -71,6 +71,8 @@ QNodeReceiver::QNodeReceiver(int argc, char** argv) :
 	// count !doCalibration
 	countNotCalibration = 0;
 	doOffsetCalc = false;
+	for (int i=0; i<= NUMBER_OF_FRAMES; i++)
+		offsetYawBackCalculated[i]=false;
 
 	//enum not mappable to string... grrr :-)
 	limbStrings[0] = "BASE_BODY";
@@ -310,25 +312,28 @@ void QNodeReceiver::run() {
 				tf::Quaternion quat(sensorPacketData.q1, sensorPacketData.q2,
 						sensorPacketData.q3, sensorPacketData.q0);
 
+				
 				// if we have one of the small devices with wrong axes
 				if (sensorPacketData.timestamp > 100) {
-						quat = quat * yRotCorr;
+						tf::Matrix3x3(quat).getRPY(frameRoll, framePitch, frameYaw);
+						quat.setRPY(-framePitch,-frameRoll,frameYaw);
+						//quat = quat * yRotCorr;
 						quat.normalize();
-					}			
+					}
+						
 
 				//normalize rotation data (quaternion)
 				if (doOffsetCalc) {
 					if (QNodeReceiver::offsetCalculated[currFrame]) {
-						quat = quat * QNodeReceiver::offsetQuat[currFrame] * inverse(offsetYawBack);	
-							
-							/*
-							 quat = tf::Quaternion(
-												quat.getX(),
-												quat.getY(),
-												quat.getZ(),
-												quat.getW());
-												*/
+						if (offsetYawBackCalculated[currFrame]) {
+							offsetQuat[currFrame]= offsetQuat[currFrame]*inverse(offsetYawBack);
+							offsetQuat[currFrame].normalize();
+							offsetYawBackCalculated[currFrame]=false;
+						}
+						quat = quat * QNodeReceiver::offsetQuat[currFrame];
 						quat.normalize();
+						//quat = quat * inverse(offsetYawBack);
+						//quat.normalize();
 						
 					} else {	
 						//the first iterations[currFrame] are used for the correction
@@ -349,44 +354,36 @@ void QNodeReceiver::run() {
 									QNodeReceiver::offsetQuat[currFrame].getW()
 											/ iterations[currFrame]);
 
-							if(currFrame == 0)
+							if(currFrame == 0) {
 								offsetYawBack = QNodeReceiver::offsetQuat[0];
+								tf::Matrix3x3(offsetYawBack).getRPY(frameRoll, framePitch, frameYaw);
+								offsetYawBack.setRPY(0,0,-frameYaw);
+								for (int i=0; i<= NUMBER_OF_FRAMES; i++)
+									offsetYawBackCalculated[i]=true;
+								offsetYawBack.normalize();
+								}
 
 							QNodeReceiver::offsetQuat[currFrame] = baseQuat * inverse(
 									QNodeReceiver::offsetQuat[currFrame]);
+									
+							offsetQuat[currFrame].normalize();
 
 							QNodeReceiver::offsetCalculated[currFrame] = true;
 							display(INFO, QString("Offset calculated!"));
 
 
 							//corrects the base body rotation to its original angle
-							if (currFrame == 0) {
-								//tf::Matrix3x3(offsetHelper).getEulerYPR(frameYaw, framePitch, frameRoll);
-								//tf::Matrix3x3(offsetHelper).setEulerYPR(frameYaw, 0, 0);
-								tf::Matrix3x3(offsetYawBack).getRPY(frameRoll, framePitch, frameYaw);
-								offsetYawBack.setRPY(0,0,-frameYaw);
-
-								/* has to be calculated for every frame, but after the 
-								 * base body offsetYawBack has been calculated
-								QNodeReceiver::offsetQuat[currFrame]=
-									QNodeReceiver::offsetQuat[currFrame] *
-									inverse(offsetYawBack);
-									*/
-								}
+							//if (currFrame == 0) {
+								//has to be calculated for every frame, but after the 
+								//base body offsetYawBack has been calculated
+								//QNodeReceiver::offsetQuat[currFrame]=
+								//	QNodeReceiver::offsetQuat[currFrame] *
+								//	inverse(offsetYawBack);
+								//}
 
 						}
 						iterations[currFrame]++;
 					}
-				} else {
-					/***********************************************************/
-					//correct original rotation for all frames except the feet frames
-					//if (currFrame != 7 && currFrame != 13) {
-					//multiply rotation data with rotation correction
-					//quat = quat * yRotCorr;
-
-					//normalize rotation data
-					//quat.normalize();
-					//}
 				}
 
 				//do calibration
@@ -394,7 +391,6 @@ void QNodeReceiver::run() {
 					if (firstTime) {
 						display(CALIBRATION,
 							QString("Move your " + limbStrings[limbOrder[nextChangeIndex]]));
-
 						firstTime = false;
 					}
 
